@@ -25,6 +25,46 @@ OUTPUT_FILE="${DATA_DIR}/php_apis.json"
 
 CLASSES_DIR="${PROJECT_DIR}/Classes"
 
+# TYPO3 Architecture Documentation Priorities
+# Based on references/typo3-extension-architecture.md
+get_doc_priority() {
+    local file_path=$1
+    if [[ "$file_path" == *"Controller"* ]]; then
+        echo "HIGH"
+    elif [[ "$file_path" == *"Domain/Model"* ]]; then
+        echo "HIGH"
+    elif [[ "$file_path" == *"Domain/Repository"* ]]; then
+        echo "MEDIUM-HIGH"
+    elif [[ "$file_path" == *"Service"* ]]; then
+        echo "MEDIUM-HIGH"
+    elif [[ "$file_path" == *"ViewHelper"* ]]; then
+        echo "MEDIUM"
+    elif [[ "$file_path" == *"Utility"* ]]; then
+        echo "MEDIUM"
+    else
+        echo "MEDIUM"
+    fi
+}
+
+get_class_category() {
+    local file_path=$1
+    if [[ "$file_path" == *"Controller"* ]]; then
+        echo "controller"
+    elif [[ "$file_path" == *"Domain/Model"* ]]; then
+        echo "model"
+    elif [[ "$file_path" == *"Domain/Repository"* ]]; then
+        echo "repository"
+    elif [[ "$file_path" == *"Service"* ]]; then
+        echo "service"
+    elif [[ "$file_path" == *"ViewHelper"* ]]; then
+        echo "viewhelper"
+    elif [[ "$file_path" == *"Utility"* ]]; then
+        echo "utility"
+    else
+        echo "other"
+    fi
+}
+
 # Check if Classes/ exists
 if [ ! -d "${CLASSES_DIR}" ]; then
     echo -e "${YELLOW}No Classes/ directory found, skipping PHP extraction${NC}"
@@ -76,6 +116,10 @@ for php_file in $php_files; do
     # Get license
     license=$(grep '@license' "$php_file" | head -1 | sed 's/.*@license //;s/ *$//' || echo "")
 
+    # Get documentation priority
+    doc_priority=$(get_doc_priority "$rel_path")
+    class_category=$(get_class_category "$rel_path")
+
     # Build JSON entry (simplified structure)
     if [ $current -gt 1 ]; then
         echo '    ,' >> "${OUTPUT_FILE}"
@@ -87,7 +131,9 @@ for php_file in $php_files; do
     echo '      "file": "'${rel_path}'",' >> "${OUTPUT_FILE}"
     echo '      "description": "'${class_desc}'",' >> "${OUTPUT_FILE}"
     echo '      "author": "'${author}'",' >> "${OUTPUT_FILE}"
-    echo '      "license": "'${license}'"' >> "${OUTPUT_FILE}"
+    echo '      "license": "'${license}'",' >> "${OUTPUT_FILE}"
+    echo '      "documentation_priority": "'${doc_priority}'",' >> "${OUTPUT_FILE}"
+    echo '      "category": "'${class_category}'"' >> "${OUTPUT_FILE}"
     echo -n '    }' >> "${OUTPUT_FILE}"
 done
 
