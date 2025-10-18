@@ -88,7 +88,11 @@ Documentation/
 - Yes → Use :ref: labels (see "Cross-References")
 - No → Write standard RST content (see references/rst-syntax.md)
 
-**7. Always: Validate and Render**
+**7. Setup Documentation Context (First Time)**
+- Add AGENTS.md to Documentation/ folder
+- Run scripts/add-agents-md.sh (creates context for AI assistants)
+
+**8. Always: Validate and Render**
 - Run scripts/validate_docs.sh
 - Run scripts/render_docs.sh
 - Check for warnings and broken references

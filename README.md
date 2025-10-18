@@ -14,6 +14,7 @@ This skill provides guidance for working with TYPO3 extension documentation in r
 - **Validation Tools** - RST syntax and quality check scripts
 - **Quality Standards** - Pre-commit checklists and best practices
 - **TYPO3 Intercept** - Automated deployment guidance
+- **AI Assistant Context** - AGENTS.md templates for Documentation/ folders
 
 ## Installation
 
@@ -67,7 +68,21 @@ Main skill file with comprehensive instructions for:
 - Intersphinx references
 - Quality checklists
 
+### templates/
+
+**AGENTS.md** - AI assistant context template:
+- Documentation strategy and audience
+- TYPO3 RST syntax patterns
+- Directive usage examples
+- Cross-reference patterns
+- Validation and rendering procedures
+
 ### scripts/
+
+**add-agents-md.sh** - Add AI context to Documentation/:
+- Creates AGENTS.md from template
+- Provides documentation context for AI assistants
+- Helps AI understand project documentation structure
 
 **validate_docs.sh** - Validation script:
 - Checks RST syntax
@@ -89,6 +104,13 @@ The skill automatically activates for TYPO3 documentation tasks. You can also ma
 ```
 
 ### Quick Examples
+
+**Add AI Assistant Context:**
+```bash
+cd /path/to/your-extension
+~/.claude/skills/typo3-docs/scripts/add-agents-md.sh
+# Creates Documentation/AGENTS.md with TYPO3 documentation patterns
+```
 
 **Document Configuration:**
 ```rst
