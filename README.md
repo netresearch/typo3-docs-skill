@@ -1,0 +1,198 @@
+# TYPO3 Documentation Skill
+
+A comprehensive Claude Code skill for creating and maintaining TYPO3 extension documentation following official TYPO3 documentation standards.
+
+## Overview
+
+This skill provides guidance for working with TYPO3 extension documentation in reStructuredText (RST) format, including TYPO3-specific directives, local rendering with Docker, validation procedures, and automated deployment through TYPO3 Intercept.
+
+## Features
+
+- **RST Syntax Reference** - Complete reStructuredText formatting guide
+- **TYPO3-Specific Directives** - confval, versionadded, php:method, card-grid
+- **Local Rendering** - Docker-based documentation rendering scripts
+- **Validation Tools** - RST syntax and quality check scripts
+- **Quality Standards** - Pre-commit checklists and best practices
+- **TYPO3 Intercept** - Automated deployment guidance
+
+## Installation
+
+### Download the Skill
+
+Download the latest release from the [releases page](https://github.com/netresearch/typo3-docs-skill/releases) or install directly:
+
+```bash
+# Using curl
+curl -L https://github.com/netresearch/typo3-docs-skill/archive/refs/heads/main.zip -o typo3-docs.zip
+unzip typo3-docs.zip -d ~/.claude/skills/
+mv ~/.claude/skills/typo3-docs-skill-main ~/.claude/skills/typo3-docs
+
+# Or using git
+git clone https://github.com/netresearch/typo3-docs-skill.git ~/.claude/skills/typo3-docs
+```
+
+### Verify Installation
+
+The skill will automatically activate when working with TYPO3 documentation:
+
+- Creating/updating `Documentation/*.rst` files
+- Using TYPO3-specific directives
+- Rendering documentation locally
+- Following TYPO3 documentation guidelines
+
+## Contents
+
+### SKILL.md
+
+Main skill file with comprehensive instructions for:
+- Documentation structure and workflow
+- Configuration documentation with confval
+- Version documentation with versionadded/versionchanged
+- PHP API documentation with php:method
+- Card grid navigation with stretched links
+- Cross-references and quality standards
+
+### references/
+
+**rst-syntax.md** - Complete RST syntax reference:
+- Headings, code blocks, lists, links
+- Tables, admonitions, images
+- Whitespace rules and common mistakes
+
+**typo3-directives.md** - TYPO3-specific directives:
+- confval for configuration values
+- Version directives (added/changed/deprecated)
+- PHP domain (class/method/property)
+- Card grids with stretched links
+- Intersphinx references
+- Quality checklists
+
+### scripts/
+
+**validate_docs.sh** - Validation script:
+- Checks RST syntax
+- Validates Settings.cfg and Index.rst
+- Detects encoding issues
+- Identifies trailing whitespace
+
+**render_docs.sh** - Rendering script:
+- Renders documentation locally with Docker
+- Uses official TYPO3 render-guides image
+- Outputs to Documentation-GENERATED-temp/
+
+## Usage
+
+The skill automatically activates for TYPO3 documentation tasks. You can also manually invoke it:
+
+```
+/skill typo3-docs
+```
+
+### Quick Examples
+
+**Document Configuration:**
+```rst
+.. confval:: fetchExternalImages
+
+   :type: boolean
+   :Default: true
+   :Path: $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['ext_key']['setting']
+
+   Controls whether external image URLs are automatically fetched.
+```
+
+**Document Version Changes:**
+```rst
+.. versionadded:: 13.0.0
+   The CKEditor plugin now requires ``StyleUtils`` and ``GeneralHtmlSupport``
+   dependencies for style functionality.
+```
+
+**Create Card Grid Navigation:**
+```rst
+.. card-grid::
+    :columns: 1
+    :columns-md: 2
+
+    ..  card:: 📘 Introduction
+
+        Extension overview and features
+
+        ..  card-footer:: :ref:`Read more <introduction>`
+            :button-style: btn btn-primary stretched-link
+```
+
+**Validate Documentation:**
+```bash
+~/.claude/skills/typo3-docs/scripts/validate_docs.sh /path/to/project
+```
+
+**Render Documentation:**
+```bash
+~/.claude/skills/typo3-docs/scripts/render_docs.sh /path/to/project
+```
+
+## Quality Standards
+
+Before committing documentation changes, ensure:
+
+- ✅ No rendering warnings
+- ✅ No broken cross-references
+- ✅ All confval directives complete
+- ✅ Version information for new features
+- ✅ Card grids use stretched-link
+- ✅ UTF-8 emoji icons in card titles
+- ✅ Code blocks specify language
+- ✅ Proper heading hierarchy
+- ✅ No trailing whitespace
+
+## Resources
+
+**Official Documentation:**
+- [TYPO3 Documentation Guide](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/)
+- [RST Reference](https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html)
+- [Rendering with Docker](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Howto/RenderingDocs/Index.html)
+
+**Example Projects:**
+- [TYPO3 Best Practice Extension](https://github.com/TYPO3BestPractices/tea)
+- [RTE CKEditor Image](https://docs.typo3.org/p/netresearch/rte-ckeditor-image/main/en-us/)
+
+**TYPO3 Intercept:**
+- [Deployment Dashboard](https://intercept.typo3.com/admin/docs/deployments)
+
+## Contributing
+
+Contributions are welcome! Please follow these guidelines:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/improvement`)
+3. Make your changes
+4. Test the skill thoroughly
+5. Commit your changes (`git commit -m 'Add improvement'`)
+6. Push to the branch (`git push origin feature/improvement`)
+7. Create a Pull Request
+
+## License
+
+This skill is licensed under the same license as the [TYPO3 RTE CKEditor Image extension](https://github.com/netresearch/t3x-rte_ckeditor_image) - GPL-2.0-or-later.
+
+## Support
+
+**Issues and Questions:**
+- GitHub Issues: [Report issues](https://github.com/netresearch/typo3-docs-skill/issues)
+- TYPO3 Slack: [#typo3-cms](https://typo3.slack.com/archives/typo3-cms)
+
+## Credits
+
+Created by Netresearch DTT GmbH for the TYPO3 community.
+
+Based on:
+- [TYPO3 Official Documentation Standards](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/)
+- [Anthropic Skill Creator](https://github.com/anthropics/skills/tree/main/skill-creator)
+- Real-world usage in [RTE CKEditor Image Extension](https://github.com/netresearch/t3x-rte_ckeditor_image)
+
+---
+
+**Version:** 1.0.0
+**Maintained By:** Netresearch DTT GmbH
+**Last Updated:** 2025-10-18
