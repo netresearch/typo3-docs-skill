@@ -132,6 +132,46 @@ The skill automatically activates for TYPO3 documentation tasks. You can also ma
 ~/.claude/skills/typo3-docs/scripts/render_docs.sh /path/to/project
 ```
 
+## Deployment Setup
+
+**Enable automatic documentation publishing to docs.typo3.org:**
+
+### Prerequisites
+1. Extension published in [TYPO3 Extension Repository (TER)](https://extensions.typo3.org/)
+2. Git repository URL referenced on TER detail page
+3. Valid Documentation/ structure with Index.rst and Settings.cfg
+
+### Quick Webhook Setup
+
+**GitHub:**
+```
+Settings → Webhooks → Add webhook
+Payload URL: https://docs-hook.typo3.org
+Content type: application/json
+SSL: Enabled
+Events: Just the push event
+Active: ✓
+```
+
+**GitLab:**
+```
+Settings → Webhooks
+URL: https://docs-hook.typo3.org
+Triggers: Push events + Tag push events
+SSL: Enabled
+```
+
+### Verification
+
+After first push, check:
+- **Webhook delivery**: GitHub/GitLab webhook recent deliveries (expect `200`)
+- **Build status**: [Intercept Dashboard](https://intercept.typo3.com/admin/docs/deployments)
+- **Published docs**: `https://docs.typo3.org/p/{vendor}/{extension}/main/en-us/`
+
+**First build requires approval** by TYPO3 Documentation Team (1-3 business days). Future builds are automatic.
+
+**Full webhook setup guide:** [references/intercept-deployment.md](references/intercept-deployment.md)
+
 ## Quality Standards
 
 Before committing documentation changes, ensure:

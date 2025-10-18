@@ -347,20 +347,102 @@ xdg-open Documentation-GENERATED-temp/Index.html
 
 ## TYPO3 Intercept Deployment
 
-**Automatic Publishing:**
-- Git push to main/master triggers build
-- New version tags trigger build
-- Manual trigger via Intercept dashboard
+TYPO3 Intercept provides automatic documentation rendering and publishing. Properly configured repositories automatically build and publish documentation to docs.typo3.org.
 
-**Build Process:**
-1. Intercept detects commit/tag
-2. Documentation rendered using render-guides
-3. Output published to docs.typo3.org
-4. Indexed for search
+### Prerequisites
 
-**Dashboard:** https://intercept.typo3.com/admin/docs/deployments
+Before enabling automatic deployment:
 
-**Published Result:** https://docs.typo3.org/p/{vendor}/{extension}/main/en-us/
+1. **Extension in TER**: Extension must be registered in TYPO3 Extension Repository with same key as `composer.json`
+2. **Git Repository Referenced**: Repository URL must be listed on TER detail page
+3. **Documentation Structure**: Must include `Index.rst`, `Settings.cfg`, and valid RST files
+
+### Webhook Registration
+
+**GitHub Setup:**
+1. Repository Settings → Webhooks → Add webhook
+2. Payload URL: `https://docs-hook.typo3.org`
+3. Content type: `application/json`
+4. Enable SSL verification
+5. Events: "Just the push event"
+6. Mark as Active
+
+**GitLab Setup:**
+1. Project Settings → Webhooks
+2. URL: `https://docs-hook.typo3.org`
+3. Triggers: Push events + Tag push events
+4. Enable SSL verification
+
+### First-Time Approval
+
+First webhook trigger requires manual approval by TYPO3 Documentation Team:
+- Automatic hold on first build
+- Team verifies TER registration and repository reference
+- Typical approval time: 1-3 business days
+- Future builds are automatic after approval
+
+### Verification
+
+**Check Webhook Delivery:**
+- GitHub: Settings → Webhooks → Recent Deliveries (expect `200` response)
+- GitLab: Settings → Webhooks → Recent events (verify success)
+
+**Check Build Status:**
+- Dashboard: https://intercept.typo3.com/admin/docs/deployments
+- Filter by extension package name
+- Monitor build progress and success status
+
+**Published Documentation:**
+```
+https://docs.typo3.org/p/{vendor}/{extension}/main/en-us/
+https://docs.typo3.org/p/{vendor}/{extension}/{version}/en-us/
+```
+
+### Automatic Triggers
+
+Builds triggered by:
+- Git push to main/master
+- Version tags (e.g., `2.1.0`)
+- Branch pushes (for multi-version docs)
+
+### Manual Rebuild
+
+If needed:
+1. Visit https://intercept.typo3.com/admin/docs/deployments
+2. Find your extension
+3. Click Redeploy button
+
+### Build Process
+
+1. Webhook received from Git host
+2. Build job queued
+3. Repository cloned at specific commit/tag
+4. Documentation rendered using `render-guides`
+5. HTML published to docs.typo3.org
+6. Content indexed for search
+
+**Typical build time:** 2-5 minutes
+
+### Troubleshooting
+
+**Build Failing:**
+- Validate RST syntax locally: `scripts/validate_docs.sh`
+- Render locally: `scripts/render_docs.sh`
+- Check for broken cross-references
+- Verify UTF-8 encoding
+
+**Webhook Not Triggering:**
+- Verify webhook URL: `https://docs-hook.typo3.org`
+- Check SSL verification enabled
+- Verify webhook marked as Active
+- Check Recent Deliveries for errors
+
+**First Build On Hold:**
+- Expected for new repositories
+- Wait for Documentation Team approval
+- Post in TYPO3 Slack #typo3-documentation to expedite
+
+For comprehensive webhook setup, troubleshooting, and best practices, see: `references/intercept-deployment.md`
 
 ## Best Practices
 
