@@ -77,6 +77,14 @@ Main skill file with comprehensive instructions for:
 - Template generation approaches
 - Quality standards for extraction
 
+**typo3-extension-architecture.md** - TYPO3 official file structure reference:
+- File structure hierarchy with priority weights
+- Directory structure weights (Classes/, Configuration/, Resources/)
+- Extraction weight matrix (Priority 1-5)
+- Quality weighting algorithm
+- Gap analysis priority calculation
+- Documentation mapping strategies
+
 ### templates/
 
 **AGENTS.md** - AI assistant context template:
