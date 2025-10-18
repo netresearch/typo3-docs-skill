@@ -253,6 +253,145 @@ copyright = 2024
 project_repository = https://github.com/vendor/extension
 ```
 
+## Documentation Extraction and Analysis
+
+### Using Extraction Tools
+
+Before creating or updating documentation, use extraction tools to:
+
+1. **Identify gaps** - Find undocumented classes, methods, and configuration options
+2. **Ensure accuracy** - Verify documented defaults match actual code
+3. **Speed up documentation** - Use extracted data as templates
+
+### Extraction Workflow
+
+**Step 1: Extract Project Data**
+
+```bash
+# From project root directory
+cd /path/to/extension
+scripts/extract-all.sh              # Core extraction (PHP, configs, composer)
+scripts/extract-all.sh --all        # Include build configs and repo metadata
+```
+
+Extraction data saved to `.claude/docs-extraction/data/`:
+- `php_apis.json` - Classes, methods, docblocks
+- `extension_meta.json` - ext_emconf.php data
+- `config_options.json` - ext_conf_template.txt options
+- `dependencies.json` - composer.json requirements
+- `project_files.json` - README, CHANGELOG content
+
+**Step 2: Analyze Coverage**
+
+```bash
+scripts/analyze-docs.sh
+```
+
+Generates `Documentation/ANALYSIS.md` with:
+- Missing documentation items
+- Outdated configuration defaults
+- Inconsistencies between code and docs
+- Prioritized recommendations
+
+**Step 3: Review Analysis**
+
+Open `Documentation/ANALYSIS.md` and identify:
+- **Priority 1**: Missing core documentation (undocumented classes, essential configs)
+- **Priority 2**: Outdated content (wrong defaults, old signatures)
+- **Priority 3**: Enhancement opportunities (missing examples, incomplete descriptions)
+
+**Step 4: Use Extracted Data**
+
+When documenting items from ANALYSIS.md:
+
+1. **Open corresponding JSON file** in `.claude/docs-extraction/data/`
+2. **Copy relevant information** (descriptions, defaults, types)
+3. **Create RST documentation** using proper directives
+4. **Add examples and context** beyond extracted data
+
+### Example: Using Extracted Config Data
+
+**ANALYSIS.md identifies missing option:**
+```
+### fetchExternalImages
+- Type: boolean
+- Default: true
+- Security Warning: Enabling this setting fetches arbitrary URLs
+```
+
+**Check extracted data:**
+```bash
+cat .claude/docs-extraction/data/config_options.json | jq '.config_options[] | select(.key=="fetchExternalImages")'
+```
+
+**Create documentation:**
+```rst
+.. confval:: fetchExternalImages
+
+   :type: boolean
+   :Default: true
+   :Path: $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['ext_key']['fetchExternalImages']
+
+   [Paste extracted description]
+
+   .. warning::
+      [Paste extracted security warning]
+
+   [TODO: Add usage examples]
+   [TODO: Add troubleshooting tips]
+```
+
+### Extraction Best Practices
+
+**DO:**
+- Run `scripts/analyze-docs.sh` before starting documentation work
+- Use extracted data as starting templates, not final documentation
+- Add usage examples and context beyond extracted descriptions
+- Re-run analysis after updates to track progress
+- Keep extraction data gitignored (already in `.claude/`)
+
+**DON'T:**
+- Skip extraction for existing extensions (saves time finding gaps)
+- Commit `.claude/docs-extraction/` to version control
+- Blindly copy extracted data without adding examples
+- Ignore security warnings in config option extractions
+- Forget to validate after using extracted data
+
+### Extraction Data Structure
+
+**php_apis.json:**
+```json
+{
+  "classes": [
+    {
+      "name": "ClassName",
+      "namespace": "Vendor\\Extension\\Path",
+      "file": "Classes/Path/ClassName.php",
+      "description": "Class description from docblock",
+      "author": "Author Name",
+      "methods": [...]
+    }
+  ]
+}
+```
+
+**config_options.json:**
+```json
+{
+  "config_options": [
+    {
+      "key": "settingName",
+      "type": "boolean",
+      "default": "1",
+      "description": "Description from ext_conf_template.txt",
+      "security_warning": "Warning text if present"
+    }
+  ]
+}
+```
+
+See `references/extraction-patterns.md` for complete extraction documentation.
+
 ## Best Practices
 
 1. **Clear Structure**: Organize docs by audience (users vs developers)

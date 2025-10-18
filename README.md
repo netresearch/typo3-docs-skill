@@ -8,6 +8,8 @@ This skill provides guidance for working with TYPO3 extension documentation in r
 
 ## Features
 
+- **Documentation Extraction** - Automated extraction from code, configs, and repository metadata
+- **Gap Analysis** - Identify missing and outdated documentation
 - **RST Syntax Reference** - Complete reStructuredText formatting guide
 - **TYPO3-Specific Directives** - confval, versionadded, php:method, card-grid
 - **Local Rendering** - Docker-based documentation rendering scripts
@@ -68,6 +70,13 @@ Main skill file with comprehensive instructions for:
 - Intersphinx references
 - Quality checklists
 
+**extraction-patterns.md** - Documentation extraction guide:
+- Multi-source extraction patterns (PHP, configs, repository)
+- Data-to-RST mapping strategies
+- Gap analysis workflow
+- Template generation approaches
+- Quality standards for extraction
+
 ### templates/
 
 **AGENTS.md** - AI assistant context template:
@@ -95,6 +104,47 @@ Main skill file with comprehensive instructions for:
 - Uses official TYPO3 render-guides image
 - Outputs to Documentation-GENERATED-temp/
 
+**extract-all.sh** - Documentation extraction orchestrator:
+- Extracts data from PHP code, extension configs, composer.json
+- Optional: build configs (.github/workflows, phpunit.xml)
+- Optional: repository metadata (GitHub/GitLab API)
+- Outputs to .claude/docs-extraction/data/*.json
+
+**analyze-docs.sh** - Documentation coverage analysis:
+- Compares extracted data with existing Documentation/
+- Identifies missing and outdated documentation
+- Generates Documentation/ANALYSIS.md with recommendations
+- Prioritizes action items for systematic documentation
+
+**extract-php.sh** - PHP code extraction:
+- Parses Classes/**/*.php for docblocks and signatures
+- Extracts class descriptions, methods, constants
+- Outputs to .claude/docs-extraction/data/php_apis.json
+
+**extract-extension-config.sh** - Extension configuration extraction:
+- Parses ext_emconf.php for extension metadata
+- Parses ext_conf_template.txt for configuration options
+- Identifies security warnings in config comments
+- Outputs to extension_meta.json and config_options.json
+
+**extract-composer.sh** - Composer dependency extraction:
+- Extracts requirements and dev-requirements
+- Outputs to .claude/docs-extraction/data/dependencies.json
+
+**extract-project-files.sh** - Project file extraction:
+- Extracts content from README.md, CHANGELOG.md
+- Outputs to .claude/docs-extraction/data/project_files.json
+
+**extract-build-configs.sh** - Build configuration extraction (optional):
+- Extracts CI/CD configurations, PHPUnit settings
+- Outputs to .claude/docs-extraction/data/build_configs.json
+
+**extract-repo-metadata.sh** - Repository metadata extraction (optional):
+- Fetches GitHub/GitLab repository information
+- Requires gh or glab CLI tools
+- Outputs to .claude/docs-extraction/data/repo_metadata.json
+- Cached for 24 hours
+
 ## Usage
 
 The skill automatically activates for TYPO3 documentation tasks. You can also manually invoke it:
@@ -110,6 +160,23 @@ The skill automatically activates for TYPO3 documentation tasks. You can also ma
 cd /path/to/your-extension
 ~/.claude/skills/typo3-docs/scripts/add-agents-md.sh
 # Creates Documentation/AGENTS.md with TYPO3 documentation patterns
+```
+
+**Extract and Analyze Documentation:**
+```bash
+cd /path/to/your-extension
+
+# Extract data from code and configs
+~/.claude/skills/typo3-docs/scripts/extract-all.sh
+
+# Analyze documentation coverage
+~/.claude/skills/typo3-docs/scripts/analyze-docs.sh
+
+# Review the analysis report
+cat Documentation/ANALYSIS.md
+
+# Extract with optional sources
+~/.claude/skills/typo3-docs/scripts/extract-all.sh --all  # Include build configs & repo metadata
 ```
 
 **Document Configuration:**

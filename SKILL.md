@@ -62,6 +62,161 @@ Documentation/
 └── API/               # PHP API reference
 ```
 
+## Documentation Extraction and Analysis
+
+### When to Use Extraction
+
+Use extraction tools when:
+
+- **Starting documentation for existing extension** - Extract data from code and configs
+- **Auditing documentation coverage** - Identify undocumented APIs and configurations
+- **Updating after code changes** - Find documentation gaps for new features
+- **Ensuring consistency** - Verify docs match current code/config defaults
+
+### Extraction Workflow
+
+```
+1. Extract → 2. Analyze → 3. Generate (optional) → 4. Complete → 5. Validate
+```
+
+**1. Extract Data from All Sources**
+
+Run extraction to gather documentation data:
+
+```bash
+scripts/extract-all.sh                    # Core extraction only
+scripts/extract-all.sh --build            # Include build configs
+scripts/extract-all.sh --repo             # Include GitHub/GitLab data
+scripts/extract-all.sh --all              # Extract everything
+```
+
+Extracted data saved to: `.claude/docs-extraction/data/*.json`
+
+**Sources:**
+- PHP code (Classes/**/*.php) → php_apis.json
+- Extension configs (ext_emconf.php, ext_conf_template.txt) → extension_meta.json, config_options.json
+- Composer dependencies → dependencies.json
+- Project files (README.md, CHANGELOG.md) → project_files.json
+- Build configs (optional: .github/workflows, phpunit.xml) → build_configs.json
+- Repository metadata (optional: GitHub/GitLab API) → repo_metadata.json
+
+**2. Analyze Documentation Coverage**
+
+Compare extracted data with existing Documentation/:
+
+```bash
+scripts/analyze-docs.sh
+```
+
+Generates: `Documentation/ANALYSIS.md` with:
+- **Summary**: Coverage statistics (X/Y classes documented, etc.)
+- **Missing Documentation**: Undocumented classes, configs, methods
+- **Outdated Documentation**: Config defaults that don't match code
+- **Recommendations**: Prioritized action items
+
+**3. Review Analysis Report**
+
+Open and review `Documentation/ANALYSIS.md`:
+
+- Identify Priority 1 items (missing core documentation)
+- Check Priority 2 items (outdated content)
+- Plan documentation updates
+
+**4. Create Missing Documentation**
+
+For each missing item in ANALYSIS.md:
+
+**Classes/APIs:**
+```bash
+# Manually create based on php_apis.json data
+# Location: Documentation/API/ClassName.rst
+# Use php:class and php:method directives
+```
+
+**Configuration Options:**
+```bash
+# Add to existing or new configuration RST
+# Location: Documentation/Integration/Configuration.rst
+# Use confval directive with extracted data
+```
+
+**Extension Metadata:**
+```bash
+# Update Documentation/Index.rst
+# Update Documentation/Settings.cfg
+# Verify version numbers match ext_emconf.php
+```
+
+**5. Validate and Re-analyze**
+
+After updates:
+
+```bash
+scripts/validate_docs.sh                  # Check RST syntax
+scripts/render_docs.sh                    # Verify rendering
+scripts/analyze-docs.sh                   # Re-check coverage
+```
+
+### Extraction Best Practices
+
+**DO:**
+- Run extraction before starting documentation work
+- Review ANALYSIS.md for systematic gap identification
+- Use extracted data as templates (copy descriptions, defaults)
+- Keep extraction data in .claude/ directory (gitignored)
+- Re-run analyze-docs.sh after updates to track progress
+
+**DON'T:**
+- Commit extraction data to version control
+- Blindly copy extracted data without adding examples
+- Skip the analysis step - it provides valuable insights
+- Ignore security warnings in extracted config options
+- Auto-generate docs without human review
+
+### Example: Documenting Undocumented Config Option
+
+**ANALYSIS.md reports:**
+```markdown
+### fetchExternalImages (ext_conf_template.txt)
+- Type: boolean
+- Default: true
+- Security Warning: Enabling this setting fetches arbitrary URLs from the internet.
+- Suggested Location: Integration/Configuration.rst
+```
+
+**Action:**
+
+1. Open `Documentation/Integration/Configuration.rst`
+2. Add confval directive using extracted data:
+
+```rst
+.. confval:: fetchExternalImages
+
+   :type: boolean
+   :Default: true
+   :Path: $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['rte_ckeditor_image']['fetchExternalImages']
+
+   Controls whether external image URLs are automatically fetched and uploaded
+   to the current backend user's upload folder.
+
+   .. warning::
+      Enabling this setting fetches arbitrary URLs from the internet.
+
+   Example
+   -------
+
+   Disable for security-sensitive installations:
+
+   .. code-block:: php
+      :caption: ext_localconf.php
+
+      $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['rte_ckeditor_image']['fetchExternalImages'] = false;
+```
+
+3. Re-run `scripts/analyze-docs.sh` to verify
+
+For complete extraction patterns and examples, see: `references/extraction-patterns.md`
+
 ## Workflow Decision Tree
 
 **1. New Documentation?**
