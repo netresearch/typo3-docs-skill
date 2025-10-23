@@ -4,9 +4,10 @@ version: 1.0.0
 description: >
   Create and maintain TYPO3 extension documentation following official standards.
 
-  Trigger when: editing Documentation/**/*.rst files, using TYPO3 directives (confval, versionadded,
-  versionchanged, php:method, card-grid), rendering documentation locally (ddev docs, render_docs.sh),
-  extracting documentation data (extract-all.sh, analyze-docs.sh), or working with TYPO3 documentation guidelines.
+  Trigger when: editing Documentation/**/*.rst files or README.md (keep in sync!), using TYPO3 directives
+  (confval, versionadded, versionchanged, php:method, card-grid), rendering documentation locally (ddev docs,
+  render_docs.sh), extracting documentation data (extract-all.sh, analyze-docs.sh), or working with TYPO3
+  documentation guidelines.
 
   Covers: RST syntax, TYPO3-specific directives, documentation extraction/analysis, local Docker rendering,
   validation procedures, and TYPO3 Intercept deployment. Ensures documentation meets official TYPO3 quality
@@ -24,6 +25,7 @@ Invoke this skill when working with TYPO3 extension documentation:
 - Editing `Documentation/**/*.rst` files
 - Creating new RST files in Documentation/ directory
 - Updating `Documentation/Settings.cfg`
+- Editing `README.md` (requires syncing with Documentation/)
 
 **Keywords/Commands:**
 - Using TYPO3 directives: `confval`, `versionadded`, `versionchanged`, `php:method`, `card-grid`
@@ -46,14 +48,15 @@ Invoke this skill when working with TYPO3 extension documentation:
 
 ## Workflow
 
-**Before editing Documentation/*.rst files:**
+**Before editing Documentation/*.rst files or README.md:**
 1. Invoke this skill if not already active
 2. Optional: Run `scripts/extract-all.sh` and `scripts/analyze-docs.sh` for gap analysis
 3. Review the workflow decision tree below
 4. Use appropriate TYPO3 directives (not plain text equivalents)
 5. Validate: `scripts/validate_docs.sh` or `ddev docs`
 6. Check rendered output for warnings
-7. Commit only after successful rendering
+7. **Verify synchronization:** If editing README.md, update Documentation/ accordingly (and vice versa)
+8. Commit both README.md and Documentation/ together in atomic commits
 
 **Common Mistakes to Avoid:**
 - ❌ Writing "Since v13.0.0" instead of `.. versionadded:: 13.0.0`
@@ -62,6 +65,42 @@ Invoke this skill when working with TYPO3 extension documentation:
 - ❌ Creating markdown files in Documentation/ (RST only)
 - ❌ Missing `:type:`, `:Default:`, or `:Path:` in confval directives
 - ❌ Using external links for internal documentation (use `:ref:` instead)
+- ❌ **Updating README.md without updating Documentation/** (or vice versa)
+
+## Documentation Synchronization
+
+**Critical Rule:** README.md and Documentation/ must stay synchronized.
+
+**When to sync:**
+- Installation instructions changed → Update both README.md and Documentation/Introduction/Index.rst
+- Feature descriptions changed → Update both README.md and Documentation/Index.rst
+- Configuration examples changed → Update both README.md and Documentation/Integration/
+- Button names or UI elements mentioned → Verify consistency across all docs
+
+**Synchronization checklist:**
+1. ✅ Installation steps match between README.md and Documentation/Introduction/
+2. ✅ Feature descriptions consistent between README.md and Documentation/Index.rst
+3. ✅ Code examples identical (button names, configuration, TypoScript)
+4. ✅ Version numbers consistent (README.md badges match Documentation/Settings.cfg)
+5. ✅ Links to external resources point to same destinations
+
+**Example from real bug:**
+```markdown
+# README.md (WRONG)
+toolbar: [typo3image]  # Wrong button name
+
+# Documentation/Integration/RTE-Setup.rst (WRONG)
+toolbar: [typo3image]  # Wrong button name
+
+# Actual JavaScript code (CORRECT)
+editor.ui.componentFactory.add('insertimage', ...)  # Correct button name
+```
+
+**Fix approach:**
+1. Find source of truth (usually the actual code)
+2. Update README.md with correct information
+3. Update all Documentation/*.rst files with same information
+4. Commit both in same atomic commit
 
 ## Overview
 
