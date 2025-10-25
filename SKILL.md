@@ -411,6 +411,21 @@ To document PHP classes and methods, use the PHP domain directives:
    :throws \\RuntimeException: When file is not found
 ```
 
+**Return Type Annotations:**
+
+Include return type annotations in method signatures (after closing parenthesis) to improve documentation clarity and follow Sphinx best practices:
+
+```rst
+✅ Correct:   .. php:method:: getImage(int $fileUid): File|null
+❌ Incorrect: .. php:method:: getImage(int $fileUid)
+```
+
+**Return Type Format:**
+- Use short class names when unambiguous: `File|null`, `ProcessedFile|null`
+- Use fully qualified names when needed: `\\TYPO3\\CMS\\Core\\Resource\\File|null`
+- Use union types for nullable returns: `string|null` or `?string`
+- Match the style used in parameter type hints for consistency
+
 **Class:**
 ```rst
 .. php:class:: SelectImageController
@@ -578,6 +593,7 @@ xdg-open Documentation-GENERATED-temp/Index.html
 - ✅ Code blocks specify language
 - ✅ Proper heading hierarchy
 - ✅ No trailing whitespace
+- ✅ PHP method signatures include return types
 
 **Documentation Coverage:**
 - All public APIs documented
