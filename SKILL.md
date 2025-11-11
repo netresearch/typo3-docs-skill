@@ -565,20 +565,37 @@ To document PHP classes and methods, use the PHP domain directives:
    :throws \\RuntimeException: When file is not found
 ```
 
-**Return Type Annotations:**
+**Return Type Strategy (Hybrid Rule):**
 
-Include return type annotations in method signatures (after closing parenthesis) to improve documentation clarity and follow Sphinx best practices:
+Use context-appropriate return type documentation based on complexity:
 
-```rst
-✅ Correct:   .. php:method:: getImage(int $fileUid): File|null
-❌ Incorrect: .. php:method:: getImage(int $fileUid)
-```
+1. **Simple types (string, int, bool, array):** Include in signature only
+   ```rst
+   .. php:method:: isEnabled(): bool
 
-**Return Type Format:**
-- Use short class names when unambiguous: `File|null`, `ProcessedFile|null`
-- Use fully qualified names when needed: `\\TYPO3\\CMS\\Core\\Resource\\File|null`
-- Use union types for nullable returns: `string|null` or `?string`
-- Match the style used in parameter type hints for consistency
+      Checks if the configuration is valid.
+   ```
+
+2. **TYPO3 types with clear meaning:** Include in signature + `:returntype:` for FQN
+   ```rst
+   .. php:method:: getFile(int $uid): File|null
+
+      Retrieves file by UID.
+
+      :returntype: ``\\TYPO3\\CMS\\Core\\Resource\\File|null``
+   ```
+
+3. **Complex union types (>2 types or long FQNs):** Use `:returntype:` field only
+   ```rst
+   .. php:method:: processImage(File $file, array $options)
+
+      Processes image with multiple return possibilities.
+
+      :returns: Processed file, original file if no processing needed, or null on error
+      :returntype: ``\\TYPO3\\CMS\\Core\\Resource\\ProcessedFile|\\TYPO3\\CMS\\Core\\Resource\\File|null``
+   ```
+
+**Rationale:** Balance readability (signature for quick scan) with precision (field for complex types)
 
 **Class:**
 ```rst
