@@ -1,6 +1,6 @@
 ---
 name: typo3-docs
-version: 1.2.0
+version: 1.3.0
 description: >
   Create and maintain TYPO3 extension documentation following official TYPO3 13.x standards.
 
@@ -643,6 +643,56 @@ To create visual navigation, use card-grid layouts with stretched links:
 
 For complete card-grid reference, see: `references/typo3-directives.md`
 
+## Code Snippets with literalinclude
+
+For PHP scripts, configuration files, or other code examples, prefer `literalinclude` over inline code blocks:
+
+**Benefits:**
+- DRY: Single source of truth for code
+- Testable: Referenced file can be syntax-checked/executed
+- GitHub link: Rendered docs include "Edit on GitHub" link
+- Maintainable: Update code in one place
+
+**Basic Usage:**
+```rst
+..  literalinclude:: _codesnippets/example.php
+    :caption: example.php
+    :language: php
+```
+
+**With Line Selection:**
+```rst
+..  literalinclude:: _codesnippets/example.php
+    :caption: Relevant excerpt
+    :language: php
+    :lines: 10-25
+```
+
+**With Highlighting:**
+```rst
+..  literalinclude:: _codesnippets/example.php
+    :caption: example.php
+    :language: php
+    :emphasize-lines: 5,10-12
+```
+
+**Directory Structure:**
+```
+Documentation/
+├── Section/
+│   ├── Index.rst
+│   └── _codesnippets/
+│       ├── example.php
+│       └── config.yaml
+```
+
+**When to Use:**
+- ✅ Scripts longer than ~20 lines
+- ✅ Code that should be executable/testable
+- ✅ Examples referenced from multiple places
+- ❌ Short inline examples (use code-block)
+- ❌ Pseudo-code or partial snippets
+
 ## Cross-References
 
 To create internal links, use labels and `:ref:`:
@@ -941,6 +991,27 @@ If needed:
 
 For comprehensive webhook setup, troubleshooting, and best practices, see: `references/intercept-deployment.md`
 
+## Security Tips for Documentation
+
+**Sensitive Commands in Code Blocks:**
+
+When documenting commands with API tokens or secrets, add a leading space to prevent shell history logging:
+
+```rst
+..  code-block:: bash
+
+    # Set API token (leading space prevents saving to shell history)
+     export CROWDIN_TOKEN="your_api_token_here"
+```
+
+The leading space triggers `HISTCONTROL=ignorespace` behavior in bash/zsh, keeping secrets out of `~/.bash_history`.
+
+**Other Security Practices:**
+- ✅ Use environment variables for secrets, never hardcode
+- ✅ Add warnings for security-sensitive settings
+- ✅ Document minimal required permissions
+- ✅ Reference official security guidelines
+
 ## Documentation Standards Application
 
 When creating or editing TYPO3 documentation, apply these modern standards:
@@ -955,6 +1026,7 @@ When creating or editing TYPO3 documentation, apply these modern standards:
 - Use `confval` directive for ALL configuration options, never plain text
 - Apply `versionadded`/`versionchanged` directives for version-specific features
 - Document PHP APIs with `php:method` and `php:class` directives
+- Use `literalinclude` for longer code examples (DRY, testable, GitHub edit links)
 - Create internal links with `:ref:` labels, avoid external links for internal documentation
 
 **File and Content Constraints:**
