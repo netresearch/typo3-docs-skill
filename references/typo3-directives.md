@@ -622,8 +622,9 @@ The `guides.xml` file configures modern PHP-based documentation rendering. It re
 </guides>
 ```
 
-**Note:** The `xsi:schemaLocation` URL `https://docs.typo3.org/.../Schema/Guides.xsd` is broken (404).
-Use the local vendor path: `vendor/phpdocumentor/guides-cli/resources/schema/guides.xsd`
+**Note on schemaLocation:** The format is `namespace-URI schema-path`. The namespace
+(`https://www.phpdoc.org/guides`) is just an identifier. The schema file is at
+`../vendor/phpdocumentor/guides-cli/resources/schema/guides.xsd` (relative to Documentation/).
 
 ## References
 
