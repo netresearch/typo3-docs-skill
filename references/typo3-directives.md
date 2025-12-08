@@ -550,8 +550,11 @@ The `guides.xml` file configures modern PHP-based documentation rendering. It re
 **Template:**
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
-<guides xmlns="https://www.phpdoc.org/guides" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="https://www.phpdoc.org/guides https://docs.typo3.org/other/t3docs/render-guides/main/en-us/Schema/Guides.xsd"
+<guides
+    xmlns="https://www.phpdoc.org/guides"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="https://www.phpdoc.org/guides vendor/phpdocumentor/guides-cli/resources/schema/guides.xsd"
+    theme="typo3docs"
 >
     <project title="Extension Name"
              version="1.0"
@@ -574,12 +577,19 @@ The `guides.xml` file configures modern PHP-based documentation rendering. It re
 </guides>
 ```
 
+**Root Attributes (`<guides>`):**
+
+| Attribute | Purpose |
+|-----------|---------|
+| `theme` | Theme name (e.g., `typo3docs`) - **must be attribute, not element** |
+| `links-are-relative` | Use relative links in output (default: `false`) |
+
 **Key Elements:**
 
 | Element | Purpose |
 |---------|---------|
 | `<project>` | Extension metadata (title, version, copyright) |
-| `<extension>` | Theme configuration and GitHub integration |
+| `<extension>` | Theme extension and GitHub integration |
 | `<inventory>` | Intersphinx references to other TYPO3 docs |
 
 **Extension Attributes:**
@@ -599,16 +609,21 @@ The `guides.xml` file configures modern PHP-based documentation rendering. It re
 <inventory id="t3tsref" url="https://docs.typo3.org/m/typo3/reference-typoscript/main/en-us/" />
 ```
 
-**⚠️ Deprecated Elements:**
+**⚠️ Common Mistakes:**
 
-Do NOT use the `<theme>` element - it causes render errors:
 ```xml
-<!-- ❌ WRONG - causes "Invalid type for path guides.theme" error -->
-<theme name="typo3docs" />
+<!-- ❌ WRONG - <theme> as element causes "Invalid type for path guides.theme" error -->
+<guides ...>
+    <theme name="typo3docs" />
+</guides>
 
-<!-- ✅ CORRECT - theme is configured via <extension class="..."> -->
-<extension class="\T3Docs\Typo3DocsTheme\DependencyInjection\Typo3DocsThemeExtension" ... />
+<!-- ✅ CORRECT - theme is an ATTRIBUTE on <guides>, not a child element -->
+<guides theme="typo3docs" ...>
+</guides>
 ```
+
+**Note:** The `xsi:schemaLocation` URL `https://docs.typo3.org/.../Schema/Guides.xsd` is broken (404).
+Use the local vendor path: `vendor/phpdocumentor/guides-cli/resources/schema/guides.xsd`
 
 ## References
 
