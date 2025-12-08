@@ -543,6 +543,73 @@ function getItems(int $id): array
 ✅ **List punctuation**: all list items end with periods
 ✅ **CGL compliance**: PHP code examples pass `make fix-cgl`
 
+## guides.xml Configuration
+
+The `guides.xml` file configures modern PHP-based documentation rendering. It replaces the legacy `Settings.cfg`.
+
+**Template:**
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<guides xmlns="https://www.phpdoc.org/guides" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="https://www.phpdoc.org/guides https://docs.typo3.org/other/t3docs/render-guides/main/en-us/Schema/Guides.xsd"
+>
+    <project title="Extension Name"
+             version="1.0"
+             release="1.0.0"
+             copyright="Vendor Name"
+    />
+
+    <extension
+        class="\T3Docs\Typo3DocsTheme\DependencyInjection\Typo3DocsThemeExtension"
+        project-home="https://github.com/vendor/extension"
+        project-contact="https://github.com/vendor/extension/issues"
+        project-repository="https://github.com/vendor/extension"
+        edit-on-github="vendor/extension"
+        edit-on-github-branch="main"
+    />
+
+    <inventory id="t3coreapi"
+               url="https://docs.typo3.org/m/typo3/reference-coreapi/main/en-us/"
+    />
+</guides>
+```
+
+**Key Elements:**
+
+| Element | Purpose |
+|---------|---------|
+| `<project>` | Extension metadata (title, version, copyright) |
+| `<extension>` | Theme configuration and GitHub integration |
+| `<inventory>` | Intersphinx references to other TYPO3 docs |
+
+**Extension Attributes:**
+
+- `class` (mandatory): Always use `\T3Docs\Typo3DocsTheme\DependencyInjection\Typo3DocsThemeExtension`
+- `project-home`: Extension homepage URL
+- `project-contact`: Issues/support URL
+- `project-repository`: Git repository URL
+- `edit-on-github`: Repository in format `owner/repo` (enables "Edit on GitHub" button)
+- `edit-on-github-branch`: Branch name (default: `main`)
+
+**Common Inventories:**
+
+```xml
+<inventory id="t3coreapi" url="https://docs.typo3.org/m/typo3/reference-coreapi/main/en-us/" />
+<inventory id="t3tsconfig" url="https://docs.typo3.org/m/typo3/reference-tsconfig/main/en-us/" />
+<inventory id="t3tsref" url="https://docs.typo3.org/m/typo3/reference-typoscript/main/en-us/" />
+```
+
+**⚠️ Deprecated Elements:**
+
+Do NOT use the `<theme>` element - it causes render errors:
+```xml
+<!-- ❌ WRONG - causes "Invalid type for path guides.theme" error -->
+<theme name="typo3docs" />
+
+<!-- ✅ CORRECT - theme is configured via <extension class="..."> -->
+<extension class="\T3Docs\Typo3DocsTheme\DependencyInjection\Typo3DocsThemeExtension" ... />
+```
+
 ## References
 
 - **TYPO3 Documentation Guide:** https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/
