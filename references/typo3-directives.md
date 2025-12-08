@@ -553,7 +553,7 @@ The `guides.xml` file configures modern PHP-based documentation rendering. It re
 <guides
     xmlns="https://www.phpdoc.org/guides"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="https://www.phpdoc.org/guides vendor/phpdocumentor/guides-cli/resources/schema/guides.xsd"
+    xsi:schemaLocation="https://www.phpdoc.org/guides ../vendor/phpdocumentor/guides-cli/resources/schema/guides.xsd"
     theme="typo3docs"
 >
     <project title="Extension Name"
