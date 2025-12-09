@@ -64,6 +64,7 @@ Invoke this skill when working with TYPO3 extension documentation:
 - ❌ Missing permalink anchors (`.. _section-label:`) before section headings
 - ❌ List items without ending punctuation (periods)
 - ❌ PHP code examples failing CGL checks (run `make fix-cgl`)
+- ❌ **Committing `Documentation-GENERATED-temp/`** (add to `.gitignore`)
 
 ## Documentation Synchronization
 
@@ -171,6 +172,8 @@ scripts/render_docs.sh /path/to/project
 ```
 
 Output: `Documentation-GENERATED-temp/Index.html`
+
+**Important:** Add `Documentation-GENERATED-temp/` to `.gitignore` - this is a build artifact that should not be committed.
 
 **Always render locally before committing to verify:**
 - No rendering warnings
