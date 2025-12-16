@@ -1,0 +1,20 @@
+{
+  "name": "netresearch/agent-typo3-docs",
+  "description": "Create and maintain TYPO3 extension documentation following official TYPO3 13.x standards. Use when creating/editing Documentation/*.rst files or README.md, using TYPO3 directives (confval, versionadd",
+  "type": "ai-agent-skill",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Netresearch DTT GmbH",
+      "email": "plugins@netresearch.de",
+      "homepage": "https://www.netresearch.de/",
+      "role": "Manufacturer"
+    }
+  ],
+  "require": {
+    "netresearch/composer-agent-skill-plugin": "*"
+  },
+  "extra": {
+    "ai-agent-skill": "SKILL.md"
+  }
+}
