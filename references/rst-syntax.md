@@ -19,19 +19,30 @@ Subsubsection heading
 ~~~~~~~~~~~~~~~~~~~~~
 
 Paragraph heading
-^^^^^^^^^^^^^^^^^
+"""""""""""""""""
+
+Deep heading
+''''''''''''
 ```
 
+**Heading Hierarchy:**
+
+| Level | Character | Usage |
+|-------|-----------|-------|
+| 1 (Title) | `=` above and below | Page title only |
+| 2 | `=` below | Major sections |
+| 3 | `-` below | Subsections |
+| 4 | `~` below | Sub-subsections |
+| 5 | `"` below | Paragraphs |
+| 6 | `'` below | Deep nesting |
+| 7+ | `^`, `#` | Rarely used |
+
 **Rules:**
-- Page titles: `=` above and below (must match title length)
-- Sections: `=` below
-- Subsections: `-` below
-- Subsubsections: `~` below
-- Paragraphs: `^` below
 - **CRITICAL**: Underline must be exactly the same length as the title text
 - **SENTENCE CASE**: Use sentence case for all headlines, NOT title case
   - ✅ Correct: "Mass approval on Crowdin", "API endpoints", "Best practices"
   - ❌ Wrong: "Mass Approval On Crowdin", "API Endpoints", "Best Practices"
+- **PERMALINK ANCHORS**: Every section MUST have a label (`.. _section-label:`)
 
 ## Inline Formatting
 

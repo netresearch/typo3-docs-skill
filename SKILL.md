@@ -54,9 +54,161 @@ Invoke this skill when working with TYPO3 extension documentation:
 | Code blocks | Use `code-block::` with `:caption:` | `references/rst-syntax.md` |
 | Cross-references | Use `:ref:` labels | `references/rst-syntax.md` |
 | Basic RST syntax | Headings, lists, tables | `references/rst-syntax.md` |
+| Adding screenshots | PNG format, alt text, light mode | See "Image Guidelines" section |
+| File/folder naming | CamelCase, Index.rst per directory | See "File Structure Rules" section |
+| Check spelling | American English, Merriam-Webster | See "Spelling and Style" section |
 | Deploy to docs.typo3.org | Setup webhook | `references/intercept-deployment.md` |
 
 **Always: Validate and render before committing**
+
+## Formatting Rules (MANDATORY)
+
+### Encoding and Whitespace
+
+- **Encoding**: UTF-8 for all files
+- **Indentation**: 4 spaces (no tabs)
+- **Trailing whitespace**: Remove all trailing spaces/tabs
+- **Line length**: Keep lines under 80 characters
+
+### EditorConfig
+
+Add `.editorconfig` to enforce standards:
+
+```ini
+[*.{rst,rst.txt}]
+charset = utf-8
+indent_style = space
+indent_size = 4
+end_of_line = lf
+trim_trailing_whitespace = true
+insert_final_newline = true
+max_line_length = 80
+```
+
+### Heading Hierarchy
+
+Use consistent underline characters per level:
+
+| Level | Character | Usage |
+|-------|-----------|-------|
+| 1 (Title) | `=` above and below | Page title only |
+| 2 | `=` below | Major sections |
+| 3 | `-` below | Subsections |
+| 4 | `~` below | Sub-subsections |
+| 5 | `"` below | Paragraphs |
+| 6 | `'` below | Deep nesting |
+
+**Rules:**
+- Underline must match title length exactly
+- Use **sentence case** for all headings (not Title Case)
+- Every section MUST have a permalink anchor (`.. _label:`)
+
+## File Structure Rules (MANDATORY)
+
+### Naming Conventions
+
+- **CamelCase** for directories and files: `GeneralConventions/FileStructure.rst`
+- **Index.rst** required in every directory (fallback for version switching)
+- **Included files**: Use `.rst.txt` extension (e.g., `Includes.rst.txt`)
+- **Code snippets**: Start with underscore (e.g., `_codesnippets/example.php`)
+
+### Required Structure
+
+```
+Documentation/
+├── guides.xml              # Configuration (REQUIRED)
+├── Index.rst               # Entry point (REQUIRED)
+├── Includes.rst.txt        # Global includes (REQUIRED)
+├── Introduction/
+│   └── Index.rst           # REQUIRED in each directory
+├── Configuration/
+│   └── Index.rst
+└── Images/                 # Screenshots and graphics
+```
+
+### Navigation Title
+
+Use `:navigation-title:` for custom menu labels:
+
+```rst
+:navigation-title: Quick Start
+
+===============
+Getting Started
+===============
+```
+
+## Image Guidelines (MANDATORY)
+
+### Screenshot Standards
+
+| Requirement | Value |
+|-------------|-------|
+| **Format** | PNG (`.png`) |
+| **Full page dimensions** | 1400 × 1050 pixels |
+| **Alt text** | Always required for accessibility |
+| **Backend mode** | Light mode, modern look |
+| **Username** | "j.doe" (standardized) |
+| **TYPO3 version** | Latest LTS, Composer-based |
+
+### Figure Syntax
+
+```rst
+..  figure:: /Images/screenshot.png
+    :alt: Description for accessibility
+    :class: with-shadow
+
+    Caption text describing the screenshot
+```
+
+### Best Practices
+
+- ✅ Prefer partial screenshots over full-page captures
+- ✅ Use sufficient contrast for annotations (boxes, arrows)
+- ✅ Avoid third-party extensions in screenshots
+- ✅ Keep screenshots minimal and focused
+- ❌ Don't use JPG/JPEG for screenshots
+- ❌ Don't include sensitive data
+
+## Spelling and Style (MANDATORY)
+
+### American English
+
+Use American English spelling (reference: Merriam-Webster):
+- ✅ "color", "optimize", "behavior"
+- ❌ "colour", "optimise", "behaviour"
+
+### Compound Words (TYPO3-Specific)
+
+| Correct | Incorrect |
+|---------|-----------|
+| backend | back-end, back end |
+| frontend | front-end, front end |
+| sitepackage | site package, site-package |
+
+### Brand Names vs Commands
+
+| Brand Name | Command |
+|------------|---------|
+| Git | `git` |
+| Docker | `docker` |
+| Composer | `composer` |
+
+Use capitalized form in prose, backtick form for commands:
+- "Use Git for version control" (brand)
+- "Run :bash:`git status`" (command)
+
+### Special Spellings (Preserve Exactly)
+
+- TypoScript, TSconfig, ViewHelper
+- Backend, Frontend (when referring to TYPO3 areas)
+- HTML, PHP, CMS, LTS, FAL (acronyms uppercase)
+
+### GUI Elements
+
+Match exact interface capitalization:
+- :guilabel:`File > Open` (matches menu)
+- :guilabel:`ADMIN TOOLS > Extensions` (matches UI)
 
 ## Conformance Rules
 
@@ -190,6 +342,32 @@ For PlantUML reference, see: `references/typo3-directives.md`
 - ❌ Using card-grid without `stretched-link` class
 - ❌ Missing `:type:`, `:Default:`, or `:Path:` in confval directives
 
+### Formatting Errors
+- ❌ Using tabs instead of 4 spaces for indentation
+- ❌ Lines exceeding 80 characters
+- ❌ Trailing whitespace at end of lines
+- ❌ Non-UTF-8 file encoding
+- ❌ Underline length not matching heading text
+
+### File Structure Errors
+- ❌ Using lowercase or kebab-case file names (use CamelCase: `FeatureOverview.rst`)
+- ❌ Missing `Index.rst` in subdirectories
+- ❌ Using `.rst` for included files (use `.rst.txt`)
+- ❌ Code snippets not prefixed with underscore (`_codesnippets/`)
+
+### Image Errors
+- ❌ Using JPG/JPEG format (use PNG)
+- ❌ Missing `:alt:` text on figures
+- ❌ Full-page screenshots when partial would suffice
+- ❌ Screenshots in dark mode (use light mode)
+- ❌ Non-standard username in screenshots (use "j.doe")
+
+### Spelling/Style Errors
+- ❌ British spelling ("colour", "behaviour")
+- ❌ Hyphenated compounds ("back-end" instead of "backend")
+- ❌ Lowercase brand names in prose ("use git" instead of "use Git")
+- ❌ Wrong case for special terms ("Typoscript" instead of "TypoScript")
+
 ### Structure Errors
 - ❌ Skipping local rendering before committing
 - ❌ Creating markdown files in Documentation/ (RST only)
@@ -319,21 +497,47 @@ Output: `Documentation-GENERATED-temp/Index.html`
 
 Before committing documentation changes:
 
+**Validation:**
 1. Run `scripts/validate_docs.sh` - check RST syntax.
 2. Run `scripts/render_docs.sh` - verify no warnings.
-3. Verify text roles used correctly:
-   - `:php:` for PHP code, not backticks
-   - `:file:` for files, `:path:` for directories
-   - `:guilabel:` for GUI elements
-   - `:typoscript:` for TypoScript code
-4. Verify code blocks have `:caption:` option.
-5. Check cross-references resolve correctly.
-6. Verify confval directives have `:type:`, `:Default:`, `:Path:`.
-7. Verify card-footer buttons include `stretched-link`.
-8. Verify sentence case headings (not Title Case).
-9. Verify permalink anchors (`.. _label:`) before sections.
-10. Verify list items end with periods.
-11. Run `make fix-cgl` for PHP code in `_codesnippets/`.
+
+**Formatting:**
+3. UTF-8 encoding, 4-space indentation, no tabs.
+4. Lines under 80 characters (where practical).
+5. No trailing whitespace.
+6. Underlines match heading text length exactly.
+
+**Text Roles:**
+7. `:php:` for PHP code, not backticks.
+8. `:file:` for files, `:path:` for directories.
+9. `:guilabel:` for GUI elements.
+10. `:typoscript:` for TypoScript code.
+
+**Directives:**
+11. Code blocks have `:caption:` option.
+12. confval directives have `:type:`, `:Default:`, `:Path:`.
+13. card-footer buttons include `stretched-link`.
+
+**Structure:**
+14. CamelCase file/directory names.
+15. Index.rst in every subdirectory.
+16. Permalink anchors (`.. _label:`) before sections.
+17. Sentence case headings (not Title Case).
+18. List items end with periods.
+
+**Images:**
+19. PNG format (not JPG/JPEG).
+20. All figures have `:alt:` text.
+21. Screenshots use light mode, "j.doe" username.
+
+**Spelling:**
+22. American English (color, optimize, behavior).
+23. Correct compound words (backend, sitepackage).
+24. Brand names capitalized in prose (Git, Docker).
+
+**Code:**
+25. Run `make fix-cgl` for PHP code in `_codesnippets/`.
+26. Cross-references resolve correctly.
 
 ## TYPO3 Intercept Deployment
 
@@ -374,8 +578,14 @@ Consult these bundled references for detailed information:
 | Webhook setup and deployment | `references/intercept-deployment.md` |
 | Extension file structure priorities | `references/typo3-extension-architecture.md` |
 
-**External Resources:**
+**External Resources (Official TYPO3 Guidelines):**
 - TYPO3 Documentation Guide: https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/
+- Coding Guidelines: https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/CodingGuidelines/Index.html
+- Advanced Coding Guidelines: https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Advanced/CodingGuidelines.html
+- Image Guidelines: https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Advanced/GuidelinesForImages.html
+- Content Style Guide: https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Advanced/ContentStyleGuide.html
+- guides.xml Reference: https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/GuidesXml.html
+- File Structure: https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/FileStructure.html
 - RST Specification: https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html
 - Best Practice Extension: https://github.com/TYPO3BestPractices/tea
 
