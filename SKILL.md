@@ -18,7 +18,9 @@ Invoke this skill when working with TYPO3 extension documentation:
 
 **Keywords/Commands:**
 - Creating: "create Documentation/", "generate documentation", "new docs"
-- Using TYPO3 directives: `confval`, `versionadded`, `versionchanged`, `php:method`, `card-grid`
+- Using TYPO3 directives: `confval`, `versionadded`, `versionchanged`, `card-grid`, `uml`
+- Using PHP domain: `php:class`, `php:method`, `php:interface`, `php:trait`, `php:attr`, `php:const`
+- Using text roles: `:php:`, `:typoscript:`, `:file:`, `:path:`, `:guilabel:`, `:confval:`, `:ref:`
 - Running: `ddev docs`, `scripts/validate_docs.sh`, `scripts/render_docs.sh`
 - Extraction: `scripts/extract-all.sh`, `scripts/analyze-docs.sh`
 - Deployment: "setup webhook", "deploy docs", "publish to docs.typo3.org"
@@ -43,21 +45,154 @@ Invoke this skill when working with TYPO3 extension documentation:
 | New documentation | Create Index.rst with card-grid | `references/typo3-directives.md` |
 | Configuration | Use `confval` directive | `references/typo3-directives.md` |
 | Version-specific feature | Use `versionadded`/`versionchanged` | `references/typo3-directives.md` |
-| PHP API documentation | Use `php:method` directive | `references/typo3-directives.md` |
+| PHP API documentation | Use `php:class`, `php:method` directives | `references/typo3-directives.md` |
 | Visual navigation | Use card-grid with `stretched-link` | `references/typo3-directives.md` |
+| Architecture diagrams | Use PlantUML `uml::` directive | `references/typo3-directives.md` |
+| Inline PHP code | Use `:php:` text role | `references/text-roles-inline-code.md` |
+| File/path references | Use `:file:` or `:path:` roles | `references/text-roles-inline-code.md` |
+| GUI elements | Use `:guilabel:` text role | `references/text-roles-inline-code.md` |
+| Code blocks | Use `code-block::` with `:caption:` | `references/rst-syntax.md` |
 | Cross-references | Use `:ref:` labels | `references/rst-syntax.md` |
-| Basic RST syntax | Headings, lists, code blocks | `references/rst-syntax.md` |
+| Basic RST syntax | Headings, lists, tables | `references/rst-syntax.md` |
 | Deploy to docs.typo3.org | Setup webhook | `references/intercept-deployment.md` |
 
 **Always: Validate and render before committing**
 
+## Conformance Rules
+
+### Text Roles (MANDATORY)
+
+Always use semantic text roles instead of plain backticks:
+
+| Content Type | Role | Example |
+|--------------|------|---------|
+| PHP code/classes | `:php:` | `:php:\`GeneralUtility\`` |
+| TypoScript | `:typoscript:` | `:typoscript:\`lib.parseFunc_RTE\`` |
+| File names | `:file:` | `:file:\`ext_localconf.php\`` |
+| Directory paths | `:path:` | `:path:\`Configuration/TypoScript/\`` |
+| GUI elements | `:guilabel:` | `:guilabel:\`Save\`` |
+| Menu paths | `:menuselection:` | `:menuselection:\`File --> Save\`` |
+| Keyboard shortcuts | `:kbd:` | `:kbd:\`Ctrl+S\`` |
+| HTML elements | `:html:` | `:html:\`<img>\`` |
+| YAML config | `:yaml:` | `:yaml:\`key: value\`` |
+| SQL queries | `:sql:` | `:sql:\`SELECT * FROM\`` |
+| Shell commands | `:bash:` | `:bash:\`composer install\`` |
+| Config references | `:confval:` | `:confval:\`fetchExternalImages\`` |
+| Cross-references | `:ref:` | `:ref:\`section-label\`` |
+
+**Decision Tree:**
+- Is it a file? → `:file:`
+- Is it a directory? → `:path:`
+- Is it PHP? → `:php:`
+- Is it TypoScript? → `:typoscript:`
+- Is it a button/UI element? → `:guilabel:`
+- Is it a menu navigation? → `:menuselection:`
+- Is it a config value? → `:confval:`
+
+For complete text role reference, see: `references/text-roles-inline-code.md`
+
+### Code Blocks (MANDATORY)
+
+Always include `:caption:` for code blocks:
+
+```rst
+..  code-block:: php
+    :caption: Classes/Service/MyService.php
+
+    <?php
+    $code = 'example';
+```
+
+**Required Options:**
+- `:caption:` - Always include (typically file path)
+- `:language:` - Specify explicitly (php, typoscript, yaml, bash, html, etc.)
+
+**Optional Options:**
+- `:linenos:` - Show line numbers
+- `:emphasize-lines:` - Highlight specific lines (e.g., `3,5-7`)
+- `:lineno-start:` - Start line numbers at N
+- `:name:` - Unique reference label
+
+For code blocks reference, see: `references/rst-syntax.md`
+
+### confval Directive (MANDATORY for Configuration)
+
+All configuration values MUST use the `confval` directive:
+
+```rst
+..  confval:: settingName
+    :name: confval-settingname
+    :type: boolean
+    :Default: true
+    :Path: $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['ext_key']['setting']
+
+    Description of the configuration value.
+```
+
+**Required Fields:**
+- `:type:` - Data type (boolean, string, integer, array)
+- `:Default:` - Default value
+- `:Path:` - Full configuration path
+
+**Optional Fields:**
+- `:name:` - For cross-referencing with `:confval:`
+- `:Required:` - If value is mandatory
+
+### PHP Domain (for API Documentation)
+
+Use PHP domain directives for class/method documentation:
+
+```rst
+..  php:class:: MyClass
+
+    Class description.
+
+    ..  php:method:: myMethod($param)
+
+        :param string $param: Parameter description.
+        :returns: Return value description.
+        :returntype: string
+```
+
+For complete PHP domain reference, see: `references/typo3-directives.md`
+
+### PlantUML Diagrams (Optional)
+
+For architectural diagrams, use the `uml` directive:
+
+```rst
+..  uml::
+    :caption: Component diagram
+
+    @startuml
+    component Frontend
+    component Backend
+    Frontend --> Backend
+    @enduml
+```
+
+For PlantUML reference, see: `references/typo3-directives.md`
+
 ## Common Mistakes to Avoid
 
+### Text Role Errors
+- ❌ Using backticks `\`\`code\`\`` instead of `:php:\`code\``
+- ❌ Using `:file:` for directories (use `:path:` instead)
+- ❌ Plain text for UI elements (use `:guilabel:` instead)
+
+### Code Block Errors
+- ❌ Missing `:caption:` on code blocks
+- ❌ Using `::` shorthand instead of `..  code-block::`
+- ❌ Wrong language identifier (e.g., `javascript` for TypoScript)
+
+### Directive Errors
 - ❌ Writing "Since v13.0.0" instead of `.. versionadded:: 13.0.0`
 - ❌ Using card-grid without `stretched-link` class
+- ❌ Missing `:type:`, `:Default:`, or `:Path:` in confval directives
+
+### Structure Errors
 - ❌ Skipping local rendering before committing
 - ❌ Creating markdown files in Documentation/ (RST only)
-- ❌ Missing `:type:`, `:Default:`, or `:Path:` in confval directives
 - ❌ Using external links for internal documentation (use `:ref:` instead)
 - ❌ **Updating README.md without updating Documentation/** (or vice versa)
 - ❌ Using Title Case headlines instead of sentence case
@@ -184,14 +319,21 @@ Output: `Documentation-GENERATED-temp/Index.html`
 
 Before committing documentation changes:
 
-1. Run `scripts/validate_docs.sh` - check RST syntax
-2. Run `scripts/render_docs.sh` - verify no warnings
-3. Check cross-references resolve correctly
-4. Verify confval directives have `:type:`, `:Default:`, `:Path:`
-5. Verify card-footer buttons include `stretched-link`
-6. Verify sentence case headings (not Title Case)
-7. Verify permalink anchors (`.. _label:`) before sections
-8. Run `make fix-cgl` for PHP code in `_codesnippets/`
+1. Run `scripts/validate_docs.sh` - check RST syntax.
+2. Run `scripts/render_docs.sh` - verify no warnings.
+3. Verify text roles used correctly:
+   - `:php:` for PHP code, not backticks
+   - `:file:` for files, `:path:` for directories
+   - `:guilabel:` for GUI elements
+   - `:typoscript:` for TypoScript code
+4. Verify code blocks have `:caption:` option.
+5. Check cross-references resolve correctly.
+6. Verify confval directives have `:type:`, `:Default:`, `:Path:`.
+7. Verify card-footer buttons include `stretched-link`.
+8. Verify sentence case headings (not Title Case).
+9. Verify permalink anchors (`.. _label:`) before sections.
+10. Verify list items end with periods.
+11. Run `make fix-cgl` for PHP code in `_codesnippets/`.
 
 ## TYPO3 Intercept Deployment
 
@@ -224,8 +366,9 @@ Consult these bundled references for detailed information:
 
 | Challenge | Reference File |
 |-----------|----------------|
+| Text roles and inline code (`:php:`, `:file:`, `:guilabel:`) | `references/text-roles-inline-code.md` |
 | Basic RST syntax (headings, lists, code blocks) | `references/rst-syntax.md` |
-| TYPO3 directives (confval, card-grid, php:method) | `references/typo3-directives.md` |
+| TYPO3 directives (confval, card-grid, php domain, PlantUML) | `references/typo3-directives.md` |
 | Documentation coverage methodology | `references/documentation-coverage-analysis.md` |
 | Extraction patterns and templates | `references/extraction-patterns.md` |
 | Webhook setup and deployment | `references/intercept-deployment.md` |
