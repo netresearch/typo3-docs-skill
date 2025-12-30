@@ -34,6 +34,7 @@ description: "Create and maintain TYPO3 extension documentation following offici
 | Coverage methodology | `references/documentation-coverage-analysis.md` |
 | Webhook setup and deployment | `references/intercept-deployment.md` |
 | Extension architecture context | `references/typo3-extension-architecture.md` |
+| Architecture Decision Records (ADRs) | `references/architecture-decision-records.md` |
 
 ## Critical Rules (Always Apply)
 
