@@ -20,8 +20,11 @@ description: "Create and maintain TYPO3 extension documentation following offici
 2. Use TYPO3 directives, not plain text equivalents
 3. Validate: `scripts/validate_docs.sh`
 4. Render: `scripts/render_docs.sh`
-5. Keep README.md and Documentation/ synchronized
-6. Commit together atomically
+5. **Verify rendered output visually** (open in browser)
+6. Keep README.md and Documentation/ synchronized
+7. Commit together atomically
+
+> **Critical**: When user asks to "show docs", render and display the HTML output, not raw RST.
 
 ## Quick Reference Table
 
@@ -80,8 +83,9 @@ Documentation/
 
 1. `scripts/validate_docs.sh` passes
 2. `scripts/render_docs.sh` shows no warnings
-3. README.md and Documentation/ are in sync
-4. `Documentation-GENERATED-temp/` is in `.gitignore`
+3. **Visual verification**: Open rendered HTML and confirm formatting
+4. README.md and Documentation/ are in sync
+5. `Documentation-GENERATED-temp/` is in `.gitignore`
 
 For detailed guidelines, read the appropriate reference file before starting work.
 
