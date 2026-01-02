@@ -7,6 +7,7 @@ description: "Create and maintain TYPO3 extension documentation following offici
 
 ## When to Use
 
+- Creating new `Documentation/` directory structure
 - Editing `Documentation/**/*.rst` files
 - Creating `Documentation/guides.xml` or updating `Settings.cfg`
 - Using TYPO3 directives: `confval`, `versionadded`, `card-grid`, `php:class`
@@ -30,6 +31,7 @@ description: "Create and maintain TYPO3 extension documentation following offici
 
 | Task | Reference File |
 |------|----------------|
+| File structure and naming conventions | `references/file-structure.md` |
 | Text roles (`:php:`, `:file:`, `:guilabel:`) | `references/text-roles-inline-code.md` |
 | RST syntax (headings, lists, code blocks) | `references/rst-syntax.md` |
 | TYPO3 directives (confval, card-grid, PlantUML) | `references/typo3-directives.md` |
@@ -60,15 +62,32 @@ description: "Create and maintain TYPO3 extension documentation following offici
 
 See `references/text-roles-inline-code.md` for complete list.
 
-## Required Structure
+## Required File Structure
+
+Full documentation requires this structure (per [TYPO3 File Structure](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/FileStructure.html)):
 
 ```
-Documentation/
-├── guides.xml        # Config (modern)
-├── Index.rst         # Entry point
-├── Includes.rst.txt  # Global includes
-└── */Index.rst       # Each subdirectory
+project-root/
+├── composer.json         # Required for rendering
+├── README.md             # Project overview (synced with Documentation/)
+└── Documentation/
+    ├── guides.xml        # Metadata and rendering config (required)
+    ├── Index.rst         # Entry point with toctree (required)
+    ├── Sitemap.rst       # Auto-populated site structure (optional)
+    ├── Includes.rst.txt  # Global includes for all pages (optional)
+    └── SectionName/      # CamelCase directories
+        └── Index.rst     # Required in every subdirectory
 ```
+
+**Naming Conventions:**
+- **CamelCase** for directories and files: `Configuration/Index.rst`, `Developer/TcaIntegration.rst`
+- **Index.rst** required in every directory (fallback during version switching)
+- Included RST files use `.rst.txt` extension: `Includes.rst.txt`
+- Code snippet files start with underscore: `_Services.yaml`, `_Example.php`
+
+**Minimum Prerequisites:**
+- Valid `composer.json` in project root
+- Entry point: `Documentation/Index.rst` (or `README.md` for single-file docs)
 
 ## Scripts
 
@@ -81,11 +100,12 @@ Documentation/
 
 ## Pre-Commit Checklist
 
-1. `scripts/validate_docs.sh` passes
-2. `scripts/render_docs.sh` shows no warnings
-3. **Visual verification**: Open rendered HTML and confirm formatting
-4. README.md and Documentation/ are in sync (no contradictions)
-5. `Documentation-GENERATED-temp/` is in `.gitignore`
+1. **File structure**: Every directory has `Index.rst`, CamelCase naming
+2. `scripts/validate_docs.sh` passes
+3. `scripts/render_docs.sh` shows no warnings
+4. **Visual verification**: Open rendered HTML and confirm formatting
+5. README.md and Documentation/ are in sync (no contradictions)
+6. `Documentation-GENERATED-temp/` is in `.gitignore`
 
 ## README.md Synchronization
 
