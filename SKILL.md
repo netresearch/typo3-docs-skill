@@ -7,6 +7,7 @@ description: "Create and maintain TYPO3 extension documentation following offici
 
 ## When to Use
 
+- **Creating documentation from scratch** (no `Documentation/` exists) → Use `init` command
 - Creating new `Documentation/` directory structure
 - Editing `Documentation/**/*.rst` files
 - Creating `Documentation/guides.xml` or updating `Settings.cfg`
@@ -30,6 +31,31 @@ description: "Create and maintain TYPO3 extension documentation following offici
 7. Commit together atomically
 
 > **Critical**: When user asks to "show docs", render and display the HTML output, not raw RST.
+
+## Creating Documentation from Scratch
+
+When asked to create documentation and no `Documentation/` directory exists, **always use the `init` command first**:
+
+```bash
+docker run --rm --pull always -v $(pwd):/project -it \
+  ghcr.io/typo3-documentation/render-guides:latest init
+```
+
+**Interactive prompts:**
+1. **Format**: Choose `rst` (ReStructuredText) for full TYPO3 theme features
+2. **Site Set**: Enter name/path if extension defines a Site set (auto-generates config docs)
+
+**After init, enhance the generated files:**
+1. Update `guides.xml` with GitHub integration (see guides.xml section)
+2. Expand `Index.rst` with proper toctree
+3. Create section directories with `Index.rst` files
+4. Add content based on extension features
+
+**Prerequisites:**
+- `composer.json` must exist in project root
+- Docker must be running
+
+See `references/rendering.md` for complete init documentation.
 
 ## Quick Reference Table
 
