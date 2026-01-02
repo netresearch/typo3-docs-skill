@@ -65,6 +65,7 @@ See `references/rendering.md` for complete init documentation.
 | File structure and naming conventions | `references/file-structure.md` |
 | guides.xml configuration | `references/guides-xml.md` |
 | Coding guidelines and .editorconfig | `references/coding-guidelines.md` |
+| **Code blocks, confval, PHP domain** | `references/code-structure-elements.md` |
 | Rendering, testing, viewing documentation | `references/rendering.md` |
 | Screenshots and images | `references/screenshots.md` |
 | Text roles (`:php:`, `:file:`, `:guilabel:`) | `references/text-roles-inline-code.md` |
@@ -112,12 +113,56 @@ See `references/coding-guidelines.md` for complete formatting rules.
 | Content | Role |
 |---------|------|
 | PHP code | `:php:\`ClassName\`` |
+| TypoScript | `:typoscript:\`lib.parseFunc\`` |
+| YAML | `:yaml:\`imports\`` |
 | Files | `:file:\`ext_localconf.php\`` |
 | Directories | `:path:\`Configuration/\`` |
 | UI elements | `:guilabel:\`Save\`` |
-| TypoScript | `:typoscript:\`lib.parseFunc\`` |
+| Keyboard shortcuts | `:kbd:\`Ctrl+S\`` |
 
 See `references/text-roles-inline-code.md` for complete list.
+
+## Code Blocks and Structure Elements
+
+### Use the Right Element
+
+| Content Type | Element |
+|--------------|---------|
+| Multi-line code | `..  code-block:: <language>` |
+| External code files | `..  literalinclude::` |
+| Configuration options | `..  confval::` |
+| PHP API documentation | `..  php:class::`, `..  php:method::` |
+| Site settings | `..  typo3:site-set-settings::` |
+
+### Code Block Requirements
+
+```rst
+..  code-block:: php
+    :caption: EXT:my_ext/Classes/Service/MyService.php
+
+    <?php
+    // Always include :caption: with file path
+```
+
+**Always include:**
+- `:caption:` with file path or description
+- Correct language identifier
+- Syntactically valid code (highlighting fails on errors)
+
+### confval for Configuration
+
+Use `confval` for extension settings, TCA fields, TypoScript properties:
+
+```rst
+..  confval:: encryptionMethod
+    :name: ext-vault-encryptionMethod
+    :type: string
+    :default: 'aes-256-gcm'
+
+    Description of the configuration option.
+```
+
+See `references/code-structure-elements.md` for complete guide.
 
 ## Required File Structure
 
@@ -215,13 +260,16 @@ See `references/screenshots.md` for complete guidelines.
 1. **`.editorconfig`**: Exists in `Documentation/` with correct settings
 2. **File structure**: Every directory has `Index.rst`, CamelCase naming
 3. **Formatting**: 4-space indentation, no tabs, max 80 chars, LF line endings
-4. **guides.xml**: Valid config with edit-on-github, project links, inventories
-5. **Screenshots**: PNG format, proper alt text, stored in `Documentation/Images/`
-6. `scripts/validate_docs.sh` passes
-7. `scripts/render_docs.sh` shows no warnings
-8. **Visual verification**: Open rendered HTML and confirm formatting
-9. README.md and Documentation/ are in sync (no contradictions)
-10. `Documentation-GENERATED-temp/` is in `.gitignore`
+4. **Code blocks**: Have `:caption:`, correct language, valid syntax
+5. **Configuration**: Uses `confval` directive with `:type:`, `:default:`
+6. **Text roles**: Inline code uses proper roles (`:php:`, `:file:`, etc.)
+7. **guides.xml**: Valid config with edit-on-github, project links, inventories
+8. **Screenshots**: PNG format, proper alt text, stored in `Documentation/Images/`
+9. `scripts/validate_docs.sh` passes
+10. `scripts/render_docs.sh` shows no warnings
+11. **Visual verification**: Open rendered HTML and confirm formatting
+12. README.md and Documentation/ are in sync (no contradictions)
+13. `Documentation-GENERATED-temp/` is in `.gitignore`
 
 ## README.md Synchronization
 
