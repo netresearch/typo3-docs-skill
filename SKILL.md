@@ -14,6 +14,7 @@ description: "Create and maintain TYPO3 extension documentation following offici
 - Using text roles: `:php:`, `:file:`, `:guilabel:`, `:ref:`
 - **Creating/adding screenshots**: Docker container, image guidelines
 - **Rendering documentation**: `scripts/render_docs.sh`, Docker container
+- **Live-viewing documentation**: Watch mode with auto-rebuild (`--watch`)
 - **Testing/validating documentation**: `scripts/validate_docs.sh`
 - **Viewing/showing documentation**: Render and open in browser
 - Deploying to docs.typo3.org
@@ -127,6 +128,7 @@ See `references/guides-xml.md` for complete configuration options.
 |--------|---------|
 | `scripts/validate_docs.sh` | Validate RST syntax |
 | `scripts/render_docs.sh` | Render locally with Docker |
+| `scripts/watch_docs.sh` | Live-view with auto-rebuild (watch mode) |
 | `scripts/extract-all.sh` | Extract documentation data |
 | `scripts/analyze-docs.sh` | Generate coverage analysis |
 
