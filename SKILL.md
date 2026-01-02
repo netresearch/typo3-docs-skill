@@ -1,6 +1,6 @@
 ---
 name: typo3-docs
-description: "Create and maintain TYPO3 extension documentation following official TYPO3 13.x standards. Use when creating/editing Documentation/*.rst files or README.md, using TYPO3 directives (confval, versionadded, card-grid), rendering/testing/viewing docs locally, or deploying to docs.typo3.org. By Netresearch."
+description: "Create and maintain TYPO3 extension documentation following official TYPO3 13.x standards. Use when creating/editing Documentation/*.rst files or README.md, using TYPO3 directives (confval, versionadded, card-grid), creating/adding screenshots, rendering/testing/viewing docs locally, or deploying to docs.typo3.org. By Netresearch."
 ---
 
 # TYPO3 Documentation
@@ -12,6 +12,7 @@ description: "Create and maintain TYPO3 extension documentation following offici
 - Creating `Documentation/guides.xml` or updating `Settings.cfg`
 - Using TYPO3 directives: `confval`, `versionadded`, `card-grid`, `php:class`
 - Using text roles: `:php:`, `:file:`, `:guilabel:`, `:ref:`
+- **Creating/adding screenshots**: Docker container, image guidelines
 - **Rendering documentation**: `scripts/render_docs.sh`, Docker container
 - **Testing/validating documentation**: `scripts/validate_docs.sh`
 - **Viewing/showing documentation**: Render and open in browser
@@ -36,6 +37,7 @@ description: "Create and maintain TYPO3 extension documentation following offici
 | File structure and naming conventions | `references/file-structure.md` |
 | guides.xml configuration | `references/guides-xml.md` |
 | Rendering, testing, viewing documentation | `references/rendering.md` |
+| Screenshots and images | `references/screenshots.md` |
 | Text roles (`:php:`, `:file:`, `:guilabel:`) | `references/text-roles-inline-code.md` |
 | RST syntax (headings, lists, code blocks) | `references/rst-syntax.md` |
 | TYPO3 directives (confval, card-grid, PlantUML) | `references/typo3-directives.md` |
@@ -128,15 +130,44 @@ See `references/guides-xml.md` for complete configuration options.
 | `scripts/extract-all.sh` | Extract documentation data |
 | `scripts/analyze-docs.sh` | Generate coverage analysis |
 
+## Screenshots
+
+When writing or reviewing documentation, **proactively suggest screenshots** where they would help users:
+
+### Suggest Screenshots For
+
+- **Backend module interfaces** - Show where to find features
+- **Configuration screens** - Extension settings, site configuration
+- **Complex UI workflows** - Multi-step processes
+- **Visual results** - Frontend output demonstrating features
+
+### Do NOT Add Screenshots For
+
+- Simple button clicks (use `:guilabel:` role instead)
+- Information easily conveyed in text
+- Standard TYPO3 interfaces that rarely change
+
+### Creating Screenshots
+
+Use the official Docker container for consistent screenshots:
+```bash
+docker run -d --name typo3-screenshots -p 8080:80 linawolf/typo3-screenshots
+```
+
+**Requirements:** PNG format, 1400x1050 or cropped, light mode, `j.doe` username.
+
+See `references/screenshots.md` for complete guidelines.
+
 ## Pre-Commit Checklist
 
 1. **File structure**: Every directory has `Index.rst`, CamelCase naming
 2. **guides.xml**: Valid config with edit-on-github, project links, inventories
-3. `scripts/validate_docs.sh` passes
-4. `scripts/render_docs.sh` shows no warnings
-5. **Visual verification**: Open rendered HTML and confirm formatting
-6. README.md and Documentation/ are in sync (no contradictions)
-7. `Documentation-GENERATED-temp/` is in `.gitignore`
+3. **Screenshots**: PNG format, proper alt text, stored in `Documentation/Images/`
+4. `scripts/validate_docs.sh` passes
+5. `scripts/render_docs.sh` shows no warnings
+6. **Visual verification**: Open rendered HTML and confirm formatting
+7. README.md and Documentation/ are in sync (no contradictions)
+8. `Documentation-GENERATED-temp/` is in `.gitignore`
 
 ## README.md Synchronization
 
