@@ -84,8 +84,18 @@ Documentation/
 1. `scripts/validate_docs.sh` passes
 2. `scripts/render_docs.sh` shows no warnings
 3. **Visual verification**: Open rendered HTML and confirm formatting
-4. README.md and Documentation/ are in sync
+4. README.md and Documentation/ are in sync (no contradictions)
 5. `Documentation-GENERATED-temp/` is in `.gitignore`
+
+## README.md Synchronization
+
+"In sync" means **content parity** and **consistency**, not duplication:
+
+- **Parity**: Topics in README.md should be covered in Documentation/.
+- **Consistency**: Shared topics must not contradict (CLI commands, code examples, configs).
+- **Source of truth**: Documentation/ is authoritative; update README.md to match.
+
+See `references/rst-syntax.md` for detailed examples.
 
 For detailed guidelines, read the appropriate reference file before starting work.
 
