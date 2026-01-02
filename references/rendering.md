@@ -118,6 +118,96 @@ After rendering, always verify the output visually:
 5. Test internal links work
 6. Review table formatting
 
+## Live View (Watch Mode)
+
+For real-time preview while editing, use watch mode. The container monitors file changes and automatically re-renders, enabling WYSIWYG-style editing.
+
+### Live View Command
+
+```bash
+docker run --rm -it --pull always \
+  -v "./Documentation:/project/Documentation" \
+  -v "./Documentation-GENERATED-temp:/project/Documentation-GENERATED-temp" \
+  -p 1337:1337 \
+  ghcr.io/typo3-documentation/render-guides:latest \
+  --config="Documentation" --watch
+```
+
+Then open `http://localhost:1337/Index.html` in your browser.
+
+### Command Differences from Basic Render
+
+| Option | Purpose |
+|--------|---------|
+| `-p 1337:1337` | Expose built-in web server on port 1337 |
+| `--watch` | Enable file watching and auto-rebuild |
+| Separate volume mounts | Required for watch mode to detect changes |
+
+### Custom Port
+
+If port 1337 is in use, change the host port:
+
+```bash
+-p 8080:1337  # Access via http://localhost:8080/
+```
+
+### Convenience Script: scripts/watch_docs.sh
+
+```bash
+#!/bin/bash
+# Live-render documentation with auto-reload
+set -e
+
+cd "$(dirname "$0")/.."
+
+echo "Starting documentation live server..."
+echo "Open: http://localhost:1337/Index.html"
+echo "Press Ctrl+C to stop"
+echo ""
+
+docker run --rm -it --pull always \
+  -v "./Documentation:/project/Documentation" \
+  -v "./Documentation-GENERATED-temp:/project/Documentation-GENERATED-temp" \
+  -p 1337:1337 \
+  ghcr.io/typo3-documentation/render-guides:latest \
+  --config="Documentation" --watch
+```
+
+### Shell Alias
+
+Add to your shell config (`.bashrc`, `.zshrc`) for quick access:
+
+```bash
+alias typo3-docs-watch="docker run --rm -it --pull always \
+  -v './Documentation:/project/Documentation' \
+  -v './Documentation-GENERATED-temp:/project/Documentation-GENERATED-temp' \
+  -p 1337:1337 ghcr.io/typo3-documentation/render-guides:latest --watch"
+```
+
+### DDEV Integration
+
+For DDEV projects, use the official addon:
+
+```bash
+ddev get github.com/TYPO3-Documentation/ddev-renderer-guides
+ddev restart
+```
+
+Access via `http://<yourproject>.ddev.site:1337/`
+
+### Watch Mode Limitations
+
+Auto-rebuild does **not** trigger for:
+
+| Change Type | Action Required |
+|-------------|-----------------|
+| `guides.xml` changes | Restart watch container |
+| Newly added files | Restart watch container |
+| Menu structure changes | Restart watch container |
+| File relocations | Restart watch container |
+
+For these changes, stop the container (Ctrl+C) and restart it.
+
 ## Troubleshooting
 
 ### Container Not Starting
@@ -196,4 +286,5 @@ Documentation-GENERATED-temp/
 ## References
 
 - **Rendering Container:** https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/RenderingContainer.html
+- **Live View (Watch Mode):** https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Howto/RenderingDocs/Watch.html
 - **guides.xml Reference:** https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/GuidesXml.html
