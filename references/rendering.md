@@ -48,17 +48,51 @@ Open this file in a browser to preview the documentation.
 
 ## Initializing New Documentation
 
-For new projects, scaffold the documentation structure:
+When no `Documentation/` directory exists, **always use the init command** to scaffold the structure:
 
 ```bash
 docker run --rm --pull always -v $(pwd):/project -it \
   ghcr.io/typo3-documentation/render-guides:latest init
 ```
 
-This creates:
-- `Documentation/guides.xml` - Configuration file
-- `Documentation/Index.rst` - Entry point
+### Prerequisites
+
+- `composer.json` must exist in project root
+- Docker must be installed and running
+
+### Interactive Prompts
+
+The init command asks for:
+
+1. **Documentation format**:
+   - `rst` (ReStructuredText) - **Recommended** for full TYPO3 theme features
+   - `md` (Markdown) - Simpler, for single-page documentation only
+
+2. **Site Set configuration** (if applicable):
+   - Enter the Site set name and path if your extension defines one
+   - Auto-generates configuration documentation
+   - Skip if extension has no Site sets
+
+### Generated Files
+
+The command creates:
+- `Documentation/guides.xml` - Configuration file (enhance with GitHub integration)
+- `Documentation/Index.rst` - Entry point with basic structure
 - Example documentation pages
+
+### Post-Init Workflow
+
+After running init:
+
+1. **Enhance `guides.xml`** with GitHub integration, project links, inventories
+2. **Expand `Index.rst`** with proper toctree and extension overview
+3. **Create section directories** (`Configuration/`, `Usage/`, `Developer/`) with `Index.rst` files
+4. **Add content** based on extension features
+5. **Render and verify** the documentation
+
+### Reference
+
+- **Writing Documentation for Extensions:** https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Howto/WritingDocForExtension/Index.html
 
 ## Convenience Scripts
 
