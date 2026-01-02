@@ -1,6 +1,6 @@
 ---
 name: typo3-docs
-description: "Create and maintain TYPO3 extension documentation following official TYPO3 13.x standards. Use when creating/editing Documentation/*.rst files or README.md, using TYPO3 directives (confval, versionadded, card-grid), rendering docs locally, or deploying to docs.typo3.org. By Netresearch."
+description: "Create and maintain TYPO3 extension documentation following official TYPO3 13.x standards. Use when creating/editing Documentation/*.rst files or README.md, using TYPO3 directives (confval, versionadded, card-grid), rendering/testing/viewing docs locally, or deploying to docs.typo3.org. By Netresearch."
 ---
 
 # TYPO3 Documentation
@@ -12,7 +12,9 @@ description: "Create and maintain TYPO3 extension documentation following offici
 - Creating `Documentation/guides.xml` or updating `Settings.cfg`
 - Using TYPO3 directives: `confval`, `versionadded`, `card-grid`, `php:class`
 - Using text roles: `:php:`, `:file:`, `:guilabel:`, `:ref:`
-- Running: `scripts/validate_docs.sh`, `scripts/render_docs.sh`
+- **Rendering documentation**: `scripts/render_docs.sh`, Docker container
+- **Testing/validating documentation**: `scripts/validate_docs.sh`
+- **Viewing/showing documentation**: Render and open in browser
 - Deploying to docs.typo3.org
 
 ## Core Workflow
@@ -33,6 +35,7 @@ description: "Create and maintain TYPO3 extension documentation following offici
 |------|----------------|
 | File structure and naming conventions | `references/file-structure.md` |
 | guides.xml configuration | `references/guides-xml.md` |
+| Rendering, testing, viewing documentation | `references/rendering.md` |
 | Text roles (`:php:`, `:file:`, `:guilabel:`) | `references/text-roles-inline-code.md` |
 | RST syntax (headings, lists, code blocks) | `references/rst-syntax.md` |
 | TYPO3 directives (confval, card-grid, PlantUML) | `references/typo3-directives.md` |
