@@ -91,10 +91,12 @@ git remote get-url origin | sed -E 's/.*[:/]([^/]+)\/([^/.]+)(\.git)?$/\1\/\2/'
         project-contact="mailto:info@vendor.com"
         project-repository="https://github.com/vendor/extension"
         project-issues="https://github.com/vendor/extension/issues"
+        project-discussions="https://github.com/vendor/extension/discussions"
         edit-on-github="vendor/extension"
         edit-on-github-branch="main"
         edit-on-github-directory="Documentation"
     />
+    <!-- Note: Only include project-discussions if GitHub Discussions is enabled -->
 
     <!-- Intersphinx inventories for cross-references -->
     <inventory id="t3coreapi" url="https://docs.typo3.org/m/typo3/reference-coreapi/main/en-us/"/>
@@ -135,11 +137,13 @@ Project metadata displayed in rendered documentation.
 
 ### `<extension>` Element
 
-TYPO3-specific theme configuration.
+TYPO3-specific theme configuration. The `class` attribute loads the TYPO3 documentation theme which provides the official styling, "Edit on GitHub" buttons, version switcher, and intersphinx support.
 
 | Attribute | Required | Description |
 |-----------|----------|-------------|
 | `class` | Yes | Always: `\T3Docs\Typo3DocsTheme\DependencyInjection\Typo3DocsThemeExtension` |
+
+**Why `class` is required:** Without the theme extension class, documentation renders with default phpDocumentor styling instead of TYPO3's official theme. The class enables all TYPO3-specific features like the version switcher, intersphinx cross-references, and branded styling.
 
 #### GitHub Integration Attributes
 
@@ -163,6 +167,19 @@ TYPO3-specific theme configuration.
 | `report-issue` | Override issue link | `none`, internal path, or URL |
 
 **Extract from:** `composer.json` support section or GitHub repository
+
+**project-discussions:** Add this attribute only if GitHub Discussions is enabled on the repository. Check with:
+```bash
+gh repo view --json hasDiscussionsEnabled --jq '.hasDiscussionsEnabled'
+# If true, add:
+gh repo view --json url --jq '"\(.url)/discussions"'
+```
+
+**report-issue:** Controls the "Report Issue" button behavior:
+- **Omit attribute**: Uses `project-issues` URL (default behavior)
+- **`none`**: Hides the "Report Issue" button entirely (use for internal/private docs)
+- **URL**: Custom URL for issue reporting (e.g., different tracker, form)
+- **Internal path**: Link to a documentation page (e.g., `/Contribute/ReportIssue`)
 
 #### Interlink Configuration
 
@@ -193,6 +210,17 @@ Define Intersphinx inventories for cross-references to other TYPO3 documentation
 |-----------|-------------|
 | `id` | Identifier used in `:ref:` cross-references |
 | `url` | Absolute URL to the documentation (must end with `/`) |
+
+#### When to Add Inventories
+
+Add an `<inventory>` element **only when your documentation uses cross-references to that manual**. Do not add unused inventories.
+
+**Detection:** Search your RST files for `:ref:` patterns with prefixes:
+```bash
+grep -rE ':ref:`t3[a-z]+:' Documentation/
+```
+
+If you use `:ref:`t3coreapi:dependency-injection``, add the `t3coreapi` inventory.
 
 #### Common Inventories
 
@@ -245,6 +273,11 @@ gh repo view --json defaultBranchRef --jq '.defaultBranchRef.name'
 
 # Get issues URL
 gh repo view --json url --jq '"\(.url)/issues"'
+
+# Check if Discussions enabled (add project-discussions only if true)
+gh repo view --json hasDiscussionsEnabled --jq '.hasDiscussionsEnabled'
+# If true:
+gh repo view --json url --jq '"\(.url)/discussions"'
 ```
 
 ### Step 3: Determine Extension Key
@@ -262,14 +295,17 @@ Combine extracted values into the complete template above.
 Before committing `guides.xml`:
 
 1. ✅ `theme="typo3docs"` is an attribute on `<guides>`, not a child element
-2. ✅ `<project title="">` is set with meaningful extension name
-3. ✅ `<project copyright="">` includes year and author/company
-4. ✅ `edit-on-github` matches GitHub `owner/repo` exactly
-5. ✅ `edit-on-github-branch` matches your default branch
-6. ✅ `project-repository` and `project-issues` are valid URLs
-7. ✅ `interlink-shortcode` uses Composer package name format
-8. ✅ Required `<inventory>` elements are included for cross-references used
-9. ✅ All URLs end with `/` where required
+2. ✅ `<extension class="...">` includes the required theme extension class
+3. ✅ `<project title="">` is set with meaningful extension name
+4. ✅ `<project copyright="">` includes year and author/company
+5. ✅ `edit-on-github` matches GitHub `owner/repo` exactly
+6. ✅ `edit-on-github-branch` matches your default branch
+7. ✅ `project-repository` and `project-issues` are valid URLs
+8. ✅ `project-discussions` added only if GitHub Discussions is enabled
+9. ✅ `interlink-shortcode` uses Composer package name format
+10. ✅ `typo3-core-preferred` set appropriately (stable, main, or specific version)
+11. ✅ `<inventory>` elements added only for cross-references actually used
+12. ✅ All inventory URLs end with `/`
 
 ## Common Mistakes
 
