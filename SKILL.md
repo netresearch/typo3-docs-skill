@@ -1,6 +1,6 @@
 ---
 name: typo3-docs
-description: "Create and maintain TYPO3 extension documentation following official docs.typo3.org standards. Use when creating/editing Documentation/*.rst files or README.md, using TYPO3 directives (confval, versionadded, card-grid), creating/adding screenshots, rendering/testing/viewing docs locally, or deploying to docs.typo3.org. By Netresearch."
+description: "Create and maintain TYPO3 extension documentation following official docs.typo3.org standards. Use when creating/editing Documentation/*.rst files or README.md, using TYPO3 directives (confval, versionadded, card-grid, accordion, tabs, admonitions), creating/adding screenshots, rendering/testing/viewing docs locally, or deploying to docs.typo3.org. By Netresearch."
 ---
 
 # TYPO3 Documentation
@@ -11,7 +11,7 @@ description: "Create and maintain TYPO3 extension documentation following offici
 - Creating new `Documentation/` directory structure
 - Editing `Documentation/**/*.rst` files
 - Creating `Documentation/guides.xml` or updating `Settings.cfg`
-- Using TYPO3 directives: `confval`, `versionadded`, `card-grid`, `php:class`
+- Using TYPO3 directives: `confval`, `versionadded`, `card-grid`, `accordion`, `tabs`
 - Using text roles: `:php:`, `:file:`, `:guilabel:`, `:ref:`
 - **Creating/adding screenshots**: Docker container, image guidelines
 - **Rendering documentation**: `scripts/render_docs.sh`, Docker container
@@ -66,6 +66,7 @@ See `references/rendering.md` for complete init documentation.
 | guides.xml configuration | `references/guides-xml.md` |
 | Coding guidelines and .editorconfig | `references/coding-guidelines.md` |
 | **Code blocks, confval, PHP domain** | `references/code-structure-elements.md` |
+| **Content directives (accordion, tabs, cards)** | `references/content-directives.md` |
 | Rendering, testing, viewing documentation | `references/rendering.md` |
 | Screenshots and images | `references/screenshots.md` |
 | Text roles (`:php:`, `:file:`, `:guilabel:`) | `references/text-roles-inline-code.md` |
@@ -163,6 +164,49 @@ Use `confval` for extension settings, TCA fields, TypoScript properties:
 ```
 
 See `references/code-structure-elements.md` for complete guide.
+
+## Content Directives
+
+Use the right directive for structured content:
+
+| Content Type | Directive | When to Use |
+|--------------|-----------|-------------|
+| Collapsible content | `accordion` | FAQ, optional details |
+| Important notices | `note`, `tip`, `warning` | Callouts, caveats |
+| Feature grids | `card-grid` | Overview pages, navigation |
+| Alternative examples | `tabs` | Multi-language code, variants |
+| Version changes | `versionadded`, `deprecated` | API changes |
+
+### Admonitions (Use Appropriately)
+
+```rst
+..  note::
+    Background information users should know.
+
+..  tip::
+    Helpful suggestion for better results.
+
+..  warning::
+    Potential issue or data loss risk.
+```
+
+### Tabs (Synchronized)
+
+```rst
+..  tabs::
+
+    ..  group-tab:: Composer
+
+        Run :bash:`composer require vendor/package`
+
+    ..  group-tab:: Classic
+
+        Download and install manually.
+```
+
+Tabs with the same name synchronize across the page.
+
+See `references/content-directives.md` for complete guide.
 
 ## Required File Structure
 
@@ -263,13 +307,15 @@ See `references/screenshots.md` for complete guidelines.
 4. **Code blocks**: Have `:caption:`, correct language, valid syntax
 5. **Configuration**: Uses `confval` directive with `:type:`, `:default:`
 6. **Text roles**: Inline code uses proper roles (`:php:`, `:file:`, etc.)
-7. **guides.xml**: Valid config with edit-on-github, project links, inventories
-8. **Screenshots**: PNG format, proper alt text, stored in `Documentation/Images/`
-9. `scripts/validate_docs.sh` passes
-10. `scripts/render_docs.sh` shows no warnings
-11. **Visual verification**: Open rendered HTML and confirm formatting
-12. README.md and Documentation/ are in sync (no contradictions)
-13. `Documentation-GENERATED-temp/` is in `.gitignore`
+7. **Content directives**: Correct admonition type, synchronized tab names
+8. **Version directives**: Include version number, deprecations mention replacement
+9. **guides.xml**: Valid config with edit-on-github, project links, inventories
+10. **Screenshots**: PNG format, proper alt text, stored in `Documentation/Images/`
+11. `scripts/validate_docs.sh` passes
+12. `scripts/render_docs.sh` shows no warnings
+13. **Visual verification**: Open rendered HTML and confirm formatting
+14. README.md and Documentation/ are in sync (no contradictions)
+15. `Documentation-GENERATED-temp/` is in `.gitignore`
 
 ## README.md Synchronization
 
