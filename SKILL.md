@@ -46,10 +46,11 @@ docker run --rm --pull always -v $(pwd):/project -it \
 2. **Site Set**: Enter name/path if extension defines a Site set (auto-generates config docs)
 
 **After init, enhance the generated files:**
-1. Update `guides.xml` with GitHub integration (see guides.xml section)
-2. Expand `Index.rst` with proper toctree
-3. Create section directories with `Index.rst` files
-4. Add content based on extension features
+1. **Create `.editorconfig`** in `Documentation/` folder (see Critical Rules)
+2. Update `guides.xml` with GitHub integration (see guides.xml section)
+3. Expand `Index.rst` with proper toctree
+4. Create section directories with `Index.rst` files
+5. Add content based on extension features
 
 **Prerequisites:**
 - `composer.json` must exist in project root
@@ -63,6 +64,7 @@ See `references/rendering.md` for complete init documentation.
 |------|----------------|
 | File structure and naming conventions | `references/file-structure.md` |
 | guides.xml configuration | `references/guides-xml.md` |
+| Coding guidelines and .editorconfig | `references/coding-guidelines.md` |
 | Rendering, testing, viewing documentation | `references/rendering.md` |
 | Screenshots and images | `references/screenshots.md` |
 | Text roles (`:php:`, `:file:`, `:guilabel:`) | `references/text-roles-inline-code.md` |
@@ -76,12 +78,34 @@ See `references/rendering.md` for complete init documentation.
 
 ## Critical Rules (Always Apply)
 
+- **`.editorconfig`** required in `Documentation/` folder (see template below)
 - **UTF-8** encoding, **4-space** indentation, no tabs
+- **80 characters** max line length
+- **LF** line endings (Unix-style), no trailing whitespace
 - **Sentence case** headings (not Title Case)
 - **CamelCase** file/directory names
 - **Index.rst** required in every subdirectory
 - **American English** spelling (color, behavior, optimize)
 - **PNG format** for screenshots, always include `:alt:` text
+
+### Required .editorconfig
+
+Create `Documentation/.editorconfig`:
+
+```editorconfig
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+trim_trailing_whitespace = true
+max_line_length = 80
+```
+
+See `references/coding-guidelines.md` for complete formatting rules.
 
 ## Text Roles (Must Use)
 
@@ -188,14 +212,16 @@ See `references/screenshots.md` for complete guidelines.
 
 ## Pre-Commit Checklist
 
-1. **File structure**: Every directory has `Index.rst`, CamelCase naming
-2. **guides.xml**: Valid config with edit-on-github, project links, inventories
-3. **Screenshots**: PNG format, proper alt text, stored in `Documentation/Images/`
-4. `scripts/validate_docs.sh` passes
-5. `scripts/render_docs.sh` shows no warnings
-6. **Visual verification**: Open rendered HTML and confirm formatting
-7. README.md and Documentation/ are in sync (no contradictions)
-8. `Documentation-GENERATED-temp/` is in `.gitignore`
+1. **`.editorconfig`**: Exists in `Documentation/` with correct settings
+2. **File structure**: Every directory has `Index.rst`, CamelCase naming
+3. **Formatting**: 4-space indentation, no tabs, max 80 chars, LF line endings
+4. **guides.xml**: Valid config with edit-on-github, project links, inventories
+5. **Screenshots**: PNG format, proper alt text, stored in `Documentation/Images/`
+6. `scripts/validate_docs.sh` passes
+7. `scripts/render_docs.sh` shows no warnings
+8. **Visual verification**: Open rendered HTML and confirm formatting
+9. README.md and Documentation/ are in sync (no contradictions)
+10. `Documentation-GENERATED-temp/` is in `.gitignore`
 
 ## README.md Synchronization
 
