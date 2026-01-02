@@ -32,6 +32,7 @@ description: "Create and maintain TYPO3 extension documentation following offici
 | Task | Reference File |
 |------|----------------|
 | File structure and naming conventions | `references/file-structure.md` |
+| guides.xml configuration | `references/guides-xml.md` |
 | Text roles (`:php:`, `:file:`, `:guilabel:`) | `references/text-roles-inline-code.md` |
 | RST syntax (headings, lists, code blocks) | `references/rst-syntax.md` |
 | TYPO3 directives (confval, card-grid, PlantUML) | `references/typo3-directives.md` |
@@ -89,6 +90,32 @@ project-root/
 - Valid `composer.json` in project root
 - Entry point: `Documentation/Index.rst` (or `README.md` for single-file docs)
 
+## guides.xml Configuration
+
+Extract project metadata from `composer.json` and GitHub to create a comprehensive `guides.xml`:
+
+```xml
+<guides theme="typo3docs">
+    <project title="Extension Name" copyright="since 2024 by Vendor"/>
+    <extension
+        class="\T3Docs\Typo3DocsTheme\DependencyInjection\Typo3DocsThemeExtension"
+        edit-on-github="owner/repo"
+        edit-on-github-branch="main"
+        project-repository="https://github.com/owner/repo"
+        project-issues="https://github.com/owner/repo/issues"
+        interlink-shortcode="vendor/package-name"
+    />
+    <inventory id="t3coreapi" url="https://docs.typo3.org/m/typo3/reference-coreapi/main/en-us/"/>
+</guides>
+```
+
+**Extract from sources:**
+- `composer.json`: `name` → interlink-shortcode, `authors` → copyright, `support` → project-issues
+- GitHub: `owner/repo` → edit-on-github, default branch → edit-on-github-branch
+- Git remote: `git remote get-url origin` to determine owner/repo
+
+See `references/guides-xml.md` for complete configuration options.
+
 ## Scripts
 
 | Script | Purpose |
@@ -101,11 +128,12 @@ project-root/
 ## Pre-Commit Checklist
 
 1. **File structure**: Every directory has `Index.rst`, CamelCase naming
-2. `scripts/validate_docs.sh` passes
-3. `scripts/render_docs.sh` shows no warnings
-4. **Visual verification**: Open rendered HTML and confirm formatting
-5. README.md and Documentation/ are in sync (no contradictions)
-6. `Documentation-GENERATED-temp/` is in `.gitignore`
+2. **guides.xml**: Valid config with edit-on-github, project links, inventories
+3. `scripts/validate_docs.sh` passes
+4. `scripts/render_docs.sh` shows no warnings
+5. **Visual verification**: Open rendered HTML and confirm formatting
+6. README.md and Documentation/ are in sync (no contradictions)
+7. `Documentation-GENERATED-temp/` is in `.gitignore`
 
 ## README.md Synchronization
 
