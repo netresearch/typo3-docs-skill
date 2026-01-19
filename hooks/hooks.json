@@ -1,0 +1,27 @@
+{
+  "description": "TYPO3 docs hooks for RST syntax validation before writes",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${CLAUDE_PLUGIN_ROOT}/scripts/validate_rst.py",
+            "timeout": 2
+          }
+        ]
+      },
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${CLAUDE_PLUGIN_ROOT}/scripts/validate_rst.py",
+            "timeout": 2
+          }
+        ]
+      }
+    ]
+  }
+}
