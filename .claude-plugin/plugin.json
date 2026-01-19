@@ -1,14 +1,15 @@
 {
   "name": "typo3-docs",
-  "version": "2.0.2",
-  "description": "Create and maintain TYPO3 extension documentation following official docs.typo3.org standards",
+  "version": "2.1.0",
+  "description": "Create and maintain TYPO3 extension documentation with RST validation",
   "repository": "https://github.com/netresearch/typo3-docs-skill",
   "license": "MIT",
   "author": {
     "name": "Netresearch DTT GmbH",
-    "email": "info@netresearch.de"
+    "url": "https://www.netresearch.de"
   },
   "skills": [
     "./skills/typo3-docs"
-  ]
+  ],
+  "hooks": "./hooks/hooks.json"
 }
