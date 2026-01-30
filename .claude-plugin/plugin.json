@@ -1,6 +1,6 @@
 {
   "name": "typo3-docs",
-  "version": "2.1.1",
+  "version": "2.2.0",
   "description": "Create and maintain TYPO3 extension documentation with RST validation",
   "repository": "https://github.com/netresearch/typo3-docs-skill",
   "license": "MIT",
