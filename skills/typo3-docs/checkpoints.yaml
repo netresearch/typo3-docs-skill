@@ -1,0 +1,188 @@
+# Checkpoints for typo3-docs skill
+# Validates TYPO3 extension documentation following docs.typo3.org standards
+
+version: 1
+skill_id: typo3-docs
+
+mechanical:
+  # === DIRECTORY STRUCTURE ===
+  - id: TD-01
+    type: file_exists
+    target: Documentation/
+    severity: error
+    desc: "Documentation/ directory must exist"
+
+  - id: TD-02
+    type: file_exists
+    target: Documentation/Index.rst
+    severity: error
+    desc: "Documentation/Index.rst must exist as main entry point"
+
+  - id: TD-03
+    type: file_exists
+    target: Documentation/guides.xml
+    severity: error
+    desc: "Documentation/guides.xml must exist for rendering configuration"
+
+  # === EDITORCONFIG ===
+  - id: TD-04
+    type: file_exists
+    target: Documentation/.editorconfig
+    severity: warning
+    desc: "Documentation/.editorconfig should exist for consistent formatting"
+
+  # === GUIDES.XML CONTENT ===
+  - id: TD-05
+    type: contains
+    target: Documentation/guides.xml
+    pattern: "<project"
+    severity: error
+    desc: "guides.xml must contain project element"
+
+  - id: TD-06
+    type: contains
+    target: Documentation/guides.xml
+    pattern: "version="
+    severity: warning
+    desc: "guides.xml should specify documentation version"
+
+  - id: TD-07
+    type: regex
+    target: Documentation/guides.xml
+    pattern: 'extension="[a-z_]+"'
+    severity: warning
+    desc: "guides.xml should specify extension key"
+
+  # === INDEX.RST CONTENT ===
+  - id: TD-08
+    type: regex
+    target: Documentation/Index.rst
+    pattern: "^={3,}$"
+    severity: error
+    desc: "Index.rst must have proper RST title underline"
+
+  - id: TD-09
+    type: contains
+    target: Documentation/Index.rst
+    pattern: ".. toctree::"
+    severity: warning
+    desc: "Index.rst should have toctree directive"
+
+  # === FILE NAMING (CamelCase) ===
+  - id: TD-10
+    type: command
+    pattern: "find Documentation/ -name '*.rst' | grep -E '/[a-z]' | grep -v Index.rst | head -1 && exit 1 || exit 0"
+    severity: warning
+    desc: "RST files should use CamelCase naming (e.g., Configuration.rst not configuration.rst)"
+
+  # === IMAGE FORMAT ===
+  - id: TD-11
+    type: command
+    pattern: "find Documentation/ -type f \\( -name '*.jpg' -o -name '*.jpeg' -o -name '*.gif' -o -name '*.bmp' \\) | head -1 && exit 1 || exit 0"
+    severity: warning
+    desc: "Images should be in PNG format, not JPG/GIF/BMP"
+
+  - id: TD-12
+    type: file_exists
+    target: Documentation/Images/
+    severity: info
+    desc: "Documentation/Images/ directory should exist for screenshots"
+
+  # === README CONSISTENCY ===
+  - id: TD-13
+    type: file_exists
+    target: README.md
+    severity: warning
+    desc: "README.md should exist at repository root"
+
+  - id: TD-14
+    type: contains
+    target: README.md
+    pattern: "Documentation"
+    severity: info
+    desc: "README.md should reference the Documentation folder"
+
+  # === COMMON DOCUMENTATION SECTIONS ===
+  - id: TD-15
+    type: file_exists
+    target: Documentation/Configuration/
+    severity: info
+    desc: "Documentation/Configuration/ directory should exist"
+
+  - id: TD-16
+    type: file_exists
+    target: Documentation/Installation/
+    severity: info
+    desc: "Documentation/Installation/ directory should exist"
+
+  - id: TD-17
+    type: file_exists
+    target: Documentation/Introduction/
+    severity: info
+    desc: "Documentation/Introduction/ directory should exist"
+
+llm_reviews:
+  # === CONTENT QUALITY ===
+  - id: TD-20
+    domain: documentation
+    prompt: |
+      Review the Documentation/Index.rst file for:
+      - Proper RST formatting with correct heading levels
+      - Clear project description in the introduction
+      - Logical toctree ordering (Introduction, Installation, Configuration, etc.)
+      - Appropriate maxdepth setting in toctree
+
+      Report any formatting issues or missing standard sections.
+    severity: warning
+    desc: "Index.rst should have proper structure and formatting"
+
+  - id: TD-21
+    domain: documentation
+    prompt: |
+      Compare README.md with Documentation/Index.rst:
+      - Extension name should be consistent
+      - Version references should match
+      - Feature descriptions should align
+      - Installation instructions should not contradict
+
+      Report any inconsistencies between these files.
+    severity: warning
+    desc: "README.md and Documentation should be consistent"
+
+  - id: TD-22
+    domain: documentation
+    prompt: |
+      Review the guides.xml configuration for:
+      - Correct project name matching extension key
+      - Appropriate release/version values
+      - Valid copyright statement
+      - Proper vendor and extension settings
+
+      Check against TYPO3 documentation rendering requirements.
+    severity: warning
+    desc: "guides.xml should be properly configured for docs.typo3.org"
+
+  - id: TD-23
+    domain: documentation
+    prompt: |
+      Check documentation completeness:
+      - Installation instructions with composer and TER options
+      - Configuration reference for TypoScript/FlexForm settings
+      - Usage examples with code snippets
+      - Changelog or version history
+
+      Report missing critical sections for an extension user.
+    severity: info
+    desc: "Documentation should cover installation, configuration, and usage"
+
+  - id: TD-24
+    domain: documentation
+    prompt: |
+      Review RST file naming conventions:
+      - Files should use CamelCase (Configuration.rst, not configuration.rst)
+      - Index.rst is the exception (lowercase allowed)
+      - Directory names should also follow CamelCase
+
+      List any files not following the convention.
+    severity: info
+    desc: "RST files should follow TYPO3 CamelCase naming convention"
