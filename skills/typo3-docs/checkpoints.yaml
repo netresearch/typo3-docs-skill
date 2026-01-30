@@ -49,7 +49,7 @@ mechanical:
   - id: TD-07
     type: regex
     target: Documentation/guides.xml
-    pattern: 'extension="[a-z_]+"'
+    pattern: 'extension-key="[a-z_]+"'
     severity: warning
     desc: "guides.xml should specify extension key"
 
