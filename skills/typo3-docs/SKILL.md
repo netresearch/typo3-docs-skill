@@ -11,12 +11,19 @@ Create and maintain TYPO3 extension documentation following official docs.typo3.
 
 To create or maintain TYPO3 documentation, follow these steps:
 
-1. Consult the appropriate reference file for the task
-2. Use TYPO3-specific directives, not plain text
-3. Run `scripts/validate_docs.sh` to check syntax
-4. Run `scripts/render_docs.sh` to build HTML output
-5. Verify rendered output visually in browser
-6. Keep README.md and Documentation/ synchronized
+1. **Run extraction first** to analyze the codebase and identify documentation gaps:
+   ```bash
+   scripts/extract-all.sh /path/to/extension
+   scripts/analyze-docs.sh /path/to/extension
+   ```
+   This reveals what features exist vs. what is documented.
+
+2. Consult the appropriate reference file for the task
+3. Use TYPO3-specific directives, not plain text
+4. Run `scripts/validate_docs.sh` to check syntax
+5. Run `scripts/render_docs.sh` to build HTML output
+6. Verify rendered output (see Pre-Commit Checklist for required evidence)
+7. Verify README.md and Documentation/ synchronization
 
 > **Critical**: When the user asks to "show docs", render and display HTML output, not raw RST.
 
@@ -223,8 +230,16 @@ mcp__chrome-devtools__take_screenshot
 6. **Screenshots exist** for all backend modules, config screens, and UI workflows
 7. All images have `:alt:` text and `:zoom: lightbox` (or appropriate zoom mode)
 8. `scripts/validate_docs.sh` passes without errors
-9. Visual verification of rendered HTML output (check screenshots display correctly)
-10. README.md and Documentation/ content is consistent
+9. **Render verification evidence required** - After `scripts/render_docs.sh`, verify and confirm:
+   - No warnings or errors in render output
+   - Card grids display correctly (no broken layouts)
+   - Cross-references resolve (no broken `:ref:` links)
+   - Images/screenshots load and display
+10. **README ↔ Documentation sync verified** - After edits, confirm:
+    - Feature descriptions match between README.md and Documentation/Index.rst
+    - Installation instructions are identical
+    - Configuration examples are consistent
+    - Version/compatibility info is synchronized
 
 ## External Resources
 
