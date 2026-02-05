@@ -156,6 +156,86 @@ exit
 | `float-left` | Float image left with text wrap |
 | `float-right` | Float image right with text wrap |
 
+## Image Zoom and Lightbox (render-guides 0.36.0+)
+
+The TYPO3 documentation theme provides built-in zoom and lightbox capabilities. Use the `:zoom:` option on figure and image directives.
+
+### Zoom Modes
+
+| Mode | Description | Use Case |
+|------|-------------|----------|
+| `lightbox` | Opens image in full-screen overlay with dark backdrop. Close with Escape or click outside. | **Default for most images** |
+| `gallery` | Gallery viewer with mouse wheel zoom and navigation between grouped images | Step-by-step tutorials, related screenshots |
+| `inline` | Scroll wheel zoom directly on image, drag-to-pan when zoomed | Technical diagrams needing frequent inspection |
+| `lens` | Magnifier lens follows cursor, showing zoomed view in adjacent panel | Detailed UI elements |
+
+### Zoom Examples
+
+**Lightbox (recommended default):**
+
+```rst
+.. figure:: /Images/Configuration/ExtensionSettings.png
+   :alt: Extension configuration screen
+   :zoom: lightbox
+   :class: with-border with-shadow
+
+   Configure the extension in Admin Tools > Settings
+```
+
+**Gallery with grouping:**
+
+```rst
+.. figure:: /Images/Tutorial/Step1.png
+   :alt: Step 1 - Open the module
+   :zoom: gallery
+   :gallery: installation-steps
+
+   Step 1: Navigate to Admin Tools
+
+.. figure:: /Images/Tutorial/Step2.png
+   :alt: Step 2 - Configure settings
+   :zoom: gallery
+   :gallery: installation-steps
+
+   Step 2: Configure the extension
+```
+
+**Inline zoom for diagrams:**
+
+```rst
+.. figure:: /Images/Developer/ArchitectureDiagram.png
+   :alt: Extension architecture showing data flow
+   :zoom: inline
+   :class: with-border
+
+   Architecture overview - scroll to zoom, drag to pan
+```
+
+**Lens mode for detail inspection:**
+
+```rst
+.. figure:: /Images/Usage/DetailedForm.png
+   :alt: TCA form with many fields
+   :zoom: lens
+   :zoom-factor: 3
+
+   Hover over form fields to magnify
+```
+
+### Additional Zoom Options
+
+| Option | Purpose | Default |
+|--------|---------|---------|
+| `:zoom-indicator:` | Show/hide zoom icon | `true` |
+| `:zoom-factor:` | Magnification strength for lens mode | `2` |
+
+### Accessibility
+
+All zoom modes:
+- Support keyboard navigation
+- Maintain proper ARIA attributes for screen readers
+- Respect `prefers-reduced-motion` media query
+
 ## Annotations
 
 When annotating screenshots with boxes, arrows, or numbers:
