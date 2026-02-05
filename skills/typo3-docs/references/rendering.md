@@ -278,6 +278,53 @@ If rendering produces unexpected results, clear the generated directory:
 rm -rf Documentation-GENERATED-temp/
 ```
 
+### Common Content Issues
+
+#### RST Not Rendering / Changes Not Appearing
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| New page not in menu | Missing from `toctree` | Add to parent `Index.rst` toctree directive |
+| Page renders blank | Indentation error | Check 3-space indent for directive content |
+| Code block not highlighted | Missing language | Add language: `.. code-block:: php` |
+| Directive ignored | Missing blank line | Add blank line before and after directive |
+
+#### Images Not Appearing
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| Broken image icon | Wrong path | Use `/Images/...` (absolute from Documentation root) |
+| Image missing in output | Not in Images folder | Move to `Documentation/Images/` |
+| Alt text warning | Missing `:alt:` | Add `:alt: Description` to figure/image |
+
+#### Cross-References Not Working
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| `undefined label` error | Label doesn't exist | Add `.. _my-label:` before target heading |
+| Wrong page linked | Duplicate labels | Use unique labels across all RST files |
+| Interlink fails | Missing inventory | Add to `guides.xml` interlink section |
+
+#### Structure Issues
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| Directory not in menu | Missing Index.rst | Create `Index.rst` in every subdirectory |
+| Render fails immediately | Missing guides.xml | Run `docker run ... init` to scaffold |
+| Menu order wrong | toctree order | Reorder entries in toctree directive |
+
+### Debugging Render Failures
+
+For verbose error output:
+```bash
+docker run --rm --pull always -v $(pwd):/project -it \
+  ghcr.io/typo3-documentation/render-guides:latest \
+  --config=Documentation \
+  --fail-on-log
+```
+
+Check the last few lines of output for specific RST file and line number causing the error.
+
 ## CI/CD Integration
 
 For GitHub Actions, add documentation rendering to your workflow:
