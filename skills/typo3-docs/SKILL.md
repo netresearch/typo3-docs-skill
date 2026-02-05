@@ -44,7 +44,9 @@ When creating interactive content, consult `references/content-directives.md` fo
 
 ### Images and Screenshots
 
-When adding screenshots, consult `references/screenshots.md` for image requirements, alt text, figure directives, and screenshot best practices.
+When adding screenshots, consult `references/screenshots.md` for image requirements, alt text, figure directives, zoom/lightbox options, and screenshot best practices.
+
+> **MANDATORY**: When documenting backend modules, configuration screens, or UI workflows, you MUST take screenshots. Do not proceed without them. See "Screenshot Requirements" below.
 
 ### Rendering and Deployment
 
@@ -136,12 +138,63 @@ To provide AI assistants with documentation context, copy `assets/AGENTS.md` to 
 - File structure overview
 - Style guidelines for AI-generated content
 
+## Screenshot Requirements (MANDATORY)
+
+**YOU MUST TAKE SCREENSHOTS** when documenting any of the following. This is not optional:
+
+| Documentation Topic | Screenshot Required |
+|---------------------|---------------------|
+| Backend module interfaces | ✅ **YES** - Show the module UI |
+| Extension configuration screens | ✅ **YES** - Show settings location |
+| Multi-step UI workflows | ✅ **YES** - One screenshot per step |
+| TCA/FlexForm configurations | ✅ **YES** - Show resulting forms |
+| Frontend visual output | ✅ **YES** - Show what users see |
+| Error messages/states | ✅ **YES** - Help users identify issues |
+
+### Screenshot Workflow
+
+1. **Before writing documentation**: Identify which screens need screenshots
+2. **Set up screenshot environment**: Use Docker container or DDEV
+3. **Take screenshots**: PNG format, 1400x1050 or cropped
+4. **Add to documentation**: Use figure directive with `:zoom: lightbox` and `:alt:`
+5. **Verify in rendered output**: Confirm images display correctly
+
+### Taking Screenshots
+
+**Using browser DevTools (Chrome/Firefox):**
+```bash
+# Open DevTools (F12), then:
+# Ctrl+Shift+P → "Capture screenshot" or "Capture full size screenshot"
+```
+
+**Using Playwright MCP (automated):**
+```
+mcp__playwright__browser_take_screenshot
+```
+
+**Using Chrome DevTools MCP:**
+```
+mcp__chrome-devtools__take_screenshot
+```
+
+### Screenshot Checklist (verify before proceeding)
+
+- [ ] PNG format used
+- [ ] Light theme in TYPO3 backend
+- [ ] Cropped to relevant area
+- [ ] `:alt:` text describes image content
+- [ ] `:zoom: lightbox` added for click-to-enlarge
+- [ ] `:class: with-border with-shadow` for visual polish
+- [ ] Image stored in `Documentation/Images/` with CamelCase name
+
+> **DO NOT** write "TODO: add screenshot" or skip screenshots. If you cannot take a screenshot, explicitly ask the user to provide one or use the MCP tools to capture them.
+
 ## Critical Rules
 
 - **UTF-8** encoding, **4-space** indentation, **80 character** max line length, **LF** line endings
 - **CamelCase** for file and directory names, **sentence case** for headings
 - **Index.rst** required in every subdirectory
-- **PNG** format for screenshots with `:alt:` text
+- **PNG** format for screenshots with `:alt:` text and `:zoom: lightbox`
 - **.editorconfig** required in `Documentation/` directory
 
 ## Element Selection Guide
@@ -156,6 +209,9 @@ To provide AI assistants with documentation context, copy `assets/AGENTS.md` to 
 | Feature grids | `card-grid` |
 | Alternative approaches | `tabs` (synchronized) |
 | Collapsible content | `accordion` |
+| **UI/Backend screenshots** | `figure` with `:zoom: lightbox` `:class: with-border with-shadow` |
+| **Tutorial steps** | `figure` with `:zoom: gallery` `:gallery: group-name` |
+| **Technical diagrams** | `figure` with `:zoom: inline` for scroll-to-zoom |
 
 ## Pre-Commit Checklist
 
@@ -164,9 +220,11 @@ To provide AI assistants with documentation context, copy `assets/AGENTS.md` to 
 3. 4-space indentation, no tabs, max 80 characters per line
 4. Code blocks have `:caption:` and valid syntax highlighting
 5. Inline code uses appropriate roles (`:php:`, `:file:`, `:typoscript:`)
-6. `scripts/validate_docs.sh` passes without errors
-7. Visual verification of rendered HTML output
-8. README.md and Documentation/ content is consistent
+6. **Screenshots exist** for all backend modules, config screens, and UI workflows
+7. All images have `:alt:` text and `:zoom: lightbox` (or appropriate zoom mode)
+8. `scripts/validate_docs.sh` passes without errors
+9. Visual verification of rendered HTML output (check screenshots display correctly)
+10. README.md and Documentation/ content is consistent
 
 ## External Resources
 
