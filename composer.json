@@ -1,5 +1,8 @@
 {
-  "name": "netresearch/agent-typo3-docs",
+  "name": "netresearch/typo3-docs-skill",
+  "replace": {
+    "netresearch/agent-typo3-docs": "self.version"
+  },
   "description": "Netresearch AI skill for TYPO3 extension documentation following official standards",
   "type": "ai-agent-skill",
   "license": "MIT",
