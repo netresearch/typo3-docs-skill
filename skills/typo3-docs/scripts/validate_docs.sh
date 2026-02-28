@@ -60,7 +60,7 @@ if command -v rst2html.py &> /dev/null; then
     while IFS= read -r -d '' file; do
         if ! rst2html.py --strict "$file" > /dev/null 2>&1; then
             echo "❌ Syntax error in: $file"
-            ((ERRORS++))
+            ERRORS=$((ERRORS + 1))
         fi
     done < <(find "$DOC_DIR" -name "*.rst" -print0)
 
@@ -97,7 +97,7 @@ done < <(find "$DOC_DIR" -name "*.rst" -print0)
 while IFS= read -r -d '' file; do
     if ! file -b --mime-encoding "$file" | grep -q utf-8; then
         echo "⚠️  Non-UTF-8 encoding in: $file"
-        ((WARNINGS++))
+        WARNINGS=$((WARNINGS + 1))
     fi
 done < <(find "$DOC_DIR" -name "*.rst" -print0)
 
@@ -105,9 +105,32 @@ done < <(find "$DOC_DIR" -name "*.rst" -print0)
 while IFS= read -r -d '' file; do
     if grep -q '[[:space:]]$' "$file"; then
         echo "⚠️  Trailing whitespace in: $file"
-        ((WARNINGS++))
+        WARNINGS=$((WARNINGS + 1))
     fi
 done < <(find "$DOC_DIR" -name "*.rst" -print0)
+
+# Check TYPO3 heading hierarchy (= for h1/h2, - for h3, ~ for h4)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+echo ""
+echo "Checking heading hierarchy..."
+HEADING_ERRORS=0
+while IFS= read -r -d '' file; do
+    RESULT=$(python3 "$SCRIPT_DIR/validate_headings.py" "$file" 2>/dev/null)
+    if [ -n "$RESULT" ]; then
+        echo "❌ Heading hierarchy issue in: $(basename "$file")"
+        echo "$RESULT"
+        HEADING_ERRORS=$((HEADING_ERRORS + 1))
+    fi
+done < <(find "$DOC_DIR" -name "*.rst" -print0)
+
+if [ $HEADING_ERRORS -eq 0 ]; then
+    echo "✅ Heading hierarchy follows TYPO3 convention"
+else
+    echo ""
+    echo "❌ Found $HEADING_ERRORS files with heading hierarchy issues"
+    echo "   TYPO3 heading order: = (h1 title, above+below), = (h2), - (h3), ~ (h4)"
+    WARNINGS=$((WARNINGS + HEADING_ERRORS))
+fi
 
 echo ""
 if [ $WARNINGS -eq 0 ]; then
