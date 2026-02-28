@@ -60,7 +60,7 @@ if command -v rst2html.py &> /dev/null; then
     while IFS= read -r -d '' file; do
         if ! rst2html.py --strict "$file" > /dev/null 2>&1; then
             echo "❌ Syntax error in: $file"
-            ((ERRORS++))
+            ERRORS=$((ERRORS + 1))
         fi
     done < <(find "$DOC_DIR" -name "*.rst" -print0)
 
@@ -97,7 +97,7 @@ done < <(find "$DOC_DIR" -name "*.rst" -print0)
 while IFS= read -r -d '' file; do
     if ! file -b --mime-encoding "$file" | grep -q utf-8; then
         echo "⚠️  Non-UTF-8 encoding in: $file"
-        ((WARNINGS++))
+        WARNINGS=$((WARNINGS + 1))
     fi
 done < <(find "$DOC_DIR" -name "*.rst" -print0)
 
@@ -105,9 +105,108 @@ done < <(find "$DOC_DIR" -name "*.rst" -print0)
 while IFS= read -r -d '' file; do
     if grep -q '[[:space:]]$' "$file"; then
         echo "⚠️  Trailing whitespace in: $file"
-        ((WARNINGS++))
+        WARNINGS=$((WARNINGS + 1))
     fi
 done < <(find "$DOC_DIR" -name "*.rst" -print0)
+
+# Check TYPO3 heading hierarchy (= for h1/h2, - for h3, ~ for h4)
+echo ""
+echo "Checking heading hierarchy..."
+HEADING_ERRORS=0
+while IFS= read -r -d '' file; do
+    RESULT=$(python3 -c "
+import sys
+
+# TYPO3 heading convention:
+# h1: = above AND below (overline)
+# h2: = below only
+# h3: - below only
+# h4: ~ below only
+# h5: \" below only
+# h6: ' below only
+EXPECTED_ORDER = ['=', '-', '~', '\"', \"'\"]
+
+with open('$file') as f:
+    lines = f.readlines()
+
+headings = []
+i = 0
+while i < len(lines):
+    line = lines[i].rstrip()
+    if line and len(line) >= 3 and all(c == line[0] for c in line) and line[0] in '=-~\"^#\\'':
+        char = line[0]
+        # Check if this is an overline (title) or underline
+        if i + 2 < len(lines):
+            next_line = lines[i+1].rstrip()
+            next_next = lines[i+2].rstrip()
+            if (next_line and not all(c == next_line[0] for c in next_line)
+                and next_next and all(c == next_next[0] for c in next_next)
+                and next_next[0] == char):
+                # Overline+underline = title (h1), skip both
+                headings.append(('h1', char, next_line, i+1))
+                i += 3
+                continue
+        # Underline only - check previous line for title text
+        if i > 0:
+            prev = lines[i-1].rstrip()
+            if prev and not all(c == prev[0] for c in prev):
+                headings.append(('section', char, prev, i))
+    i += 1
+
+if not headings:
+    sys.exit(0)
+
+# Check that section headings follow TYPO3 convention
+errors = []
+sections = [h for h in headings if h[0] == 'section']
+
+# Check 1: First section heading must use = (h2)
+if sections and sections[0][1] != '=':
+    char = sections[0][1]
+    title = sections[0][2]
+    lineno = sections[0][3]
+    errors.append(f'  L{lineno+1}: \"{title}\" - first section heading must use \"=\" (h2), not \"{char}\"')
+
+# Check 2: Detect nesting violations (e.g. h4 directly under h2, skipping h3)
+# Track the current heading depth stack
+depth_stack = []  # stack of EXPECTED_ORDER indices
+for kind, char, title, lineno in headings:
+    if kind == 'h1':
+        depth_stack = []
+        continue
+    if char not in EXPECTED_ORDER:
+        errors.append(f'  L{lineno+1}: \"{title}\" uses non-standard underline char \"{char}\"')
+        continue
+    char_idx = EXPECTED_ORDER.index(char)
+    # Pop stack back to find where this heading fits
+    while depth_stack and depth_stack[-1] >= char_idx:
+        depth_stack.pop()
+    # Check for skipped levels (e.g. jumping from = to ~ without -)
+    if depth_stack:
+        parent_idx = depth_stack[-1]
+        if char_idx > parent_idx + 1:
+            skipped = EXPECTED_ORDER[parent_idx + 1]
+            errors.append(f'  L{lineno+1}: \"{title}\" uses \"{char}\" (h{char_idx+2}) directly under \"{EXPECTED_ORDER[parent_idx]}\" (h{parent_idx+2}), skipping \"{skipped}\" (h{parent_idx+3})')
+    depth_stack.append(char_idx)
+
+for e in errors:
+    print(e)
+" 2>/dev/null)
+    if [ -n "$RESULT" ]; then
+        echo "❌ Heading hierarchy issue in: $(basename "$file")"
+        echo "$RESULT"
+        HEADING_ERRORS=$((HEADING_ERRORS + 1))
+    fi
+done < <(find "$DOC_DIR" -name "*.rst" -print0)
+
+if [ $HEADING_ERRORS -eq 0 ]; then
+    echo "✅ Heading hierarchy follows TYPO3 convention"
+else
+    echo ""
+    echo "❌ Found $HEADING_ERRORS files with heading hierarchy issues"
+    echo "   TYPO3 heading order: = (h1 title, above+below), = (h2), - (h3), ~ (h4)"
+    WARNINGS=$((WARNINGS + HEADING_ERRORS))
+fi
 
 echo ""
 if [ $WARNINGS -eq 0 ]; then
