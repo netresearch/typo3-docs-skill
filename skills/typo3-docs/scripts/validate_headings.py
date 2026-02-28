@@ -13,6 +13,7 @@ TYPO3 heading convention:
 Usage: python3 validate_headings.py <file.rst>
 Exit code 0 = no issues, output contains error lines if any.
 """
+
 import sys
 
 EXPECTED_ORDER = ["=", "-", "~", '"', "'"]
@@ -65,7 +66,7 @@ def check_headings(headings):
         title = sections[0][2]
         lineno = sections[0][3]
         errors.append(
-            f'  L{lineno+1}: "{title}" - first section heading '
+            f'  L{lineno + 1}: "{title}" - first section heading '
             f'must use "=" (h2), not "{char}"'
         )
 
@@ -77,8 +78,7 @@ def check_headings(headings):
             continue
         if char not in EXPECTED_ORDER:
             errors.append(
-                f'  L{lineno+1}: "{title}" uses non-standard '
-                f'underline char "{char}"'
+                f'  L{lineno + 1}: "{title}" uses non-standard underline char "{char}"'
             )
             continue
         char_idx = EXPECTED_ORDER.index(char)
@@ -91,10 +91,10 @@ def check_headings(headings):
             if char_idx > parent_idx + 1:
                 skipped = EXPECTED_ORDER[parent_idx + 1]
                 errors.append(
-                    f'  L{lineno+1}: "{title}" uses "{char}" '
-                    f"(h{char_idx+2}) directly under "
-                    f'"{EXPECTED_ORDER[parent_idx]}" (h{parent_idx+2}), '
-                    f'skipping "{skipped}" (h{parent_idx+3})'
+                    f'  L{lineno + 1}: "{title}" uses "{char}" '
+                    f"(h{char_idx + 2}) directly under "
+                    f'"{EXPECTED_ORDER[parent_idx]}" (h{parent_idx + 2}), '
+                    f'skipping "{skipped}" (h{parent_idx + 3})'
                 )
         depth_stack.append(char_idx)
 
