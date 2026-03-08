@@ -223,7 +223,7 @@ alias typo3-docs-watch="docker run --rm -it --pull always \
 For DDEV projects, use the official addon:
 
 ```bash
-ddev get github.com/TYPO3-Documentation/ddev-renderer-guides
+ddev add-on get TYPO3-Documentation/ddev-typo3-docs
 ddev restart
 ```
 
