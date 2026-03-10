@@ -334,8 +334,12 @@ Contributions are welcome! Please follow these guidelines:
 
 ## License
 
-This skill is licensed under the same license as the [TYPO3 RTE CKEditor Image extension](https://github.com/netresearch/t3x-rte_ckeditor_image) - GPL-2.0-or-later.
+This project uses split licensing:
 
+- **Code** (scripts, workflows, configs): [MIT](LICENSE-MIT)
+- **Content** (skill definitions, documentation, references): [CC-BY-SA-4.0](LICENSE-CC-BY-SA-4.0)
+
+See the individual license files for full terms.
 ## Support
 
 **Issues and Questions:**
