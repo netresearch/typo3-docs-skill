@@ -44,8 +44,8 @@ Create and maintain TYPO3 extension documentation following official docs.typo3.
 - **PNG** screenshots with `:alt:` and `:zoom: lightbox`
 - **.editorconfig** required in `Documentation/`
 - **Screenshots MANDATORY** for backend modules, config screens, UI workflows (see `references/asset-templates-guide.md`)
-- **Max 250 lines per RST page** — Pages exceeding 250 lines MUST be split into sub-pages with their own `Index.rst` and `toctree`. Long pages overwhelm readers and hurt navigation. This is NOT optional.
-- **No email addresses in public docs** — NEVER use `mailto:` links. Use GitHub Issues or Discussions URLs for contact links instead.
+- **Max 250 lines per RST page** — split into sub-pages with `toctree` if exceeded
+- **No `mailto:` links** — use GitHub Issues/Discussions URLs instead
 
 ## Pre-Commit Checklist
 
@@ -55,9 +55,9 @@ Create and maintain TYPO3 extension documentation following official docs.typo3.
 4. Screenshots exist with `:alt:` and `:zoom: lightbox`
 5. `scripts/validate_docs.sh` passes, render output has no warnings
 6. README and Documentation/ are synchronized
-7. No RST page exceeds 250 lines (split into sub-pages if needed)
-8. `guides.xml` uses all REQUIRED theme attributes (`project-home`, `project-contact`, `project-repository`, `project-issues`, `edit-on-github`, `edit-on-github-branch`, `edit-on-github-directory`; `project-discussions` if enabled on repo)
-9. No `mailto:` links in `guides.xml` or documentation — use GitHub Issues/Discussions URLs
+7. No RST page exceeds 250 lines
+8. `guides.xml` has all required theme attributes (see `references/guides-xml-reference.md`)
+9. No `mailto:` links anywhere
 
 ## Reference Documentation
 
