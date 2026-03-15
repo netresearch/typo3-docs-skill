@@ -49,9 +49,9 @@ mechanical:
   - id: TD-07
     type: regex
     target: Documentation/guides.xml
-    pattern: 'extension-key="[a-z_]+"'
+    pattern: '(extension-key="[a-z_]+"|<extension\s+class=|interlink-shortcode="[a-z_]+")'
     severity: warning
-    desc: "guides.xml should specify extension key"
+    desc: "guides.xml should specify extension key (extension-key attr, <extension class=...>, or interlink-shortcode)"
 
   # === INDEX.RST CONTENT ===
   - id: TD-08
