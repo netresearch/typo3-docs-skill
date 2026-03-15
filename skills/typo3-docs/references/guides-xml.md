@@ -88,7 +88,7 @@ git remote get-url origin | sed -E 's/.*[:/]([^/]+)\/([^/.]+)(\.git)?$/\1\/\2/'
         typo3-core-preferred="stable"
         interlink-shortcode="vendor/extension-name"
         project-home="https://extensions.typo3.org/extension/extension_key"
-        project-contact="mailto:info@vendor.com"
+        project-contact="https://github.com/vendor/extension/issues"
         project-repository="https://github.com/vendor/extension"
         project-issues="https://github.com/vendor/extension/issues"
         project-discussions="https://github.com/vendor/extension/discussions"
@@ -145,30 +145,37 @@ TYPO3-specific theme configuration. The `class` attribute loads the TYPO3 docume
 
 **Why `class` is required:** Without the theme extension class, documentation renders with default phpDocumentor styling instead of TYPO3's official theme. The class enables all TYPO3-specific features like the version switcher, intersphinx cross-references, and branded styling.
 
-#### GitHub Integration Attributes
+#### Required Attributes
 
-| Attribute | Default | Description |
-|-----------|---------|-------------|
-| `edit-on-github` | `""` | Format: `Organization/Repository` (enables "Edit on GitHub" button) |
-| `edit-on-github-branch` | `main` | Branch for edit links |
-| `edit-on-github-directory` | `Documentation` | Path to Documentation/ within repo |
+The following `<extension>` attributes are REQUIRED on every `guides.xml`. Omitting any of these is a documentation defect.
 
-**Extract from:** Git remote URL or `gh repo view`
+| Attribute | Required | Description |
+|-----------|----------|-------------|
+| `project-home` | **REQUIRED** | Extension homepage (TER page or custom website) |
+| `project-contact` | **REQUIRED** | GitHub Discussions or Issues URL. **NEVER** use `mailto:` |
+| `project-repository` | **REQUIRED** | Source code URL (`https://github.com/vendor/repo`) |
+| `project-issues` | **REQUIRED** | Issue tracker URL (`https://github.com/vendor/repo/issues`) |
+| `project-discussions` | **REQUIRED if enabled** | GitHub Discussions URL (if Discussions is enabled on repo) |
+| `edit-on-github` | **REQUIRED** | Format: `Organization/Repository` |
+| `edit-on-github-branch` | **REQUIRED** | Default branch name (e.g., `main`) |
+| `edit-on-github-directory` | **REQUIRED** | Path to Documentation/ within repo (typically `Documentation`) |
 
-#### Project Links Attributes
+**NEVER use `mailto:` for `project-contact`.** Use a GitHub Issues or Discussions URL instead. Email addresses MUST NOT appear in public documentation.
+
+**Extract from:** Git remote URL, `gh repo view`, or `composer.json` support section
+
+#### Project Links Details
 
 | Attribute | Description | Example |
 |-----------|-------------|---------|
 | `project-home` | Extension homepage | TER page or custom website |
-| `project-contact` | Contact for questions | `mailto:info@example.com` or Slack channel |
+| `project-contact` | Contact for questions | GitHub Issues or Discussions URL (**NEVER** `mailto:`) |
 | `project-repository` | Source code URL | `https://github.com/vendor/repo` |
 | `project-issues` | Issue tracker URL | `https://github.com/vendor/repo/issues` |
-| `project-discussions` | Discussions forum (optional) | GitHub Discussions URL |
+| `project-discussions` | Discussions forum | GitHub Discussions URL (REQUIRED if enabled on repo) |
 | `report-issue` | Override issue link | `none`, internal path, or URL |
 
-**Extract from:** `composer.json` support section or GitHub repository
-
-**project-discussions:** Add this attribute only if GitHub Discussions is enabled on the repository. Check with:
+**project-discussions:** Add this attribute if GitHub Discussions is enabled on the repository. Check with:
 ```bash
 gh repo view --json hasDiscussionsEnabled --jq '.hasDiscussionsEnabled'
 # If true, add:
@@ -306,6 +313,9 @@ Before committing `guides.xml`:
 10. ✅ `typo3-core-preferred` set appropriately (stable, main, or specific version)
 11. ✅ `<inventory>` elements added only for cross-references actually used
 12. ✅ All inventory URLs end with `/`
+13. ✅ `edit-on-github-directory` is set (typically `Documentation`)
+14. ✅ `project-contact` uses a GitHub URL, **NEVER** `mailto:`
+15. ✅ No `mailto:` links anywhere in `guides.xml`
 
 ## Common Mistakes
 

@@ -88,6 +88,45 @@ Files containing code examples should start with an underscore:
 
 This convention indicates the files are documentation assets, not production code.
 
+## Page Length Limits
+
+**Maximum 250 lines per RST file.** Pages longer than 250 lines MUST be split into sub-pages. This is a strict limit, not a guideline.
+
+### Splitting Pattern
+
+```
+# BEFORE: One huge file
+Documentation/
+├── Configuration/
+│   └── Index.rst          # 456 lines — TOO LONG
+
+# AFTER: Split into focused sub-pages
+Documentation/
+├── Configuration/
+│   ├── Index.rst          # Overview + toctree (~30 lines)
+│   ├── ProviderFields.rst # Provider config reference
+│   ├── ModelFields.rst    # Model config reference
+│   ├── ConfigFields.rst   # LLM configuration fields
+│   └── Security.rst       # Security, caching, logging
+```
+
+### Sub-Page Requirements
+
+Each sub-page MUST:
+- Focus on ONE topic
+- Be independently navigable
+- Have proper heading hierarchy
+- Cross-reference related pages with `:ref:`
+
+The `Index.rst` becomes a short overview with `toctree`, NOT a content dumping ground.
+
+### Checking Page Length
+
+```bash
+# Find RST files exceeding 250 lines
+find Documentation/ -name "*.rst" -exec awk 'END{if(NR>250) print FILENAME": "NR" lines"}' {} \;
+```
+
 ## Directory Structure Rules
 
 ### Index.rst in Every Directory
@@ -228,6 +267,7 @@ Before committing documentation:
 6. ✅ Included files use `.rst.txt` extension
 7. ✅ Code snippet files start with underscore
 8. ✅ `.. include:: /Includes.rst.txt` at top of every RST file
+9. ✅ No RST file exceeds 250 lines (split into sub-pages if needed)
 
 ## Common Mistakes
 
