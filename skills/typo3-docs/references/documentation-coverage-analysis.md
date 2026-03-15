@@ -58,6 +58,10 @@ Evaluate documentation quality beyond mere existence:
 - ✅ Modern tooling (guides.xml, card-grid navigation)
 - ✅ Proper cross-references and interlinking
 - ✅ Screenshots or visual aids where appropriate
+- ✅ No page exceeds 250 lines (split into focused sub-pages)
+- ✅ No `mailto:` links in guides.xml or documentation
+- ❌ Pages over 250 lines indicate poor information architecture
+- ❌ Email addresses in public documentation are a privacy/spam risk
 
 ### Step 4: Context-Aware Scoring
 
@@ -136,10 +140,13 @@ Quality Indicators:
   ✅ TYPO3 directives (confval)
   ✅ Card-grid navigation
   ✅ Code examples
+  ✅ No page exceeds 250 lines
   ⚠️ Screenshots mentioned but not included
 
-Quality Score: 4/5 = 80%
+Quality Score: 5/6 = 83%
 ```
+
+**Page length penalty:** Any RST page exceeding 250 lines MUST reduce the quality score. Pages over 250 lines indicate poor information architecture and MUST be split before the documentation can score GOOD or above.
 
 ### 5. Determine Final Rating
 
@@ -308,6 +315,8 @@ API reference if you expect other developers to extend your extension.
 3. Scope-appropriate expectations
 4. User-facing docs prioritized over developer API docs
 5. Context-aware scoring avoids penalizing focused extensions
+6. No RST page may exceed 250 lines — pages MUST be split into sub-pages
+7. No email addresses in public documentation — use GitHub URLs
 
 **Benefits:**
 - Accurate assessment of documentation completeness

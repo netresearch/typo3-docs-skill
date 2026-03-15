@@ -212,6 +212,19 @@ Wrong: tab character after ..
 Correct: spaces only
 ```
 
+## No Email Addresses in Documentation
+
+**NEVER** include email addresses (`mailto:` links or raw email addresses) in public documentation. This applies to:
+
+- `guides.xml` `project-contact` attribute
+- RST page content
+- `Includes.rst.txt` substitutions
+- README files synced with documentation
+
+**Use instead:** GitHub Issues URL, GitHub Discussions URL, or other public web-based contact channels.
+
+**Why:** Email addresses in public repositories attract spam and expose personal information. GitHub Issues/Discussions provide trackable, public communication channels.
+
 ## Pre-Commit Checklist
 
 1. ✅ `.editorconfig` exists in `Documentation/`
@@ -223,6 +236,7 @@ Correct: spaces only
 7. ✅ Line endings are LF (Unix-style)
 8. ✅ Heading underlines match text length
 9. ✅ Sentence case for headings
+10. ✅ No `mailto:` links or email addresses in documentation
 
 ## Editor Configuration
 
