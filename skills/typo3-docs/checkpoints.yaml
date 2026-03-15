@@ -102,6 +102,42 @@ mechanical:
     severity: info
     desc: "README.md should reference the Documentation folder"
 
+  # === NO MAILTO LINKS ===
+  - id: TD-18
+    type: command
+    pattern: "grep -rn 'mailto:' Documentation/ 2>/dev/null | head -1 && exit 1 || exit 0"
+    severity: warning
+    desc: "Documentation must not contain mailto: links; use GitHub Issues/Discussions URLs"
+
+  # === INDEX.RST IN SUBDIRECTORIES ===
+  - id: TD-19
+    type: command
+    pattern: "find Documentation/ -mindepth 1 -type d ! -name Images ! -name '_*' 2>/dev/null | while read dir; do [ ! -f \"$dir/Index.rst\" ] && echo \"Missing: $dir/Index.rst\" && exit 1; done; exit 0"
+    severity: warning
+    desc: "Every Documentation/ subdirectory must contain an Index.rst file"
+
+  # === GUIDES.XML THEME ===
+  - id: TD-25
+    type: contains
+    target: Documentation/guides.xml
+    pattern: 'theme="typo3docs"'
+    severity: warning
+    desc: "guides.xml should use theme=\"typo3docs\" for proper TYPO3 documentation rendering"
+
+  # === MAX RST PAGE LENGTH ===
+  - id: TD-26
+    type: command
+    pattern: "find Documentation/ -name '*.rst' -exec sh -c 'wc -l < \"$1\"' _ {} \\; 2>/dev/null | awk '$1 > 250 {found=1} END {exit found ? 1 : 0}'"
+    severity: info
+    desc: "RST pages should not exceed 250 lines; split into sub-pages with toctree"
+
+  # === NO TABS IN RST ===
+  - id: TD-27
+    type: command
+    pattern: "grep -rPn '\\t' Documentation/*.rst Documentation/**/*.rst 2>/dev/null | head -1 && exit 1 || exit 0"
+    severity: warning
+    desc: "RST files must use spaces only (4 spaces), never tabs"
+
   # === COMMON DOCUMENTATION SECTIONS ===
   - id: TD-15
     type: file_exists
