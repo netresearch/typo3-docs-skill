@@ -33,39 +33,40 @@ This skill provides guidance for working with TYPO3 extension documentation in r
 
 ## Installation
 
-### Option 1: Via Netresearch Marketplace (Recommended)
+### Marketplace (Recommended)
+
+Add the [Netresearch marketplace](https://github.com/netresearch/claude-code-marketplace) once, then browse and install skills:
 
 ```bash
+# Claude Code
 /plugin marketplace add netresearch/claude-code-marketplace
 ```
 
-Then browse skills with `/plugin`.
+### npx ([skills.sh](https://skills.sh))
 
-### Option 2: Download Release
-
-Download the [latest release](https://github.com/netresearch/typo3-docs-skill/releases/latest) and extract to `~/.claude/skills/typo3-docs/`
-
-### Option 3: Manual Installation
+Install with any [Agent Skills](https://agentskills.io)-compatible agent:
 
 ```bash
-# Using curl
-curl -L https://github.com/netresearch/typo3-docs-skill/archive/refs/heads/main.zip -o typo3-docs.zip
-unzip typo3-docs.zip -d ~/.claude/skills/
-mv ~/.claude/skills/typo3-docs-skill-main ~/.claude/skills/typo3-docs
-
-# Or using git
-git clone https://github.com/netresearch/typo3-docs-skill.git ~/.claude/skills/typo3-docs
+npx skills add https://github.com/netresearch/typo3-docs-skill --skill typo3-docs
 ```
 
-### Verify Installation
+### Download Release
 
-The skill will automatically activate when working with TYPO3 documentation:
+Download the [latest release](https://github.com/netresearch/typo3-docs-skill/releases/latest) and extract to your agent's skills directory.
 
-- Creating/updating `Documentation/*.rst` files
-- Using TYPO3-specific directives
-- Rendering documentation locally
-- Following TYPO3 documentation guidelines
+### Git Clone
 
+```bash
+git clone https://github.com/netresearch/typo3-docs-skill.git
+```
+
+### Composer (PHP Projects)
+
+```bash
+composer require netresearch/typo3-docs-skill
+```
+
+Requires [netresearch/composer-agent-skill-plugin](https://github.com/netresearch/composer-agent-skill-plugin).
 ## Contents
 
 ### SKILL.md
