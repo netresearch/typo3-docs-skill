@@ -1,14 +1,14 @@
 {
-    "name": "typo3-docs",
-    "version": "2.8.0",
-    "description": "Create and maintain TYPO3 extension documentation with RST validation",
-    "repository": "https://github.com/netresearch/typo3-docs-skill",
-    "license": "(MIT AND CC-BY-SA-4.0)",
-    "author": {
-        "name": "Netresearch DTT GmbH",
-        "url": "https://www.netresearch.de"
-    },
-    "skills": [
-        "./skills/typo3-docs"
-    ]
+  "name": "typo3-docs",
+  "version": "2.9.0",
+  "description": "Create and maintain TYPO3 extension documentation with RST validation",
+  "repository": "https://github.com/netresearch/typo3-docs-skill",
+  "license": "(MIT AND CC-BY-SA-4.0)",
+  "author": {
+    "name": "Netresearch DTT GmbH",
+    "url": "https://www.netresearch.de"
+  },
+  "skills": [
+    "./skills/typo3-docs"
+  ]
 }
