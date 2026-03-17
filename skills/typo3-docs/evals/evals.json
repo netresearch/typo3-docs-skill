@@ -1,0 +1,79 @@
+{
+  "skill_name": "typo3-docs",
+  "evals": [
+    {
+      "id": 1,
+      "eval_name": "create-docs-from-scratch",
+      "prompt": "Create documentation for this TYPO3 extension from scratch. It has PHP classes, TCA configuration, and a backend module but no Documentation/ directory yet.",
+      "expected_output": "A complete Documentation/ directory with guides.xml, Index.rst, subdirectories for Configuration, Installation, and Editor sections. Each subdirectory has its own Index.rst. An .editorconfig is present. guides.xml has correct project, version, and interlink attributes.",
+      "files": [],
+      "project_path": "/home/cybot/projects/t3x-cowriter/main",
+      "assertions": [
+        "Documentation/Index.rst exists with correct RST heading hierarchy",
+        "Documentation/guides.xml exists with project attribute matching extension key",
+        "guides.xml contains typo3/cms interlink entry",
+        "Documentation/.editorconfig exists with indent_size = 4",
+        "Every subdirectory under Documentation/ contains an Index.rst",
+        "RST files use 4-space indentation, not tabs",
+        "Headings use sentence case, not Title Case",
+        "File and directory names use CamelCase convention",
+        "No RST file exceeds 250 lines",
+        "Index.rst contains a toctree directive linking to sub-pages"
+      ]
+    },
+    {
+      "id": 2,
+      "eval_name": "add-configuration-section",
+      "prompt": "Add a Configuration section to the existing TYPO3 extension documentation. The extension has TypoScript setup, FlexForm XML, and ext_conf_template.txt settings that need documenting.",
+      "expected_output": "A new Documentation/Configuration/Index.rst file with confval directives for each setting, organized by source (TypoScript, FlexForm, Extension Configuration). The parent toctree is updated to include the new section.",
+      "files": [],
+      "project_path": "/home/cybot/projects/t3x-cowriter/main",
+      "assertions": [
+        "Documentation/Configuration/Index.rst exists",
+        "Uses confval directive with :type: and :default: options for settings",
+        "Parent Index.rst toctree includes Configuration/Index",
+        "TypoScript settings documented with code-block:: typoscript",
+        "FlexForm options documented with their actual field names",
+        "RST file uses 4-space indentation throughout",
+        "Line length does not exceed 80 characters",
+        "Section heading uses correct RST underline character for its level"
+      ]
+    },
+    {
+      "id": 3,
+      "eval_name": "validate-and-fix-docs",
+      "prompt": "Check if the documentation follows TYPO3 standards and fix any issues. Run the validation script and correct all problems found.",
+      "expected_output": "A validation report identifying RST issues (indentation, missing alt text, incorrect heading levels, missing .editorconfig). Each issue is fixed in place. The validation script passes cleanly after fixes.",
+      "files": [],
+      "project_path": "/home/cybot/projects/t3x-cowriter/main",
+      "assertions": [
+        "Runs scripts/validate_docs.sh against the extension path",
+        "Identifies specific RST issues with file paths and line numbers",
+        "Fixes indentation to 4-space standard",
+        "Ensures all figure/image directives have :alt: option",
+        "Ensures .editorconfig exists in Documentation/",
+        "Every subdirectory has an Index.rst after fixes",
+        "No mailto: links remain after fixes",
+        "Re-runs validation to confirm all issues resolved"
+      ]
+    },
+    {
+      "id": 4,
+      "eval_name": "add-screenshots-backend-module",
+      "prompt": "Add screenshots to the documentation for the backend module. The extension has a TYPO3 backend module that needs visual documentation with annotated screenshots.",
+      "expected_output": "Screenshot placeholders or captured images in Documentation/Images/ with figure directives in the relevant RST files. Each figure uses :alt:, :zoom: lightbox, and :class: with-border with-shadow options.",
+      "files": [],
+      "project_path": "/home/cybot/projects/t3x-cowriter/main",
+      "assertions": [
+        "Documentation/Images/ directory exists for screenshot storage",
+        "RST files use figure directive, not raw image directive",
+        "Every figure has :alt: text describing the screenshot content",
+        "Every figure has :zoom: lightbox option",
+        "Every figure has :class: with-border with-shadow",
+        "Screenshot filenames use CamelCase convention",
+        "Screenshots are PNG format",
+        "Figure captions describe what the user sees in the screenshot"
+      ]
+    }
+  ]
+}

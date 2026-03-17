@@ -1,6 +1,13 @@
 ---
 name: typo3-docs
-description: "Use when creating or editing TYPO3 extension documentation (Documentation/*.rst, README.md), using TYPO3 directives, adding screenshots, rendering docs locally, or deploying to docs.typo3.org."
+description: "Use when creating, editing, or reviewing TYPO3 extension documentation (Documentation/*.rst, guides.xml, README.md), rendering docs with Docker, using TYPO3 RST directives, adding screenshots, or deploying to docs.typo3.org."
+license: "(MIT AND CC-BY-SA-4.0). See LICENSE-MIT and LICENSE-CC-BY-SA-4.0"
+compatibility: "Requires php, docker (for rendering). TYPO3 extension with Documentation/ directory."
+metadata:
+  author: Netresearch DTT GmbH
+  version: "2.8.0"
+  repository: https://github.com/netresearch/typo3-docs-skill
+allowed-tools: Bash(php:*) Bash(docker:*) Bash(sed:*) Bash(grep:*) Read Write Glob Grep
 ---
 
 # TYPO3 Documentation Skill
@@ -44,8 +51,8 @@ Create and maintain TYPO3 extension documentation following official docs.typo3.
 - **PNG** screenshots with `:alt:` and `:zoom: lightbox`
 - **.editorconfig** required in `Documentation/`
 - **Screenshots MANDATORY** for backend modules, config screens, UI workflows (see `references/asset-templates-guide.md`)
-- **Max 250 lines per RST page** — split into sub-pages with `toctree` if exceeded
-- **No `mailto:` links** — use GitHub Issues/Discussions URLs instead
+- **Max 250 lines per RST page** -- split into sub-pages with `toctree` if exceeded
+- **No `mailto:` links** -- use GitHub Issues/Discussions URLs instead
 
 ## Pre-Commit Checklist
 
@@ -56,10 +63,10 @@ Create and maintain TYPO3 extension documentation following official docs.typo3.
 5. `scripts/validate_docs.sh` passes, render output has no warnings
 6. README and Documentation/ are synchronized
 7. No RST page exceeds 250 lines
-8. `guides.xml` has all required theme attributes (see `references/guides-xml-reference.md`)
+8. `guides.xml` has all required theme attributes (see `references/guides-xml.md`)
 9. No `mailto:` links anywhere
 
-## Reference Documentation
+## References
 
 - `references/file-structure.md` -- directory layout, naming conventions
 - `references/guides-xml.md` -- build configuration, interlink settings
@@ -72,12 +79,8 @@ Create and maintain TYPO3 extension documentation following official docs.typo3.
 - `references/screenshots.md` -- image requirements, figure directives
 - `references/rendering.md` -- Docker commands, live preview
 - `references/intercept-deployment.md` -- webhook, build triggers
-- `references/architecture-decision-records.md` -- ADR templates
-- `references/documentation-coverage-analysis.md` -- gap analysis
-- `references/extraction-patterns.md` -- automated extraction
-- `references/typo3-extension-architecture.md` -- file hierarchy
-- `references/scripts-guide.md` -- extraction and analysis scripts
 - `references/asset-templates-guide.md` -- templates, screenshot workflow
+- `references/scripts-guide.md` -- extraction and analysis scripts
 
 ## External Resources
 
