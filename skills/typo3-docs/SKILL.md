@@ -1,6 +1,6 @@
 ---
 name: typo3-docs
-description: "Use when creating, editing, or reviewing TYPO3 extension documentation (Documentation/*.rst, guides.xml, README.md), rendering docs with Docker, using TYPO3 RST directives, adding screenshots, or deploying to docs.typo3.org."
+description: "Use when creating, editing, or reviewing TYPO3 extension documentation (Documentation/*.rst, guides.xml, README.md), rendering docs with Docker, using TYPO3 RST directives, adding screenshots, deploying to docs.typo3.org, setting up TYPO3 docs webhook, or publishing TYPO3 documentation via Intercept."
 license: "(MIT AND CC-BY-SA-4.0). See LICENSE-MIT and LICENSE-CC-BY-SA-4.0"
 compatibility: "Requires php, docker (for rendering). TYPO3 extension with Documentation/ directory."
 metadata:
