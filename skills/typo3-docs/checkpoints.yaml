@@ -160,7 +160,7 @@ mechanical:
   # === DOCUMENTATION ACCURACY ===
   - id: TD-30
     type: command
-    pattern: "guides_ver=$(grep -oP 'version=\"[^\"]*\"' Documentation/guides.xml 2>/dev/null | head -1 | grep -oP '\"[^\"]*\"' | tr -d '\"'); emconf_ver=$(grep -oP \"'version'\\s*=>\\s*'[^']*'\" ext_emconf.php 2>/dev/null | grep -oP \"'[^']*'$\" | tr -d \"'\"); [ -n \"$guides_ver\" ] && [ -n \"$emconf_ver\" ] && [ \"$guides_ver\" != \"$emconf_ver\" ] && echo \"Version mismatch: guides.xml=$guides_ver ext_emconf.php=$emconf_ver\" && exit 1; exit 0"
+    pattern: "bash scripts/check-version-match.sh"
     severity: error
     desc: "guides.xml version must match ext_emconf.php version"
 
@@ -173,7 +173,7 @@ mechanical:
   # === DOCUMENTATION COMPLETENESS ===
   - id: TD-41
     type: command
-    pattern: "grep -rn 'versionadded\\|versionchanged' Documentation/ 2>/dev/null | grep -oP '\\d+\\.\\d+\\.\\d+' | sort -u | while read ver; do grep -q \"$ver\" ext_emconf.php 2>/dev/null || git tag -l \"$ver\" 2>/dev/null | grep -q . || git tag -l \"v$ver\" 2>/dev/null | grep -q . || { echo \"Unreleased version referenced: $ver\"; exit 1; }; done; exit 0"
+    pattern: "bash scripts/check-unreleased-versions.sh"
     severity: warning
     desc: "versionadded/versionchanged directives should reference released versions only"
 
@@ -298,5 +298,5 @@ llm_reviews:
       - Backend module documentation lacking any screenshots
 
       Report any sections with missing or placeholder screenshot content.
-    severity: info
+    severity: medium
     desc: "Screenshots sections should have actual content, not TODO placeholders"
