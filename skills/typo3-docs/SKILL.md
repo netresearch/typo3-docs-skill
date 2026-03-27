@@ -54,6 +54,18 @@ Create and maintain TYPO3 extension documentation following official docs.typo3.
 - **Max 250 lines per RST page** -- split into sub-pages with `toctree` if exceeded
 - **No `mailto:` links** -- use GitHub Issues/Discussions URLs instead
 
+## Code Example Validation
+
+After generating or reviewing documentation, cross-reference all code examples against the actual extension source code:
+
+1. **PHP code examples**: Grep every method name from documentation in `Classes/` to verify existence. If a method name appears in docs but not in source, the example is wrong.
+2. **CLI command arguments**: Compare documented arguments and options against the `configure()` method in each Command class under `Classes/Command/`.
+3. **API method signatures**: Verify that documented parameter types, return types, and method names match the actual class methods in `Classes/`.
+4. **Model accessors in migrations**: Confirm getter/setter names used in migration examples match the domain model classes.
+5. **Version numbers**: Ensure versions in `guides.xml`, code examples, and `versionadded`/`versionchanged` directives match `ext_emconf.php`.
+
+See `references/extraction-patterns.md` (Code Example Accuracy Validation) for detailed patterns and validation commands.
+
 ## Pre-Commit Checklist
 
 1. `.editorconfig` in `Documentation/`, `Index.rst` in every directory
