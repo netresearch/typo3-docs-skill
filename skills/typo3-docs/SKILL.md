@@ -54,45 +54,17 @@ Create and maintain TYPO3 extension documentation following official docs.typo3.
 - **Max 250 lines per RST page** -- split into sub-pages with `toctree` if exceeded
 - **No `mailto:` links** -- use GitHub Issues/Discussions URLs instead
 
-## Code Example Validation
-
-After generating or reviewing documentation, cross-reference all code examples against the actual extension source code:
-
-1. **PHP code examples**: Grep every method name from documentation in `Classes/` to verify existence. If a method name appears in docs but not in source, the example is wrong.
-2. **CLI command arguments**: Compare documented arguments and options against the `configure()` method in each Command class under `Classes/Command/`.
-3. **API method signatures**: Verify that documented parameter types, return types, and method names match the actual class methods in `Classes/`.
-4. **Model accessors in migrations**: Confirm getter/setter names used in migration examples match the domain model classes.
-5. **Version numbers**: Ensure versions in `guides.xml`, code examples, and `versionadded`/`versionchanged` directives match `ext_emconf.php`.
-
-See `references/extraction-patterns.md` (Code Example Accuracy Validation) for detailed patterns and validation commands.
-
 ## Pre-Commit Checklist
 
 1. `.editorconfig` in `Documentation/`, `Index.rst` in every directory
-2. 4-space indentation, no tabs, max 80 chars
-3. Code blocks have `:caption:`, inline code uses proper roles (`:php:`, `:file:`)
-4. Screenshots exist with `:alt:` and `:zoom: lightbox`
-5. `scripts/validate_docs.sh` passes, render output has no warnings
-6. README and Documentation/ are synchronized
-7. No RST page exceeds 250 lines
-8. `guides.xml` has all required theme attributes (see `references/guides-xml.md`)
-9. No `mailto:` links anywhere
+2. Code blocks have `:caption:`, screenshots have `:alt:` + `:zoom: lightbox`
+3. `scripts/validate_docs.sh` passes, no RST page >250 lines
+4. `guides.xml` version matches `ext_emconf.php`
+5. Cross-reference code examples against source (see `references/extraction-patterns.md`)
 
 ## References
 
-- `references/file-structure.md` -- directory layout, naming conventions
-- `references/guides-xml.md` -- build configuration, interlink settings
-- `references/coding-guidelines.md` -- .editorconfig, indentation rules
-- `references/rst-syntax.md` -- headings, lists, tables, formatting
-- `references/text-roles-inline-code.md` -- `:php:`, `:file:`, `:guilabel:`, `:ref:`
-- `references/code-structure-elements.md` -- code blocks, confval, PHP domain
-- `references/typo3-directives.md` -- confval, versionadded, deprecated
-- `references/content-directives.md` -- accordion, tabs, card-grid
-- `references/screenshots.md` -- image requirements, figure directives
-- `references/rendering.md` -- Docker commands, live preview
-- `references/intercept-deployment.md` -- webhook, build triggers
-- `references/asset-templates-guide.md` -- templates, screenshot workflow
-- `references/scripts-guide.md` -- extraction and analysis scripts
+`references/`: `file-structure.md`, `guides-xml.md`, `coding-guidelines.md`, `rst-syntax.md`, `text-roles-inline-code.md`, `code-structure-elements.md`, `typo3-directives.md`, `content-directives.md`, `screenshots.md`, `rendering.md`, `intercept-deployment.md`, `asset-templates-guide.md`, `scripts-guide.md`
 
 ## External Resources
 
