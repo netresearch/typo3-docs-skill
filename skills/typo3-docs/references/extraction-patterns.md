@@ -814,6 +814,87 @@ User: "Document the ImageProcessor class"
 → User reviews rendered output
 ```
 
+## Code Example Accuracy Validation
+
+Every PHP code example in documentation MUST reference methods that actually exist in the `Classes/` source tree. This section covers common mistakes found during TYPO3 v13 extension documentation reviews and the validation approach to prevent them.
+
+### Common Method Name Mistakes
+
+Documentation authors frequently invent plausible-sounding method names that do not match the actual implementation. Always verify against source code before publishing.
+
+| Incorrect (used in docs) | Correct (actual source) | Context |
+|---------------------------|-------------------------|---------|
+| `getTranslation()` | `translate()` | Language service / translation models |
+| `importXliffFile()` | `importFile()` | XLIFF import services |
+| `findByIdentifier()` | `findByName()` | Repository lookup methods |
+| `findByComponent()` | `findAllByComponentTypePlaceholderValueAndLanguage()` | Component repository queries |
+| `getKey()` | `getPlaceholder()` | Migration / model accessor methods |
+| `getValue()` | `getTranslation()` | Migration / model accessor methods |
+
+### CLI Command Documentation
+
+CLI command documentation must match the actual Symfony Console argument and option registration. Always check the `configure()` method in the Command class:
+
+```php
+// Verify docs against actual configure() registration
+protected function configure(): void
+{
+    $this->addArgument('file', InputArgument::REQUIRED, 'Path to import file');
+    $this->addOption('format', 'f', InputOption::VALUE_OPTIONAL, 'Output format', 'json');
+}
+```
+
+**Common CLI mistakes:**
+- Documenting arguments that are not registered in `configure()`
+- Wrong argument order (positional arguments are order-sensitive)
+- Missing or incorrect option short names (`-f` vs `--format`)
+- Default values that do not match the `configure()` registration
+
+### Migration Example Accuracy
+
+Migration code examples must use actual model method names. When documenting data migration or upgrade wizards:
+
+- Verify getter/setter names against the domain model class (e.g., `getPlaceholder()` not `getKey()`, `getValue()` not `getTranslation()`)
+- Check that repository method signatures match (argument count, types, return types)
+- Confirm that injected services use the correct class names
+
+### Version Number Consistency
+
+Version numbers appearing in documentation must match the canonical source:
+
+- `guides.xml` version attribute must match `ext_emconf.php` version
+- Code examples referencing `versionadded` or `versionchanged` must use released versions
+- Composer `branch-alias` versions must be consistent across `composer.json`, `ext_emconf.php`, and docs
+
+### Validation Approach
+
+Before publishing any documentation containing PHP code examples, run these checks:
+
+```bash
+# 1. Extract all method names referenced in documentation
+grep -rhoP '\b[a-z][a-zA-Z]+\(\)' Documentation/ | sort -u > /tmp/doc_methods.txt
+
+# 2. Extract all actual method names from source
+grep -rhoP 'function\s+\K[a-zA-Z]+(?=\s*\()' Classes/ | sort -u > /tmp/src_methods.txt
+
+# 3. Find methods in docs that do not exist in source
+comm -23 /tmp/doc_methods.txt /tmp/src_methods.txt
+```
+
+For CLI commands:
+```bash
+# Verify documented arguments against configure() method
+grep -A 20 'function configure' Classes/Command/*.php
+```
+
+For model methods in migration examples:
+```bash
+# Verify getter/setter names in domain models
+grep -rn 'function get\|function set\|function is\|function has' Classes/Domain/Model/
+```
+
+**Rule:** If a method name from the documentation does not appear in `Classes/`, the code example is wrong and must be corrected before publishing.
+
 ## Best Practices
 
 **DO:**

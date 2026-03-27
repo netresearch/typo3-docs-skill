@@ -473,6 +473,100 @@ When README.md and Documentation/ cover the same topics, they must not contradic
 - When inconsistencies are found, update README.md to match Documentation/.
 - Commit README.md and Documentation/ changes together atomically.
 
+## Common Documentation Errors
+
+Patterns of errors found during TYPO3 v13 extension documentation reviews. Check for these issues before publishing.
+
+### Version Directive Accuracy
+
+`versionadded` and `versionchanged` directives must reference actually released versions, not planned or future versions:
+
+```rst
+.. Good -- references a released version
+.. versionadded:: 3.0.0
+   Added support for TYPO3 v13.
+
+.. Bad -- references a version that does not exist yet
+.. versionadded:: 3.2.0
+   Will add multi-site support.
+```
+
+**Validation:** Cross-check every version number in directives against git tags (`git tag --list`) and `ext_emconf.php`.
+
+### ChangeLog Completeness
+
+The ChangeLog section must include ALL released versions. Missing versions create gaps in the project history:
+
+- Check git tags: `git tag --list --sort=-version:refname`
+- Every tagged release must have a corresponding ChangeLog entry
+- Entries must be in reverse chronological order (newest first)
+
+### Language and Feature Count Claims
+
+Numeric claims in documentation must be verifiable:
+
+- **Language count:** "Supports N languages" must match the actual number of files in `Resources/Private/Language/`. Count with: `ls -1 Resources/Private/Language/*.xlf | wc -l`
+- **Feature lists:** If documentation claims "5 CLI commands", verify with: `grep -rl 'extends Command' Classes/Command/ | wc -l`
+- **Configuration option counts:** Verify against `ext_conf_template.txt` or TCA definitions
+
+### Speculative Roadmap Content
+
+Documentation for unreleased versions (e.g., 3.1.0, 3.2.0, 4.0.0 planned features) must be handled carefully:
+
+- Remove speculative feature descriptions from published documentation entirely, OR
+- Clearly mark roadmap content with an explicit admonition:
+
+```rst
+.. note::
+   The following features are planned for future releases and are
+   subject to change. They are not available in the current version.
+```
+
+- Never use `versionadded` or `versionchanged` for unreleased versions
+
+### Unresolved TODO Directives
+
+`.. todo::` directives should not appear in published documentation. Before release:
+
+- Search for all TODOs: `grep -rn '.. todo::' Documentation/`
+- Either resolve each TODO with actual content, or remove it
+- If a TODO must remain (rare), move it to a comment so it does not render
+
+### TypoScript Documentation Accuracy
+
+TypoScript examples must reflect actual file contents:
+
+- **Backend modules** use `module.` prefix, not `plugin.`:
+  ```typoscript
+  # Correct for backend modules
+  module.tx_myext {
+      settings.itemsPerPage = 20
+  }
+
+  # Wrong -- plugin. prefix is for frontend plugins only
+  plugin.tx_myext {
+      settings.itemsPerPage = 20
+  }
+  ```
+- Sub-key paths must match the actual TypoScript setup files in `Configuration/TypoScript/`
+- Default values in documentation must match the values in the shipped `.typoscript` files
+
+### Screenshot Placeholders
+
+Screenshot sections must contain actual images or be clearly marked:
+
+- Every `.. figure::` or `.. image::` directive must reference an existing file
+- Validate with: `grep -rn '.. figure::\|.. image::' Documentation/ | while read line; do file=$(echo "$line" | grep -oP '(?<=:: ).*'); [ ! -f "$file" ] && echo "MISSING: $line"; done`
+- If screenshots are not yet available, use a visible placeholder admonition instead of an empty or broken image reference:
+
+```rst
+.. note::
+   Screenshot pending. This section will be updated with actual
+   screenshots in a future revision.
+```
+
+- Never leave empty `Images/` directories or broken image references in published docs
+
 ## References
 
 - **Sphinx RST Guide:** https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html
