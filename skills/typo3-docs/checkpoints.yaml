@@ -157,6 +157,26 @@ mechanical:
     severity: info
     desc: "Documentation/Introduction/ directory should exist"
 
+  # === DOCUMENTATION ACCURACY ===
+  - id: TD-30
+    type: command
+    pattern: "bash scripts/check-version-match.sh"
+    severity: error
+    desc: "guides.xml version must match ext_emconf.php version"
+
+  - id: TD-31
+    type: command
+    pattern: "grep -rn 'getTranslation\\|importXliffFile\\|findByIdentifier\\|findByComponent' Documentation/ 2>/dev/null | head -1 && echo 'Found common wrong method names in documentation' && exit 1 || exit 0"
+    severity: error
+    desc: "Documentation must not reference common wrong method names (getTranslation, importXliffFile, findByIdentifier, findByComponent)"
+
+  # === DOCUMENTATION COMPLETENESS ===
+  - id: TD-41
+    type: command
+    pattern: "bash scripts/check-unreleased-versions.sh"
+    severity: warning
+    desc: "versionadded/versionchanged directives should reference released versions only"
+
 llm_reviews:
   # === CONTENT QUALITY ===
   - id: TD-20
@@ -222,3 +242,61 @@ llm_reviews:
       List any files not following the convention.
     severity: info
     desc: "RST files should follow TYPO3 CamelCase naming convention"
+
+  # === DOCUMENTATION ACCURACY ===
+  - id: TD-32
+    domain: documentation
+    prompt: |
+      Review Documentation/Configuration/Index.rst (and any TypoScript configuration docs) for backend module TypoScript usage.
+      Backend modules MUST use the `module.` prefix in TypoScript, NOT `plugin.`.
+
+      Check for patterns like:
+      - `plugin.tx_extensionname` used for backend module configuration (WRONG)
+      - Should be `module.tx_extensionname` for backend modules
+
+      Report any instances where `plugin.` prefix is used for backend module TypoScript configuration.
+    severity: warning
+    desc: "TypoScript docs must use module. prefix (not plugin.) for backend modules"
+
+  - id: TD-33
+    domain: documentation
+    prompt: |
+      Compare CLI command documentation against the actual ImportCommand (or other Command classes) configure() method.
+
+      For each documented CLI command:
+      1. Find the corresponding Command class in Classes/Command/
+      2. Read its configure() method to get actual arguments and options
+      3. Compare documented arguments/options against actual configure() definitions
+      4. Check that argument names, option names, descriptions, and required/optional status match
+
+      Report any mismatches between documented CLI arguments and actual Command::configure() definitions.
+    severity: error
+    desc: "CLI command documentation must match actual Command::configure() arguments"
+
+  - id: TD-40
+    domain: documentation
+    prompt: |
+      Check Documentation/ChangeLog/Index.rst (or similar changelog file) against git tags.
+
+      1. List all git tags with `git tag -l`
+      2. For each tag that represents a release version, verify it appears in the changelog
+      3. Check that changelog entries are in reverse chronological order
+
+      Report any git tags (release versions) missing from the changelog documentation.
+    severity: warning
+    desc: "ChangeLog should include entries for all git tags (release versions)"
+
+  - id: TD-42
+    domain: documentation
+    prompt: |
+      Check all Documentation sections that should contain screenshots (especially for backend modules, configuration screens, and UI workflows).
+
+      Look for:
+      - Sections with TODO placeholders instead of actual content
+      - Screenshot references (.. figure::) pointing to non-existent images
+      - Sections titled "Screenshots" or similar that are empty or contain only placeholder text
+      - Backend module documentation lacking any screenshots
+
+      Report any sections with missing or placeholder screenshot content.
+    severity: medium
+    desc: "Screenshots sections should have actual content, not TODO placeholders"
