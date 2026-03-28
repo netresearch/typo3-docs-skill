@@ -80,41 +80,33 @@ fi
 echo ""
 echo "Checking for common issues..."
 
-# Check for broken internal references (basic check)
+# Check for common issues in a single pass over all RST files
 WARNINGS=0
+HEADING_ERRORS=0
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Check for :ref: without proper labels
 while IFS= read -r -d '' file; do
+    # Check for :ref: references
     if grep -q ':ref:`[^<]*`' "$file"; then
         REF_COUNT=$(grep -o ':ref:`[^`]*`' "$file" | wc -l)
         if [ "$REF_COUNT" -gt 0 ]; then
             echo "ℹ️  Found $REF_COUNT :ref: references in $(basename "$file")"
         fi
     fi
-done < <(find "$DOC_DIR" -name "*.rst" -print0)
 
-# Check for UTF-8 encoding
-while IFS= read -r -d '' file; do
-    if ! file -b --mime-encoding "$file" | grep -q utf-8; then
+    # Check for UTF-8 encoding
+    if ! file -b --mime-encoding "$file" | grep -qE 'utf-8|us-ascii'; then
         echo "⚠️  Non-UTF-8 encoding in: $file"
         WARNINGS=$((WARNINGS + 1))
     fi
-done < <(find "$DOC_DIR" -name "*.rst" -print0)
 
-# Check for trailing whitespace
-while IFS= read -r -d '' file; do
+    # Check for trailing whitespace
     if grep -q '[[:space:]]$' "$file"; then
         echo "⚠️  Trailing whitespace in: $file"
         WARNINGS=$((WARNINGS + 1))
     fi
-done < <(find "$DOC_DIR" -name "*.rst" -print0)
 
-# Check TYPO3 heading hierarchy (= for h1/h2, - for h3, ~ for h4)
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-echo ""
-echo "Checking heading hierarchy..."
-HEADING_ERRORS=0
-while IFS= read -r -d '' file; do
+    # Check TYPO3 heading hierarchy (= for h1/h2, - for h3, ~ for h4)
     RESULT=$(python3 "$SCRIPT_DIR/validate_headings.py" "$file" 2>/dev/null)
     if [ -n "$RESULT" ]; then
         echo "❌ Heading hierarchy issue in: $(basename "$file")"
@@ -123,10 +115,11 @@ while IFS= read -r -d '' file; do
     fi
 done < <(find "$DOC_DIR" -name "*.rst" -print0)
 
+echo ""
+echo "Checking heading hierarchy..."
 if [ $HEADING_ERRORS -eq 0 ]; then
     echo "✅ Heading hierarchy follows TYPO3 convention"
 else
-    echo ""
     echo "❌ Found $HEADING_ERRORS files with heading hierarchy issues"
     echo "   TYPO3 heading order: = (h1 title, above+below), = (h2), - (h3), ~ (h4)"
     WARNINGS=$((WARNINGS + HEADING_ERRORS))
