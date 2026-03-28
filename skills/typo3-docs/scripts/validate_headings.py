@@ -20,17 +20,24 @@ EXPECTED_ORDER = ["=", "-", "~", '"', "'"]
 UNDERLINE_CHARS = set(EXPECTED_ORDER + ["^", "#", "\\"])
 
 
+def _is_adornment(line):
+    """Return True if line is an RST adornment (all same char, length >= 3)."""
+    return (
+        bool(line)
+        and len(line) >= 3
+        and all(c == line[0] for c in line)
+        and line[0] in UNDERLINE_CHARS
+    )
+
+
 def parse_headings(lines):
     headings = []
     i = 0
+    # Track which lines are already consumed as part of an overline heading
+    consumed = set()
     while i < len(lines):
         line = lines[i].rstrip()
-        if (
-            line
-            and len(line) >= 3
-            and all(c == line[0] for c in line)
-            and line[0] in UNDERLINE_CHARS
-        ):
+        if _is_adornment(line) and i not in consumed:
             char = line[0]
             # Check if this is an overline (title) or underline
             if i + 2 < len(lines):
@@ -38,19 +45,25 @@ def parse_headings(lines):
                 next_next = lines[i + 2].rstrip()
                 if (
                     next_line
-                    and not all(c == next_line[0] for c in next_line)
-                    and next_next
-                    and all(c == next_next[0] for c in next_next)
+                    and not _is_adornment(next_line)
+                    and _is_adornment(next_next)
                     and next_next[0] == char
+                    and len(line) >= len(next_line.strip())
+                    and len(next_next) >= len(next_line.strip())
                 ):
-                    # Overline+underline = title (h1), skip both
+                    # Overline+underline = title (h1), skip all three lines
                     headings.append(("h1", char, next_line, i + 1))
+                    consumed.add(i + 2)
                     i += 3
                     continue
             # Underline only - check previous line for title text
-            if i > 0:
+            if i > 0 and i - 1 not in consumed:
                 prev = lines[i - 1].rstrip()
-                if prev and not all(c == prev[0] for c in prev):
+                if (
+                    prev
+                    and not _is_adornment(prev)
+                    and len(line) >= len(prev.strip())
+                ):
                     headings.append(("section", char, prev, i))
         i += 1
     return headings

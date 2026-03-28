@@ -95,7 +95,7 @@ done < <(find "$DOC_DIR" -name "*.rst" -print0)
 
 # Check for UTF-8 encoding
 while IFS= read -r -d '' file; do
-    if ! file -b --mime-encoding "$file" | grep -q utf-8; then
+    if ! file -b --mime-encoding "$file" | grep -qE 'utf-8|us-ascii'; then
         echo "⚠️  Non-UTF-8 encoding in: $file"
         WARNINGS=$((WARNINGS + 1))
     fi
