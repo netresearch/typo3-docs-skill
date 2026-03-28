@@ -10,7 +10,7 @@ done
 [ -z "$changelog" ] && echo "No changelog file found" && exit 1
 
 # Get all version-like tags
-tags=$(git tag -l 2>/dev/null | grep -P '^\d+\.\d+' || git tag -l 2>/dev/null | grep -P '^v?\d+\.\d+' | sed 's/^v//' || true)
+tags=$({ git tag -l 2>/dev/null | grep -P '^\d+\.\d+' || true; git tag -l 2>/dev/null | grep -P '^v\d+\.\d+' | sed 's/^v//' || true; })
 
 [ -z "$tags" ] && exit 0
 
