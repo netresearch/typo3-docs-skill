@@ -59,11 +59,7 @@ def parse_headings(lines):
             # Underline only - check previous line for title text
             if i > 0 and i - 1 not in consumed:
                 prev = lines[i - 1].rstrip()
-                if (
-                    prev
-                    and not _is_adornment(prev)
-                    and len(line) >= len(prev.strip())
-                ):
+                if prev and not _is_adornment(prev) and len(line) >= len(prev.strip()):
                     headings.append(("section", char, prev, i))
         i += 1
     return headings
