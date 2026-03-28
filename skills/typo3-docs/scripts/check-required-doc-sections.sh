@@ -8,13 +8,13 @@ missing=()
 
 # Core required sections
 for section in Introduction Installation Configuration Usage; do
-    if [ ! -d "Documentation/$section" ] && [ ! -f "Documentation/$section/Index.rst" ]; then
+    if [ ! -d "Documentation/$section" ] || [ ! -f "Documentation/$section/Index.rst" ]; then
         missing+=("$section")
     fi
 done
 
 # Developer section (recommended)
-if [ ! -d "Documentation/Developer" ] && [ ! -f "Documentation/Developer/Index.rst" ]; then
+if [ ! -d "Documentation/Developer" ] || [ ! -f "Documentation/Developer/Index.rst" ]; then
     missing+=("Developer")
 fi
 

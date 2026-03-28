@@ -16,17 +16,21 @@ while IFS= read -r file; do
     # Exclude lines that use f:translate or {f:translate()} syntax
     while IFS= read -r match; do
         [ -z "$match" ] && continue
-        # Extract the attribute value
-        value=$(echo "$match" | grep -oP '(title|aria-label|alt)="[^"]*"' | grep -oP '"[^"]*"' | tr -d '"')
-        [ -z "$value" ] && continue
-        # Skip if it contains f:translate or LLL: or curly braces (Fluid expression)
-        echo "$value" | grep -qP '(f:translate|LLL:|{.*})' && continue
-        # Count words
-        word_count=$(echo "$value" | wc -w)
-        if [ "$word_count" -gt 3 ]; then
-            echo "$file: hardcoded string ($word_count words) in attribute: $value"
-            found=1
-        fi
+        # Process each attribute match separately (a line may contain multiple attributes)
+        while IFS= read -r attr_match; do
+            [ -z "$attr_match" ] && continue
+            # Extract the attribute value
+            value=$(echo "$attr_match" | grep -oP '"[^"]*"' | tr -d '"')
+            [ -z "$value" ] && continue
+            # Skip if it contains f:translate or LLL: or curly braces (Fluid expression)
+            echo "$value" | grep -qP '(f:translate|LLL:|{.*})' && continue
+            # Count words
+            word_count=$(echo "$value" | wc -w)
+            if [ "$word_count" -gt 3 ]; then
+                echo "$file: hardcoded string ($word_count words) in attribute: $value"
+                found=1
+            fi
+        done < <(echo "$match" | grep -oP '(title|aria-label|alt)="[^"]*"' || true)
     done < <(grep -nP '(title|aria-label|alt)="[^"]*"' "$file" 2>/dev/null || true)
 done <<< "$fluid_files"
 

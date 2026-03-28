@@ -20,7 +20,9 @@ for target in Documentation/Introduction/Index.rst Documentation/Installation/In
     while IFS= read -r sub; do
         [ -z "$sub" ] && continue
         # Get the substitution value from Includes.rst.txt
-        sub_value=$(grep -P "^\.\.\s*\\$sub\s+replace::" "$includes_file" 2>/dev/null | grep -oP '::\s*.*$' | sed 's/^::\s*//' || true)
+        # Escape pipe characters for use in grep regex
+        sub_escaped=$(echo "$sub" | sed 's/|/\\|/g')
+        sub_value=$(grep -P "^\.\.\s*${sub_escaped}\s+replace::" "$includes_file" 2>/dev/null | grep -oP '::\s*.*$' | sed 's/^::\s*//' || true)
         [ -z "$sub_value" ] && continue
 
         # Check if the hardcoded value appears in target but the substitution does not

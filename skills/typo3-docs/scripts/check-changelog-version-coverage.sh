@@ -20,7 +20,7 @@ while IFS= read -r tag; do
     [ -z "$tag" ] && continue
     # Strip leading 'v' for matching
     version=$(echo "$tag" | sed 's/^v//')
-    if ! grep -qF "$version" "$changelog" 2>/dev/null; then
+    if ! grep -qF "[${version}]" "$changelog" 2>/dev/null; then
         missing+=("$version")
     fi
 done <<< "$tags"

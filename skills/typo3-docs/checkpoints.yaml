@@ -160,9 +160,9 @@ mechanical:
   # === DOCUMENTATION ACCURACY ===
   - id: TD-30
     type: command
-    pattern: "bash scripts/check-version-match.sh"
+    pattern: "bash scripts/check-guides-xml-version-sync.sh"
     severity: error
-    desc: "guides.xml version must match ext_emconf.php version"
+    desc: "guides.xml version and release attributes must both match ext_emconf.php version"
 
   - id: TD-31
     type: command
@@ -177,12 +177,8 @@ mechanical:
     severity: warning
     desc: "versionadded/versionchanged directives should reference released versions only"
 
-  # === VERSION SYNC (guides.xml version + release) ===
-  - id: TD-43
-    type: command
-    pattern: "bash scripts/check-guides-xml-version-sync.sh"
-    severity: error
-    desc: "guides.xml version and release attributes must both match ext_emconf.php version"
+  # Note: TD-43 (guides.xml version+release sync) removed — consolidated into TD-30
+  # which now uses check-guides-xml-version-sync.sh (checks both version and release attributes)
 
   # === REQUIRED DOCUMENTATION SECTIONS ===
   - id: TD-44
@@ -208,7 +204,7 @@ mechanical:
   # === PLANTUML RENDERING ===
   - id: TD-47
     type: command
-    pattern: "grep -rn '\\.\\.\\s*uml::' Documentation/ 2>/dev/null | head -1 && echo 'Found .. uml:: directive(s) — TYPO3 docs toolchain may not support PlantUML. Use .. code-block:: text or .. figure:: instead.' && exit 1 || exit 0"
+    pattern: "grep -rnP '\\.\\.\\s*uml::' Documentation/ 2>/dev/null | head -1 && echo 'Found .. uml:: directive(s) — TYPO3 docs toolchain may not support PlantUML. Use .. code-block:: text or .. figure:: instead.' && exit 1 || exit 0"
     severity: warning
     desc: ".. uml:: directives require PlantUML support which TYPO3 docs toolchain may not provide; use .. code-block:: text or .. figure:: alternatives"
 
