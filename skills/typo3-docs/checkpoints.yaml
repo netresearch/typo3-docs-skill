@@ -160,9 +160,9 @@ mechanical:
   # === DOCUMENTATION ACCURACY ===
   - id: TD-30
     type: command
-    pattern: "bash scripts/check-version-match.sh"
+    pattern: "bash scripts/check-guides-xml-version-sync.sh"
     severity: error
-    desc: "guides.xml version must match ext_emconf.php version"
+    desc: "guides.xml version and release attributes must both match ext_emconf.php version"
 
   - id: TD-31
     type: command
@@ -176,6 +176,51 @@ mechanical:
     pattern: "bash scripts/check-unreleased-versions.sh"
     severity: warning
     desc: "versionadded/versionchanged directives should reference released versions only"
+
+  # Note: TD-43 (guides.xml version+release sync) removed — consolidated into TD-30
+  # which now uses check-guides-xml-version-sync.sh (checks both version and release attributes)
+
+  # === REQUIRED DOCUMENTATION SECTIONS ===
+  - id: TD-44
+    type: command
+    pattern: "bash scripts/check-required-doc-sections.sh"
+    severity: warning
+    desc: "Documentation should include Introduction, Installation, Configuration, Usage, Developer, and Troubleshooting/FAQ sections"
+
+  # === UNTRANSLATED FLUID STRINGS ===
+  - id: TD-45
+    type: command
+    pattern: "bash scripts/check-untranslated-fluid-strings.sh"
+    severity: warning
+    desc: "Fluid templates should use f:translate for user-facing text; flag hardcoded English strings (>3 words in title/aria-label/alt)"
+
+  # === RST SUBSTITUTIONS USAGE ===
+  - id: TD-46
+    type: command
+    pattern: "bash scripts/check-rst-substitutions-used.sh"
+    severity: info
+    desc: "If Includes.rst.txt defines substitutions, they should be used in Introduction/Index.rst and Installation/Index.rst instead of hardcoded values"
+
+  # === PLANTUML RENDERING ===
+  - id: TD-47
+    type: command
+    pattern: "grep -rnP '\\.\\.\\s*uml::' Documentation/ 2>/dev/null | head -1 && echo 'Found .. uml:: directive(s) — TYPO3 docs toolchain may not support PlantUML. Use .. code-block:: text or .. figure:: instead.' && exit 1 || exit 0"
+    severity: warning
+    desc: ".. uml:: directives require PlantUML support which TYPO3 docs toolchain may not provide; use .. code-block:: text or .. figure:: alternatives"
+
+  # === CHANGELOG VERSION COVERAGE ===
+  - id: TD-48
+    type: command
+    pattern: "bash scripts/check-changelog-version-coverage.sh"
+    severity: warning
+    desc: "CHANGELOG.md should have entries for all git tags between initial and current version"
+
+  # === ADR COVERAGE ===
+  - id: TD-49
+    type: command
+    pattern: "bash scripts/check-adr-coverage.sh"
+    severity: info
+    desc: "Extensions with >10 classes should have Documentation/Developer/Adr/ for significant architectural decisions"
 
 llm_reviews:
   # === CONTENT QUALITY ===
@@ -300,3 +345,19 @@ llm_reviews:
       Report any sections with missing or placeholder screenshot content.
     severity: medium
     desc: "Screenshots sections should have actual content, not TODO placeholders"
+
+  # === API EXAMPLE ACCURACY ===
+  - id: TD-50
+    domain: documentation
+    prompt: |
+      Compare code examples in README.md and Documentation/ RST files against the actual codebase.
+
+      For each code example that references PHP classes, methods, or functions:
+      1. Find the actual class in Classes/ directory
+      2. Verify the method signatures match (method name, parameters, return types)
+      3. Check that convenience methods shown in examples actually exist
+      4. Verify namespace and use statements are correct
+
+      Report any code examples that reference methods or signatures that don't exist in the codebase.
+    severity: error
+    desc: "Code examples in README.md and docs must use actual method signatures from the codebase"
