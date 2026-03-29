@@ -23,3 +23,6 @@ __pycache__/
 *.zip
 dist/
 build/
+
+# Serena
+.serena/
