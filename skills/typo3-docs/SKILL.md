@@ -32,12 +32,12 @@ Create and maintain TYPO3 extension documentation following official docs.typo3.
 
 | Content Type | Directive |
 |--------------|-----------|
-| Code (5+ lines) | `literalinclude` |
+| Complete code | `literalinclude` (preferred over `code-block`) |
 | Short snippets | `code-block` with `:caption:` |
-| Config options | `confval` with `:type:`, `:default:` |
-| PHP API | `php:class::`, `php:method::` |
+| Config options | `confval` with `:name:`, `:type:`, `:default:` |
+| PHP API | `php:method::` -- use `:returntype:` for nullable/union types |
 | Notices | `note`, `tip`, `warning`, `important` |
-| Feature grids | `card-grid` |
+| Feature grids | `card-grid` with `stretched-link` in footer |
 | Alternatives | `tabs` (synchronized) |
 | Screenshots | `figure` with `:zoom: lightbox` `:class: with-border with-shadow` |
 
@@ -45,23 +45,20 @@ Create and maintain TYPO3 extension documentation following official docs.typo3.
 
 - **UTF-8**, **4-space** indent, **80 char** line length, **LF** endings
 - **CamelCase** file/directory names, **sentence case** headings
+- **Permalink anchors** (`.. _label:`) before **every** section heading
 - **Index.rst** required in every subdirectory
 - **PNG** screenshots with `:alt:` and `:zoom: lightbox`
 - **.editorconfig** required in `Documentation/`
 - **Screenshots MANDATORY** for backend modules, config screens, UI workflows
 - **Max 250 lines per RST page** -- split with `toctree` if exceeded
 - **No `mailto:` links** -- use GitHub Issues/Discussions URLs
+- **PHP domain**: never use `?Type` or `Type|null` in `php:method::` signatures; use `:returntype:` instead
 
 ## Code Example Validation
 
-Cross-reference all code examples against actual extension source:
-
-1. **PHP code**: Grep method names from docs in `Classes/` to verify existence
-2. **CLI arguments**: Compare against `configure()` in `Classes/Command/`
-3. **API signatures**: Verify types and names match actual class methods
-4. **Version numbers**: Ensure versions in `guides.xml` and directives match `ext_emconf.php`
-
-See `references/extraction-patterns.md` for detailed validation commands.
+Cross-reference code examples against extension source:
+grep method names in `Classes/`, compare CLI arguments against `configure()`,
+verify API signatures match. See `references/extraction-patterns.md`.
 
 ## Pre-Commit Checklist
 
