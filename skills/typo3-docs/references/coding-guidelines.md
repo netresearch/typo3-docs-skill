@@ -26,7 +26,12 @@ indent_size = 4
 
 [*.{yaml,yml}]
 indent_size = 2
+
+[*.xlf]
+indent_size = 2
 ```
+
+> **TYPO3 v14+**: XLIFF files use **2-space** indentation (Important [#107971](https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog/14.1/Important-107971-XLFFilesUseTwoSpaceIndentation.html)). Extensions shipping translations alongside docs should align.
 
 **Why .editorconfig?**
 - Ensures consistent formatting across editors (VS Code, PhpStorm, Vim, etc.)
