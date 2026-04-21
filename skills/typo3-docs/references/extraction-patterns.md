@@ -270,8 +270,8 @@ Integration/Configuration.rst:
 ```json
 {
   "require": {
-    "typo3/cms-core": "^12.4 || ^13.0",
-    "typo3/cms-backend": "^12.4 || ^13.0"
+    "typo3/cms-core": "^12.4 || ^13.0 || ^14.3",
+    "typo3/cms-backend": "^12.4 || ^13.0 || ^14.3"
   },
   "require-dev": {
     "typo3/testing-framework": "^8.0"
@@ -299,8 +299,8 @@ Dependencies
 
 **Required:**
 
-- typo3/cms-core: ^12.4 || ^13.0
-- typo3/cms-backend: ^12.4 || ^13.0
+- typo3/cms-core: ^12.4 || ^13.0 || ^14.3
+- typo3/cms-backend: ^12.4 || ^13.0 || ^14.3
 
 **Development:**
 

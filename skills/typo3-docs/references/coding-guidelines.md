@@ -48,10 +48,12 @@ indent_size = 2
 | Rule | Value |
 |------|-------|
 | Indentation style | **Spaces only** (never tabs) |
-| Indentation size | **4 spaces** per level |
-| Code examples | 4 spaces indentation |
+| RST indentation size | **4 spaces** per level |
+| YAML indentation size | 2 spaces per level |
+| XLIFF indentation size | **2 spaces** per level (TYPO3 v14+, Important [#107971](https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog/14.1/Important-107971-XLFFilesUseTwoSpaceIndentation.html)) |
+| RST code examples | 4 spaces indentation |
 
-**Critical:** Incorrect indentation causes rendering failures. RST is whitespace-sensitive.
+**Critical:** Incorrect indentation causes rendering failures. RST is whitespace-sensitive. The file-type split above matches the `.editorconfig` block shown earlier: `[*]` (and `[*.rst]`) use 4 spaces, `[*.{yaml,yml}]` and `[*.xlf]` use 2.
 
 ```rst
 .. note::
