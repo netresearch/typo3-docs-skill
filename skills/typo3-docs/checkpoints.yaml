@@ -46,12 +46,18 @@ mechanical:
     severity: warning
     desc: "guides.xml should specify documentation version"
 
+  # guides.xml extension identification — any of these per-line tokens
+  # satisfies the check. The previous regex required `<extension` and
+  # `class=` on the same line (rare in real guides.xml — TYPO3 docs
+  # convention puts each attribute on its own line). It also rejected
+  # the slash form `vendor/key` for interlink-shortcode (the real
+  # canonical form).
   - id: TD-07
     type: regex
     target: Documentation/guides.xml
-    pattern: '(extension-key="[a-z_]+"|<extension\s+class=|interlink-shortcode="[a-z_]+")'
+    pattern: 'extension-key="[a-z_-]+"|<extension(>|[[:space:]]|$)|interlink-shortcode="[a-z_/-]+"'
     severity: warning
-    desc: "guides.xml should specify extension key (extension-key attr, <extension class=...>, or interlink-shortcode)"
+    desc: "guides.xml should identify the extension via extension-key=, <extension …>, or interlink-shortcode=vendor/key"
 
   # === INDEX.RST CONTENT ===
   - id: TD-08
