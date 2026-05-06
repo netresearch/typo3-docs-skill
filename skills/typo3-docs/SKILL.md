@@ -83,3 +83,7 @@ verify API signatures match. See `references/extraction-patterns.md`.
 - `references/rendering.md` -- Docker commands, live preview
 - `references/intercept-deployment.md` -- webhook, build triggers
 - `references/asset-templates-guide.md` -- templates, screenshot workflow
+- `references/architecture-decision-records.md` -- ADR patterns for documentation decisions
+- `references/documentation-coverage-analysis.md` -- coverage scoring methodology
+- `references/scripts-guide.md` -- script options and usage
+- `references/typo3-extension-architecture.md` -- file-structure reference for documentation
