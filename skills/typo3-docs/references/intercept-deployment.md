@@ -276,15 +276,18 @@ render run exists to find**. Don't chase the API error; check the webhook delive
 REPO=owner/repo
 # 1. Find the docs-hook.typo3.org webhook id
 HOOK=$(gh api "repos/$REPO/hooks" \
-  --jq '.[] | select(.config.url | test("docs-hook.typo3.org")) | .id')
+  --jq '.[] | select(.config.url | contains("docs-hook.typo3.org")) | .id')
 
 # 2. List recent deliveries and their status codes.
 #    IMPORTANT: parse delivery ids with Python, NOT jq — the ids are 19-digit
 #    integers and jq silently loses precision, so a jq-extracted id 404s.
-gh api "repos/$REPO/hooks/$HOOK/deliveries" --paginate \
+#    --slurp wraps each --paginate page into one outer array (each page is a
+#    separate JSON document otherwise, which breaks a single json.load()).
+gh api "repos/$REPO/hooks/$HOOK/deliveries" --paginate --slurp \
   | python3 -c 'import json,sys
-for d in json.load(sys.stdin):
-    print(d["id"], d["status_code"], d.get("event"), d.get("action") or "")'
+for page in json.load(sys.stdin):
+    for d in page:
+        print(d["id"], d["status_code"], d.get("event"), d.get("action") or "")'
 # A tag push showing status_code 500 (while main pushes show 200) confirms the
 # typo3.org-side outage.
 ```
@@ -293,7 +296,8 @@ for d in json.load(sys.stdin):
 not yours; retrying while it is down just reproduces the 500):
 
 ```bash
-# Redeliver the failed tag webhook (DID = the 19-digit id from above)
+# Redeliver the failed tag webhook (DID = the 19-digit delivery id from above)
+DID=<deliveryId>
 gh api -X POST "repos/$REPO/hooks/$HOOK/deliveries/$DID/attempts"
 # Then re-run the release pipeline's failed jobs so verify-docs finds the run
 gh run rerun <releaseRunId> --failed
