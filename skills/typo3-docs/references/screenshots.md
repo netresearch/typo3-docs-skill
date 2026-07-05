@@ -69,7 +69,7 @@ result) in one shot, make the **viewport itself tall** and take a normal
 ```js
 // Capture config + output together: tall viewport, NOT fullPage.
 await page.setViewportSize({ width: 1440, height: 1750 });
-await page.screenshot({ path: 'Documentation/Images/ModuleRun.png' }); // no fullPage
+await page.screenshot({ path: 'Documentation/Images/Usage/ModuleRun.png' }); // no fullPage
 ```
 
 Verify the result height afterwards — a 1440×900 file when you expected a long
