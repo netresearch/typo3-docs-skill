@@ -81,10 +81,10 @@ Main skill file with comprehensive instructions for:
 
 ### references/
 
-**rst-syntax.md** - Complete RST syntax reference:
-- Headings, code blocks, lists, links
-- Tables, admonitions, images
-- Whitespace rules and common mistakes
+**rst-syntax.md** - TYPO3-specific RST conventions:
+- Heading hierarchy, list punctuation
+- README/Documentation sync
+- Documentation-review error patterns
 
 **typo3-directives.md** - TYPO3-specific directives:
 - confval for configuration values
