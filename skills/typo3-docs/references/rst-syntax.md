@@ -5,17 +5,18 @@ TYPO3-specific reStructuredText conventions. Generic RST/Sphinx syntax
 toctree, comments, substitutions) is not repeated here — see
 [`code-structure-elements.md`](code-structure-elements.md) for code blocks
 and `literalinclude`, [`content-directives.md`](content-directives.md) for
-tables and admonitions, [`screenshots.md`](screenshots.md) for images,
-[`coding-guidelines.md`](coding-guidelines.md) for indentation/whitespace,
-and [`typo3-directives.md`](typo3-directives.md) for permalink anchors and
-intersphinx `:ref:` targets.
+tables, admonitions, and comments, [`screenshots.md`](screenshots.md) for
+images, [`coding-guidelines.md`](coding-guidelines.md) for
+indentation/whitespace, [`file-structure.md`](file-structure.md) for
+toctree and substitutions, and [`typo3-directives.md`](typo3-directives.md)
+for permalink anchors and intersphinx `:ref:` targets.
 
 ## Headings
 
 ```rst
-=======================
+===========================
 Page title in sentence case
-=======================
+===========================
 
 Section heading
 ===============
