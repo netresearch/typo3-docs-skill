@@ -4,9 +4,9 @@ PreToolUse hook to validate RST content before writing to Documentation/ files.
 Checks for common TYPO3 RST patterns and provides helpful reminders.
 """
 
-import sys
-import re
 import json
+import re
+import sys
 
 # TYPO3 RST directive patterns
 TYPO3_DIRECTIVES = [
@@ -81,7 +81,7 @@ def check_rst_content(content: str, file_path: str) -> list[dict]:
 def main():
     try:
         input_data = sys.stdin.read()
-    except Exception:
+    except Exception:  # noqa: BLE001 - hook must fail open: never crash the tool on unreadable stdin
         return
 
     if not input_data:
