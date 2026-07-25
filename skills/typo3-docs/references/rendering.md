@@ -46,6 +46,33 @@ Documentation-GENERATED-temp/Index.html
 
 Open this file in a browser to preview the documentation.
 
+#### `--output` is a container path
+
+`--output` is resolved **inside** the container, not on the host. Pointing it
+at a host directory that is not under the `-v` mount writes the HTML into the
+container's own filesystem, which `--rm` then discards — and the render still
+prints `Successfully placed N rendered HTML … files into <path>`, so the run
+looks like a success:
+
+```bash
+# WRONG — /tmp is the container's /tmp; nothing appears on the host
+docker run --rm -v "$(pwd)":/project -w /project \
+  ghcr.io/typo3-documentation/render-guides:latest \
+  --config=Documentation --output=/tmp/rendered-docs
+
+# RIGHT — inside the mount, so it lands in ./.build/rendered-docs on the host
+docker run --rm -v "$(pwd)":/project -w /project \
+  ghcr.io/typo3-documentation/render-guides:latest \
+  --config=Documentation --output=/project/.build/rendered-docs
+```
+
+This matters when a check *reads back* the rendered HTML — asserting a new
+anchor exists, diffing output between branches, feeding a link checker. The
+assertion then fails with `No such file or directory` on a render that
+genuinely succeeded, which reads as a docs error rather than a path mistake.
+Pick a mounted, git-ignored target (`.build/`, `var/`) so the artefacts stay
+out of the working tree.
+
 ## Initializing New Documentation
 
 When no `Documentation/` directory exists, **always use the init command** to scaffold the structure:
