@@ -2,7 +2,7 @@
 
 Complete reference for rendering TYPO3 documentation locally using Docker.
 
-Based on: https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/RenderingContainer.html
+Based on: https://docs.typo3.org/permalink/h2document:rendering-container
 
 ## Overview
 
@@ -119,7 +119,7 @@ After running init:
 
 ### Reference
 
-- **Writing Documentation for Extensions:** https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Howto/WritingDocForExtension/Index.html
+- **Writing Documentation for Extensions:** https://docs.typo3.org/permalink/h2document:how-to-document-an-extension
 
 ## Convenience Scripts
 
@@ -393,9 +393,9 @@ Documentation-GENERATED-temp/
 
 ## References
 
-- **Rendering Container:** https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/RenderingContainer.html
-- **Live View (Watch Mode):** https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Howto/RenderingDocs/Watch.html
-- **guides.xml Reference:** https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/GuidesXml.html
+- **Rendering Container:** https://docs.typo3.org/permalink/h2document:rendering-container
+- **Live View (Watch Mode):** https://docs.typo3.org/permalink/h2document:rendering-with-more-wysiwyg-feeling-automatic-re-rendering
+- **guides.xml Reference:** https://docs.typo3.org/permalink/h2document:guides-xml
 
 ## Renderer gotchas: symlinks in Documentation/, permalinks for outbound links
 
