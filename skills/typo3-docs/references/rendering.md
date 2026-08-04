@@ -396,3 +396,8 @@ Documentation-GENERATED-temp/
 - **Rendering Container:** https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/RenderingContainer.html
 - **Live View (Watch Mode):** https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Howto/RenderingDocs/Watch.html
 - **guides.xml Reference:** https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/GuidesXml.html
+
+## Renderer gotchas: symlinks in Documentation/, permalinks for outbound links
+
+- **Never place `CLAUDE.md`/`GEMINI.md` (or other) symlinks inside `Documentation/`** — the docs.typo3.org / render-guides file walk follows symlinks and breaks on them. A regular `Documentation/AGENTS.md` *file* is fine (unknown `.md` files are ignored); symlinks specifically break the render. Relevant when agent-rules tooling generates scoped instruction files across the extension tree — exclude `Documentation/`.
+- **Link TO docs.typo3.org with permalinks, not path URLs**: `https://docs.typo3.org/permalink/<identifier>` survives restructuring; full `…/main/en-us/<Path>.html` URLs rot and reviewers flag them. Applies everywhere — code comments, PR bodies, chat, docs.
