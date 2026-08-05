@@ -177,3 +177,9 @@ Screenshot sections must contain actual images or be clearly marked:
 - **Sphinx RST Guide:** https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html
 - **Docutils RST:** https://docutils.sourceforge.io/rst.html
 - **TYPO3 Documentation Guide:** https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/
+
+## Interlinks: inventories are auto-provided; prefer `:ref:` over raw permalink URLs
+
+- `guides.xml` only declares the repo's own `interlink-shortcode` — the standard inventories (`t3coreapi`, `t3viewhelper`, `t3tca`, …) are injected by the docs theme at build time, so `:ref:`t3viewhelper:…`` works without declaring them.
+- Converting a raw `` `Title <https://docs.typo3.org/permalink/short:anchor>`_ `` link to `` :ref:`Title <short:anchor>` `` is safe AND build-validated (a typo fails the render); raw permalink URLs bypass build validation but can be smoke-tested (`curl -sL -o /dev/null -w "%{http_code}" https://docs.typo3.org/permalink/<short>:<anchor>` — real ones 200-redirect, bogus 404).
+- **Title over/underline mismatch is NOT a render blocker** in the TYPO3 toolchain (phpdoc/guides is lenient where strict docutils errors; verified — a 39/33 mismatch rendered fine even under `--fail-on-log`). Fix it as a correctness/portability issue, don't call it a blocker without rendering.

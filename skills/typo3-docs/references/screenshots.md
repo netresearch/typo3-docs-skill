@@ -348,3 +348,10 @@ When writing documentation, suggest screenshots for:
 
 - **Guidelines for Images:** https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Advanced/GuidelinesForImages.html
 - **Screenshot Container:** https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ScreenshotContainer/Index.html
+
+## Theme-change screenshots (render-guides): file:// is unstyled, control the comparison
+
+- The rendered output links `theme.css` with `crossorigin="anonymous"` — Chrome **blocks the stylesheet under `file://`** (CORS), so a `file://` screenshot is completely unstyled. Serve the output over HTTP (`python3 -m http.server`) and shoot `http://localhost:…`.
+- For a true before/after on CSS-only changes, reuse the SAME output HTML and swap in the old stylesheet (`git show origin/main:…/theme.css`) — the HTML doesn't change. Neutralize sticky/fixed nav before element shots (`position: static`).
+- The theme CSS is a **committed build artifact** (`npx grunt sass` → `resources/public/css/theme.css`) — rebuild it in the same commit as the SCSS change; local sass matches CI, keep the diff surgical (`git diff --stat`).
+- Computed-style dumps flap on two non-differences: custom-property **enumeration order** (compare property→value dicts, never serialized strings) and load-timing noise (rerun the SAME variant twice; a property that flaps there is noise). Trust controlled pixel comparison — 12/12 pairs were 0-pixel identical while string dumps "differed".
