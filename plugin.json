@@ -1,0 +1,12 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "typo3-docs",
+  "version": "2.14.4",
+  "description": "Create and maintain TYPO3 extension documentation with RST validation",
+  "author": {
+    "name": "Netresearch DTT GmbH",
+    "url": "https://www.netresearch.de"
+  },
+  "repository": "https://github.com/netresearch/typo3-docs-skill",
+  "license": "(MIT AND CC-BY-SA-4.0)"
+}
