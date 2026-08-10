@@ -344,6 +344,56 @@ When writing documentation, suggest screenshots for:
 7. ✅ **Annotations**: Sufficient contrast for accessibility
 8. ✅ **Necessity**: Screenshot genuinely adds value vs. text description
 
+## Diagrams: commit SVG, not PNG
+
+A screenshot records a UI you do not control. A **diagram** is authored, and the
+tradeoffs are the opposite ones.
+
+Commit diagrams as SVG:
+
+- It is text, so a reviewer sees the change in the diff instead of a binary
+  blob swap. A wrong label is caught in review rather than shipped.
+- It scales, and the same file serves every viewport.
+- No build step, no external renderer, no toolchain to keep alive. A
+  `.. code-block:: plantuml` in the source is not a diagram — the docs build has
+  no `plantuml` highlighter and emits `Language "plantuml" is not available to
+  highlight code` on every render.
+
+```rst
+..  figure:: /Images/diagram-streaming-flow.svg
+    :alt: Streaming: the prompt is screened, the budget is checked, and each
+        chunk passes a redaction window before the Generator yields it.
+    :class: with-border
+
+    Request path down the left, chunk path back up the right.
+```
+
+`render-guides` copies referenced images to `Images/` in the output tree, not to
+`_images/` — check there when verifying that a figure resolved:
+
+```bash
+docker run --rm --user $(id -u):$(id -g) -v "$(pwd)":/project -w /project \
+  ghcr.io/typo3-documentation/render-guides:latest --config=Documentation --no-progress
+find Documentation-GENERATED-temp -name 'diagram-*.svg'
+grep -oh 'diagram-[a-z-]*\.svg' Documentation-GENERATED-temp/**/*.html | sort -u
+```
+
+Two things worth doing while authoring:
+
+- **Put an `aria-label` on the `<svg>` as well as the `:alt:` on the figure.**
+  The `:alt:` serves the RST; the `aria-label` travels with the file if it is
+  ever embedded elsewhere.
+- **Trace the diagram against the code before drawing it.** A diagram is a claim
+  about how the system works, and it ages exactly like a hand-maintained count.
+  Drawing a CI pipeline from the workflow file rather than from memory is what
+  surfaces that a required check never runs; drawing a streaming path from the
+  service rather than from the feature description is what surfaces the
+  redaction window nobody had documented.
+
+Keep light-on-dark legibility in mind: a page is rendered in both themes, and an
+`<img>` does not inherit `currentColor`. A neutral card with explicit fills
+reads acceptably on both; a diagram drawn in pure black on transparent does not.
+
 ## References
 
 - **Guidelines for Images:** https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Advanced/GuidelinesForImages.html

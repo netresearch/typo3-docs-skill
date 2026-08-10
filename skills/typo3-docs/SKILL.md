@@ -79,7 +79,7 @@ verify API signatures match. See `references/extraction-patterns.md`.
 - `references/code-structure-elements.md` -- code blocks, confval, PHP domain
 - `references/typo3-directives.md` -- confval, versionadded, deprecated
 - `references/content-directives.md` -- accordion, tabs, card-grid
-- `references/screenshots.md` -- image requirements, figure directives
+- `references/screenshots.md` -- image requirements, figure directives, diagrams as SVG
 - `references/rendering.md` -- Docker commands, live preview
 - `references/intercept-deployment.md` -- webhook, build triggers
 - `references/asset-templates-guide.md` -- templates, screenshot workflow
