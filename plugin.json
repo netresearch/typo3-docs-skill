@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "typo3-docs",
-  "version": "2.15.0",
+  "version": "2.15.1",
   "description": "Create and maintain TYPO3 extension documentation with RST validation",
   "author": {
     "name": "Netresearch DTT GmbH",
