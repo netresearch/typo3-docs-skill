@@ -4,6 +4,11 @@ All notable changes to the typo3-docs skill are documented here.
 
 This project follows [Semantic Versioning](https://semver.org/).
 
+## [v2.15.1](https://github.com/netresearch/typo3-docs-skill/releases/tag/v2.15.1) — 2026-08-12
+
+### Added
+- Commit diagrams as SVG, and where render-guides puts them (typo3-docs)
+
 ## [v2.15.0](https://github.com/netresearch/typo3-docs-skill/releases/tag/v2.15.0) — 2026-08-08
 
 ### Added
