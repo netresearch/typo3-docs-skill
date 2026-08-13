@@ -87,3 +87,4 @@ verify API signatures match. See `references/extraction-patterns.md`.
 - `references/documentation-coverage-analysis.md` -- coverage scoring
 - `references/scripts-guide.md` -- script options
 - `references/typo3-extension-architecture.md` -- extension layout
+- `references/upstream-docs-contribution.md` -- upstream docs PRs
