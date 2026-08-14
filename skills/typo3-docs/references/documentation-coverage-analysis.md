@@ -140,7 +140,7 @@ Quality Indicators:
   ✅ TYPO3 directives (confval)
   ✅ Card-grid navigation
   ✅ Code examples
-  ✅ No page exceeds 250 lines
+  ✅ Pages stay near the ~250-line heuristic
   ⚠️ Screenshots mentioned but not included
 
 Quality Score: 5/6 = 83%
