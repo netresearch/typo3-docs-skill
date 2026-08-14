@@ -219,11 +219,19 @@ mechanical:
     desc: "If Includes.rst.txt defines substitutions, they should be used in Introduction/Index.rst and Installation/Index.rst instead of hardcoded values"
 
   # === PLANTUML RENDERING ===
+  # Inverted 2026-08-14: the earlier version flagged `.. uml::` on the false
+  # premise that the toolchain cannot render PlantUML — upstream Graphics/
+  # Diagrams.html documents `uml::` and states PlantUML IS integrated. The
+  # genuinely broken form is `code-block:: plantuml` (no such highlighter;
+  # render emits 'Language "plantuml" is not available to highlight code').
   - id: TD-47
     type: command
-    pattern: "grep -rnP '\\.\\.\\s*uml::' Documentation/ 2>/dev/null | head -1 && echo 'Found .. uml:: directive(s) — TYPO3 docs toolchain may not support PlantUML. Use .. code-block:: text or .. figure:: instead.' && exit 1 || exit 0"
+    pattern: "grep -rnP 'code-block:: *plantuml' Documentation/ 2>/dev/null | head -1 && echo 'Found code-block:: plantuml — no such highlighter exists; use the .. uml:: directive (officially rendered) or commit an SVG.' && exit 1 || exit 0"
     severity: warning
-    desc: ".. uml:: directives require PlantUML support which TYPO3 docs toolchain may not provide; use .. code-block:: text or .. figure:: alternatives"
+    desc: "code-block:: plantuml has no highlighter and fails the render log; use the .. uml:: directive or an SVG figure"
+    provenance: regression
+    source: "Render log 'Language \"plantuml\" is not available to highlight code'; uml:: verified rendered per https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Graphics/Diagrams.html"
+    verified: 2026-08-14
 
   # === CHANGELOG VERSION COVERAGE ===
   - id: TD-48

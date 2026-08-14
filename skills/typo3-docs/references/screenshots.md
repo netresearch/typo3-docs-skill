@@ -356,10 +356,14 @@ Commit diagrams as SVG:
 - It is text, so a reviewer sees the change in the diff instead of a binary
   blob swap. A wrong label is caught in review rather than shipped.
 - It scales, and the same file serves every viewport.
-- No build step, no external renderer, no toolchain to keep alive. A
-  `.. code-block:: plantuml` in the source is not a diagram — the docs build has
-  no `plantuml` highlighter and emits `Language "plantuml" is not available to
-  highlight code` on every render.
+- No build step and no generator dependency for the SVG itself. Two distinct
+  PlantUML facts, do not conflate them: a `.. code-block:: plantuml` is not a
+  diagram — there is no `plantuml` *highlighter*, and every render emits
+  `Language "plantuml" is not available to highlight code`. The `.. uml::`
+  *directive* however IS officially rendered (PlantUML is integrated into the
+  toolchain — see
+  [Diagrams](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Graphics/Diagrams.html)).
+  Hand-authored SVG remains preferable where reviewable diffs matter.
 
 ```rst
 ..  figure:: /Images/diagram-streaming-flow.svg

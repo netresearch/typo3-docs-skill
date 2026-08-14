@@ -40,7 +40,7 @@ Collapsible content sections for FAQ-style presentation or optional details.
 
     ..  accordion-item:: Second question?
         :name: faq-second
-        :open:
+        :show:
 
         Answer to the second question.
         This one is open by default.
@@ -51,7 +51,7 @@ Collapsible content sections for FAQ-style presentation or optional details.
 | Option | Purpose |
 |--------|---------|
 | `:name:` | Unique identifier for linking (`:ref:`) |
-| `:open:` | Display accordion item expanded by default |
+| `:show:` | Display accordion item expanded by default (upstream also documents `:header-level:`) |
 
 ### Best Practices
 
@@ -287,6 +287,11 @@ D      E      F
 
 ### t3-field-list-table (TYPO3 Specific)
 
+`[upstream]` caveat the table below must not hide: upstream warns this is a
+custom directive that **should not be used** when the RST files must also
+render on other platforms (e.g. GitHub) — plain tables are portable, this one
+is not.
+
 For TCA field documentation:
 
 ```rst
@@ -380,43 +385,24 @@ Configuration options
 
 ## ViewHelper Documentation
 
-Document Fluid ViewHelpers using the typo3:viewhelper directive.
-
-### Syntax
-
-```rst
-..  typo3:viewhelper:: f:format.html
-
-    Renders the content as HTML.
-
-    ..  rubric:: Example
-
-    ..  code-block:: html
-
-        <f:format.html>{content}</f:format.html>
-
-    ..  rubric:: Arguments
-
-    ..  include:: /CodeSnippets/ViewHelpers/Format/HtmlArguments.rst.txt
-```
-
-### Argument Documentation
+`[upstream]` Document Fluid ViewHelpers with the `typo3:viewhelper` directive
+— it renders the argument list **automatically from a JSON file** produced by
+the fluid-documentation-generator; do not hand-write per-argument `confval`
+blocks or `rubric` argument tables (that is the legacy Sphinx-era pattern and
+does not render as intended). Canonical reference:
+[ViewHelper directive](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Content/ViewHelper.html)
 
 ```rst
-..  confval:: parseFuncTSPath
-    :name: f-format-html-parseFuncTSPath
-    :type: string
-    :default: 'lib.parseFunc_RTE'
-
-    Path to TypoScript parseFunc configuration.
+..  typo3:viewhelper:: RenderViewHelper
+    :source: _Json/RenderViewHelper.json
+    :sortBy: name
 ```
 
-### Best Practices
-
-- Document all arguments with `confval`
-- Include code examples
-- Show common use cases
-- Link to related ViewHelpers
+| Option | Purpose |
+|--------|---------|
+| `:source:` | Path to the JSON file with the ViewHelper data (`argumentDefinitions`) |
+| `:sortBy:` | Argument ordering: `name` (alphabetical) or `json` (file order) |
+| `:noindex:` | Prevent indexing when the same ViewHelper appears multiple times |
 
 ## Comments
 
