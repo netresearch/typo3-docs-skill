@@ -163,7 +163,7 @@ Screenshot sections must contain actual images or be clearly marked:
 ## Interlinks: inventories are auto-provided; prefer `:ref:` over raw permalink URLs
 
 `[upstream]` for the auto-provided inventories:
-[Interlink inventories](https://docs.typo3.org/other/typo3/render-guides/main/en-us/Developer/InterlinkInventories.html)
+[Interlink inventories](https://docs.typo3.org/permalink/t3renderguides:interlink-inventories)
 ("It is not necessary anymore to list each of the standard inventories in
 the guides.xml"). The permalink smoke test below is `[regression]`.
 

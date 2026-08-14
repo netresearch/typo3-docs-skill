@@ -258,7 +258,7 @@ The `php:method` directive has strict syntax requirements that differ from PHP 8
 The standard inventories (18 ids incl. `t3coreapi`, `t3tca`, `t3tsref`,
 `changelog`, `h2document`) are **auto-provided** — listing them in
 `guides.xml` is no longer necessary:
-[Interlink inventories](https://docs.typo3.org/other/typo3/render-guides/main/en-us/Developer/InterlinkInventories.html)
+[Interlink inventories](https://docs.typo3.org/permalink/t3renderguides:interlink-inventories)
 `[upstream]`. Usage syntax: see `text-roles-inline-code.md` and
 [Cross-references](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Links/Documentation.html).
 

@@ -34,7 +34,7 @@ upstream PR instead of widening the local copy — see
 | Rendering (container, init, watch mode) | [Rendering container](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/RenderingContainer.html) and [Rendering howto](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Howto/RenderingDocs/Index.html) |
 | Webhook/Intercept deployment | [Webhook setup](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Howto/WritingDocForExtension/Webhook.html) and [Documentation for extensions](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Howto/WritingDocForExtension/Index.html) |
 | Extension file/directory anatomy | [Core API: Files and locations](https://docs.typo3.org/m/typo3/reference-coreapi/main/en-us/ExtensionArchitecture/FileStructure/Index.html) |
-| Auto-provided interlink inventories | [render-guides: Interlink inventories](https://docs.typo3.org/other/typo3/render-guides/main/en-us/Developer/InterlinkInventories.html) |
+| Auto-provided interlink inventories | [render-guides: Interlink inventories](https://docs.typo3.org/permalink/t3renderguides:interlink-inventories) |
 | Screenshot container setup | [Screenshot container](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ScreenshotContainer/Index.html) |
 | TYPO3 core behaviour cited in docs | TYPO3 core **source** (raw GitHub, see `upstream-docs-contribution.md`) — never rendered HTML, never memory |
 | The extension's own values (version, CLI flags, API signatures) | The extension's code and manifests (`ext_emconf.php`, `Command::configure()`, `Classes/`) |
