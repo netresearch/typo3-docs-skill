@@ -4,6 +4,20 @@ All notable changes to the typo3-docs skill are documented here.
 
 This project follows [Semantic Versioning](https://semver.org/).
 
+## [v2.16.0](https://github.com/netresearch/typo3-docs-skill/releases/tag/v2.16.0) — 2026-08-14
+
+### Added
+- Upstream TYPO3-Documentation contribution guide as a reference (typo3-docs)
+
+### Changed
+- Reconcile all reference files against their canonical upstream sources, with provenance labeled per rule (typo3-docs)
+- Prune RST-family, build and config references to pointers plus agent-specific value (typo3-docs)
+
+### Fixed
+- Align drifted authority rules with upstream wording, including the ~250-line report heuristic (typo3-docs)
+- Correct four verified factual defects in the references (typo3-docs)
+- guides.xml: remove the invented `theme=typo3docs` mandate (typo3-docs)
+
 ## [v2.15.1](https://github.com/netresearch/typo3-docs-skill/releases/tag/v2.15.1) — 2026-08-12
 
 ### Added
