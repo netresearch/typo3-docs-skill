@@ -1,12 +1,18 @@
 # RST Coding Guidelines
 
-Complete reference for TYPO3 documentation coding standards.
+Working summary of the TYPO3 documentation coding standards, plus the
+labelled Netresearch deltas. **The canonical source is the official manual —
+on conflict it wins; report the drift instead of enforcing a stale copy**
+(see `canonical-sources.md`):
 
-Based on: https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Advanced/CodingGuidelines.html
+- [CGL for ReST files](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/CodingGuidelines/Index.html) `[upstream]`
+- [Coding guidelines (with .editorconfig sample)](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Advanced/CodingGuidelines.html) `[upstream]`
 
-## .editorconfig (Required)
+## .editorconfig `[NR policy]`
 
-Every `Documentation/` folder **must** contain an `.editorconfig` file to enforce consistent formatting:
+Upstream ships a sample `.editorconfig`; Netresearch makes it mandatory:
+every `Documentation/` folder **must** contain one to enforce consistent
+formatting:
 
 ```editorconfig
 # Documentation/.editorconfig
@@ -67,9 +73,11 @@ indent_size = 2
     $example = 'value';
 ```
 
-## Line Length
+## Line Length `[upstream]`
 
-- Maximum **80 characters** per line
+- Wrap lines at **80 characters** where possible (upstream phrasing: a strong
+  recommendation, enforced softly via `.editorconfig` `max_line_length = 80` —
+  not a hard error for the occasional unbreakable literal)
 - Shorter lines improve:
   - Source code readability
   - GitHub diff viewing
@@ -219,7 +227,12 @@ Wrong: tab character after ..
 Correct: spaces only
 ```
 
-## No Email Addresses in Documentation
+## No Email Addresses in Documentation `[NR policy]`
+
+**This is a deliberate Netresearch policy, stricter than upstream.** The
+official guides.xml reference explicitly allows `mailto:` for
+`project-contact` (it is even the documented example). Netresearch forbids it
+anyway — do not present this rule as a TYPO3 standard.
 
 **NEVER** include email addresses (`mailto:` links or raw email addresses) in public documentation. This applies to:
 
@@ -237,7 +250,7 @@ Correct: spaces only
 1. ✅ `.editorconfig` exists in `Documentation/`
 2. ✅ All files use UTF-8 encoding
 3. ✅ Indentation uses 4 spaces (no tabs)
-4. ✅ Lines are under 80 characters
+4. ✅ Lines wrapped at 80 characters where possible
 5. ✅ No trailing whitespace
 6. ✅ Files end with a newline
 7. ✅ Line endings are LF (Unix-style)
@@ -264,5 +277,6 @@ Plug 'editorconfig/editorconfig-vim'
 
 ## References
 
-- **Coding Guidelines:** https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Advanced/CodingGuidelines.html
+- **CGL for ReST files (canonical):** https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/CodingGuidelines/Index.html
+- **Coding Guidelines (with .editorconfig sample):** https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Advanced/CodingGuidelines.html
 - **EditorConfig:** https://editorconfig.org/

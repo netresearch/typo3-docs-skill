@@ -1,8 +1,10 @@
 # Screenshots Reference
 
-Complete reference for creating and inserting screenshots in TYPO3 documentation.
-
-Based on: https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Advanced/GuidelinesForImages.html
+Creating and inserting screenshots in TYPO3 documentation. Canonical source:
+[Guidelines for images](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Advanced/GuidelinesForImages.html)
+`[upstream]` — on conflict the live manual wins. The viewport/iframe sections
+below are `[regression]` knowledge from observed agent failures; that is this
+file's real value.
 
 ## When to Add Screenshots
 
@@ -30,9 +32,9 @@ Based on: https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Advance
 
 | Type | Format |
 |------|--------|
-| Screenshots | **PNG** (required) |
+| Screenshots | **PNG or AVIF** `[upstream]`; PNG preferred for consistency `[NR policy]` |
 | Diagrams | SVG preferred, PNG acceptable |
-| Photos | PNG or JPG |
+| Photos | PNG (or AVIF) |
 
 ### Dimensions
 
@@ -335,7 +337,7 @@ When writing documentation, suggest screenshots for:
 
 ## Pre-Commit Checklist for Screenshots
 
-1. ✅ **Format**: PNG for all screenshots
+1. ✅ **Format**: PNG (or AVIF) for all screenshots
 2. ✅ **Dimensions**: 1400x1050 or appropriately cropped
 3. ✅ **Backend setup**: Light mode, modern look, j.doe user
 4. ✅ **Alt text**: Descriptive alt text provided

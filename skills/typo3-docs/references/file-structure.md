@@ -88,9 +88,12 @@ Files containing code examples should start with an underscore:
 
 This convention indicates the files are documentation assets, not production code.
 
-## Page Length Limits
+## Page Length Limits `[heuristic]`
 
-**Maximum 250 lines per RST file.** Pages longer than 250 lines MUST be split into sub-pages. This is a strict limit, not a guideline.
+**Aim for at most ~250 lines per RST file; split longer pages into
+sub-pages.** This is a Netresearch quality heuristic for focused,
+navigable pages — **no upstream limit exists**, so never present it as a
+TYPO3 standard or reject content solely for exceeding it.
 
 ### Splitting Pattern
 
@@ -267,7 +270,7 @@ Before committing documentation:
 6. ✅ Included files use `.rst.txt` extension
 7. ✅ Code snippet files start with underscore
 8. ✅ `.. include:: /Includes.rst.txt` at top of every RST file
-9. ✅ No RST file exceeds 250 lines (split into sub-pages if needed)
+9. ✅ Pages stay near the ~250-line heuristic (split into sub-pages if needed) `[heuristic]`
 
 ## Common Mistakes
 
