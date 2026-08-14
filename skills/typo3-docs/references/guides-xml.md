@@ -72,7 +72,6 @@ git remote get-url origin | sed -E 's/.*[:/]([^/]+)\/([^/.]+)(\.git)?$/\1\/\2/'
     xmlns="https://www.phpdoc.org/guides"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="https://www.phpdoc.org/guides vendor/phpdocumentor/guides-cli/resources/schema/guides.xsd"
-    theme="typo3docs"
     default-code-language="php"
     links-are-relative="true"
 >
@@ -112,24 +111,31 @@ git remote get-url origin | sed -E 's/.*[:/]([^/]+)\/([^/.]+)(\.git)?$/\1\/\2/'
 
 | Attribute | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `theme` | string | - | **Must be `typo3docs`** for TYPO3 documentation |
 | `default-code-language` | string | `php` | Default language for code blocks without explicit language |
 | `links-are-relative` | boolean | `false` | Use relative links in output |
 | `max-menu-depth` | integer | unlimited | Limit main menu nesting depth |
 | `automatic-menu` | boolean | `false` | Auto-generate alphabetical menu (for Markdown docs) |
 
-**Critical:** `theme` must be an **attribute**, not a child element.
+**The TYPO3 theme comes from `<extension class=…>`, not from a `theme`
+attribute.** `[upstream]` The upstream reference documents no `theme` setting,
+and the canonical projects (the manual's own `guides.xml`, `georgringer/news`,
+`typo3/sysext/core`) omit it — the schema accepts a `theme` attribute, but do
+not set it, and never add a `<theme>` child element (invalid per
+`guides.xsd`). An earlier version of this file declared `theme="typo3docs"`
+mandatory; that rule was skill-invented.
 
 ### `<project>` Element
 
-Project metadata displayed in rendered documentation.
+Project metadata displayed in rendered documentation. Upstream marks all four
+attributes optional; grading `title`/`copyright` as required is `[NR policy]`
+(completeness bar).
 
 | Attribute | Required | Description |
 |-----------|----------|-------------|
-| `title` | Yes | Extension/project name, displayed in sidebar and page title |
+| `title` | Yes (NR) | Extension/project name, displayed in sidebar and page title |
 | `version` | No | Version number (auto-set during CI/CD, local only) |
 | `release` | No | Release number, available via `\|release\|` substitution |
-| `copyright` | Yes | Copyright statement for footer (e.g., "since 2024 by Company") |
+| `copyright` | Yes (NR) | Copyright statement for footer (e.g., "since 2024 by Company") |
 
 **Extract from:**
 - `title`: Extension name or `composer.json` description
@@ -180,7 +186,11 @@ not present this as a TYPO3 rule.
 | `project-repository` | Source code URL | `https://github.com/vendor/repo` |
 | `project-issues` | Issue tracker URL | `https://github.com/vendor/repo/issues` |
 | `project-discussions` | Discussions forum | GitHub Discussions URL (REQUIRED if enabled on repo) |
-| `report-issue` | Override issue link | `none`, internal path, or URL |
+| `report-issue` | Override issue link | `none`, internal path, or URL (upstream default: value of `project-issues`) |
+
+Upstream defaults worth knowing: `edit-on-github-branch` defaults to `main`,
+`edit-on-github-directory` to `Documentation` — setting them explicitly is
+documentation, not necessity.
 
 **project-discussions:** Add this attribute if GitHub Discussions is enabled on the repository. Check with:
 ```bash
@@ -214,16 +224,10 @@ gh repo view --json url --jq '"\(.url)/discussions"'
 
 ### `<inventory>` Elements
 
-Define Intersphinx inventories for cross-references to other TYPO3 documentation.
-
-```xml
-<inventory id="identifier" url="https://docs.typo3.org/path/to/docs/"/>
-```
-
-| Attribute | Description |
-|-----------|-------------|
-| `id` | Identifier used in `:ref:` cross-references |
-| `url` | Absolute URL to the documentation (must end with `/`) |
+`<inventory id="…" url="…"/>` defines an Intersphinx inventory for
+cross-references; both attributes are required — syntax and semantics:
+[guides.xml reference](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/GuidesXml.html)
+`[upstream]`. The URL must end with `/` (see Common Mistakes).
 
 #### When to Add Inventories
 
@@ -308,7 +312,7 @@ Combine extracted values into the complete template above.
 
 Before committing `guides.xml`:
 
-1. ✅ `theme="typo3docs"` is an attribute on `<guides>`, not a child element
+1. ✅ No `theme` attribute/element — the TYPO3 theme comes from `<extension class>`
 2. ✅ `<extension class="...">` includes the required theme extension class
 3. ✅ `<project title="">` is set with meaningful extension name
 4. ✅ `<project copyright="">` includes year and author/company
@@ -326,16 +330,17 @@ Before committing `guides.xml`:
 
 ## Common Mistakes
 
-### Theme as Element
+### Expecting a `theme` Setting
 
 ```xml
-<!-- ❌ WRONG: theme as child element -->
+<!-- ❌ WRONG: a <theme> child element is invalid per guides.xsd -->
 <guides>
     <theme name="typo3docs"/>
 </guides>
 
-<!-- ✅ CORRECT: theme as attribute -->
-<guides theme="typo3docs">
+<!-- ✅ CORRECT: the TYPO3 theme is loaded by the extension class -->
+<guides>
+    <extension class="\T3Docs\Typo3DocsTheme\DependencyInjection\Typo3DocsThemeExtension"/>
 </guides>
 ```
 
@@ -387,7 +392,6 @@ For quick setup, use this minimal valid configuration:
     xmlns="https://www.phpdoc.org/guides"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="https://www.phpdoc.org/guides vendor/phpdocumentor/guides-cli/resources/schema/guides.xsd"
-    theme="typo3docs"
 >
     <project
         title="My Extension"
@@ -403,4 +407,4 @@ For quick setup, use this minimal valid configuration:
 ## References
 
 - **guides.xml Reference:** https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/GuidesXml.html
-- **Intersphinx:** https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/Intersphinx.html
+- **Intersphinx / interlinks:** https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Links/Documentation.html#intersphinx
