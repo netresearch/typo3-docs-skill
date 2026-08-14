@@ -113,11 +113,15 @@ Documentation for unreleased versions (e.g., 3.1.0, 3.2.0, 4.0.0 planned feature
 
 ### Unresolved TODO Directives
 
-`.. todo::` directives should not appear in published documentation. Before release:
+`[regression]` The renderer **silently drops** `.. todo::` content — readers
+never see it, so a forgotten todo is invisible rather than embarrassing, and
+nothing relies on it rendering (verified by live render; documented upstream
+via TYPO3CMS-Guide-HowToDocument PR #542). Before release:
 
 - Search for all TODOs: `grep -rn '.. todo::' Documentation/`
-- Either resolve each TODO with actual content, or remove it
-- If a TODO must remain (rare), move it to a comment so it does not render
+- Either resolve each TODO with actual content, or delete it
+- For author-only notes use a plain `..` comment — never rely on todo as a
+  visible marker
 
 ### TypoScript Documentation Accuracy
 

@@ -51,3 +51,18 @@ can be verified without rendering: a HEAD request answers `307` with a
   setting labels may fail (`404` / GraphQL permission error) even for org
   members. Put backport intent in the PR body and @-mention the maintainer
   instead of retrying the API.
+
+## Find where a topic lives: query the manual's inventory
+
+Do not guess rendered paths — every manual publishes its object inventory:
+
+```bash
+curl -s https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/objects.inv.json \
+  | jq -r '."std:label" | to_entries[] | select(.key|test("confval")) | "\(.key) -> \(.value[2])"'
+```
+
+`std:doc` maps document names, `std:label` maps every anchor to its page —
+this is how a moved page or the right `:ref:` target is found in one call
+(located the intersphinx section and the relocated InterlinkInventories page
+this way, 2026-08-14). Works for any manual (render-guides, Core API, …) by
+swapping the base URL.
