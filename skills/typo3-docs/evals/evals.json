@@ -17,7 +17,7 @@
         "RST files use 4-space indentation, not tabs",
         "Headings use sentence case, not Title Case",
         "File and directory names use CamelCase convention",
-        "No RST file exceeds 250 lines",
+        "Long topics are split into sub-pages with toctree (~250-line NR heuristic, not an upstream limit)",
         "Index.rst contains a toctree directive linking to sub-pages"
       ]
     },
@@ -71,7 +71,7 @@
         "Every figure has :zoom: lightbox option",
         "Every figure has :class: with-border with-shadow",
         "Screenshot filenames use CamelCase convention",
-        "Screenshots are PNG format",
+        "Screenshots are PNG (or AVIF) format",
         "Figure captions describe what the user sees in the screenshot"
       ]
     },
@@ -337,6 +337,48 @@
         "Shows relationships between Parser, Resolver, and Renderer",
         "Proper 4-space indentation for directive content",
         "Uses skinparam for clean styling"
+      ]
+    },
+    {
+      "id": 21,
+      "eval_name": "canonical-authority-over-cached-rule",
+      "prompt": "While updating this extension's documentation you find that a rule stated in your skill references contradicts the current official How-to-Document manual page for the same topic. Apply the correct formatting and explain your choice.",
+      "expected_output": "The agent treats the live official documentation as authoritative, applies the upstream rule, and reports the skill drift (for example by proposing a skill update) instead of enforcing the cached rule.",
+      "files": [],
+      "project_path": "/home/cybot/projects/t3x-cowriter/main",
+      "assertions": [
+        "Treats the current official docs.typo3.org page as authoritative over the skill's cached rule",
+        "Does not enforce the stale cached rule against current upstream documentation",
+        "Reports the drift so the skill gets fixed (names the affected reference or proposes a skill update)",
+        "Does not dismiss the official documentation as wrong merely because the skill says otherwise"
+      ]
+    },
+    {
+      "id": 22,
+      "eval_name": "nr-policy-labelled-not-upstream",
+      "prompt": "The customer explicitly wants an email address as the guides.xml project-contact value. Set project-contact accordingly or explain what you do instead.",
+      "expected_output": "The agent explains that upstream TYPO3 documentation allows mailto: for project-contact but Netresearch policy forbids email addresses in public docs, offers the Issues/Discussions URL alternative, and does not claim TYPO3 forbids email.",
+      "files": [],
+      "project_path": "/home/cybot/projects/t3x-cowriter/main",
+      "assertions": [
+        "Does not claim that TYPO3 or the official documentation forbids mailto/email for project-contact",
+        "Names the no-email rule as Netresearch policy with its rationale (spam/PII)",
+        "Offers a GitHub Issues or Discussions URL as the policy-compliant alternative",
+        "Surfaces the customer requirement as a policy conflict to decide, rather than silently writing the email address"
+      ]
+    },
+    {
+      "id": 23,
+      "eval_name": "no-growth-when-upstream-documents",
+      "prompt": "Capture this learning in the typo3-docs skill: 'RST page titles must be underlined and overlined with = characters.' Note that the official coding guidelines already document this rule.",
+      "expected_output": "The agent does not duplicate the upstream explanation into the skill; it points to the canonical source and adds at most a reference or an agent-specific guardrail justified by an observed failure.",
+      "files": [],
+      "project_path": "/home/cybot/projects/t3x-cowriter/main",
+      "assertions": [
+        "Does not copy the upstream rule text into the skill as a new normative rule",
+        "References the official coding guidelines page as the canonical source",
+        "Adds agent-facing content only where justified by an observed agent failure",
+        "States that duplicated upstream rules need justification and evidence"
       ]
     }
   ]

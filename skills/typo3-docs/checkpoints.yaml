@@ -29,7 +29,10 @@ mechanical:
     type: file_exists
     target: Documentation/.editorconfig
     severity: warning
-    desc: "Documentation/.editorconfig should exist for consistent formatting"
+    desc: "Documentation/.editorconfig should exist for consistent formatting (NR policy; upstream ships a sample)"
+    provenance: org-policy
+    source: https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Advanced/CodingGuidelines.html
+    verified: 2026-08-14
 
   # === GUIDES.XML CONTENT ===
   - id: TD-05
@@ -86,7 +89,10 @@ mechanical:
     type: command
     pattern: "find Documentation/ -type f \\( -name '*.jpg' -o -name '*.jpeg' -o -name '*.gif' -o -name '*.bmp' \\) | head -1 && exit 1 || exit 0"
     severity: warning
-    desc: "Images should be in PNG format, not JPG/GIF/BMP"
+    desc: "Images should be PNG (or AVIF), not JPG/GIF/BMP — upstream allows PNG or AVIF"
+    provenance: upstream
+    source: https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Advanced/GuidelinesForImages.html
+    verified: 2026-08-14
 
   - id: TD-12
     type: file_exists
@@ -113,7 +119,10 @@ mechanical:
     type: command
     pattern: "grep -rn 'mailto:' Documentation/ 2>/dev/null | head -1 && exit 1 || exit 0"
     severity: warning
-    desc: "Documentation must not contain mailto: links; use GitHub Issues/Discussions URLs"
+    desc: "No mailto: links; use GitHub Issues/Discussions URLs (NR policy — upstream explicitly allows mailto for project-contact)"
+    provenance: org-policy
+    source: "Netresearch: no email addresses in public docs (spam/PII); upstream allows them — https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/GuidesXml.html"
+    verified: 2026-08-14
 
   # === INDEX.RST IN SUBDIRECTORIES ===
   - id: TD-19
@@ -135,7 +144,9 @@ mechanical:
     type: command
     pattern: "find Documentation/ -name '*.rst' -exec sh -c 'wc -l < \"$1\"' _ {} \\; 2>/dev/null | awk '$1 > 250 {found=1} END {exit found ? 1 : 0}'"
     severity: info
-    desc: "RST pages should not exceed 250 lines; split into sub-pages with toctree"
+    desc: "RST pages should stay near ~250 lines; split with toctree (NR heuristic — no upstream limit exists)"
+    provenance: heuristic
+    source: "Netresearch quality heuristic; not a TYPO3 standard"
 
   # === NO TABS IN RST ===
   - id: TD-27

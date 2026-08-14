@@ -10,18 +10,24 @@ To provide AI assistants with documentation context, copy `assets/AGENTS.md` to 
 - File structure overview
 - Style guidelines for AI-generated content
 
-## Screenshot Requirements (MANDATORY)
+## Screenshot Guidance `[heuristic]`
 
-| Documentation Topic | Screenshot Required |
+Upstream says: *before adding a screenshot, consider if one is necessary* —
+each one is ongoing maintenance. There is no upstream "mandatory screenshot"
+rule; the table below is the Netresearch quality bar for topics where a
+screenshot usually earns its keep (necessity check still applies):
+
+| Documentation Topic | Screenshot |
 |---------------------|---------------------|
-| Backend module interfaces | ✅ **YES** - Show the module UI |
-| Extension configuration screens | ✅ **YES** - Show settings location |
-| Multi-step UI workflows | ✅ **YES** - One screenshot per step |
-| TCA/FlexForm configurations | ✅ **YES** - Show resulting forms |
-| Frontend visual output | ✅ **YES** - Show what users see |
-| Error messages/states | ✅ **YES** - Help users identify issues |
+| Backend module interfaces | Usually — show the module UI |
+| Extension configuration screens | Usually — show settings location |
+| Multi-step UI workflows | Usually — one per non-obvious step |
+| TCA/FlexForm configurations | Usually — show resulting forms |
+| Frontend visual output | Usually — show what users see |
+| Error messages/states | Usually — help users identify issues |
 
-Do NOT write "TODO: add screenshot" or skip screenshots. If you cannot take a screenshot, explicitly ask the user to provide one or use MCP tools to capture them.
+Where a screenshot IS warranted, do not write "TODO: add screenshot" or
+silently skip it — capture it, or explicitly ask the user to provide one.
 
 ## Screenshot Workflow
 
