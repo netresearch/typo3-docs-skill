@@ -1,6 +1,7 @@
 # Architecture Decision Records (ADRs)
 
-**Source:** nr_llm Extension - ADR Documentation Patterns
+`[skill-procedure]` — ADR practice for TYPO3 extension documentation (not an
+upstream TYPO3 topic; pattern derived from nr_llm).
 **Purpose:** Document architectural decisions with context and consequences
 
 ## Overview
@@ -18,16 +19,20 @@ Architecture Decision Records capture important architectural decisions along wi
 
 ## Directory Structure
 
+ADRs live where checkpoint TD-49 (`scripts/check-adr-coverage.sh`) looks for
+them: `Documentation/Developer/Adr/` (preferred; `Documentation/Developer/ADR/`
+and `docs/adr/` are also accepted). Do not place them in
+`Documentation/DeveloperGuide/ArchitectureDecisions/` or `claudedocs/` — those
+paths fail the skill's own coverage check.
+
 ```
 Extension/
 ├── Documentation/
-│   └── DeveloperGuide/
-│       └── ArchitectureDecisions/
-│           └── Index.rst           # Links to ADRs
-├── claudedocs/                      # AI-readable ADRs
-│   ├── ADR-001-initial-architecture.md
-│   ├── ADR-002-provider-abstraction.md
-│   └── ADR-013-api-key-encryption.md
+│   └── Developer/
+│       └── Adr/
+│           ├── Index.rst                        # Links to ADRs
+│           ├── Adr001InitialArchitecture.rst
+│           └── Adr013ApiKeyEncryption.rst
 └── README.md
 ```
 
@@ -151,185 +156,10 @@ We chose Option 1 because...
 
 ## Example ADRs
 
-### ADR-012: API Key Encryption
-
-```markdown
-# ADR-012: API Key Encryption at Rest
-
-## Status
-
-Accepted
-
-## Date
-
-2024-12-15
-
-## Context
-
-The extension stores API keys for external services (OpenAI, Anthropic, etc.)
-in the database. These keys provide full access to paid APIs and could be
-misused if exposed through:
-
-- Database breaches
-- Backup file exposure
-- SQL injection attacks
-- Unauthorized admin access
-
-## Problem Statement
-
-How do we protect API keys stored in the database while maintaining
-usability for backend configuration?
-
-## Decision Drivers
-
-- Security: Keys must not be readable from raw database content
-- Usability: Editors must be able to configure keys in backend
-- Performance: Encryption/decryption should be fast
-- Simplicity: No external dependencies (vault services)
-
-## Considered Options
-
-### Option 1: sodium_crypto_secretbox
-**Description:** Use PHP's built-in libsodium with XSalsa20-Poly1305
-
-**Pros:**
-- Built into PHP 7.2+
-- Authenticated encryption (detects tampering)
-- Constant-time operations (timing attack resistant)
-- Well-audited cryptographic library
-
-**Cons:**
-- Requires key management
-- Keys in memory during processing
-
-### Option 2: openssl_encrypt
-**Description:** Use OpenSSL with AES-256-GCM
-
-**Pros:**
-- Well-known algorithm
-- Built into PHP
-
-**Cons:**
-- More configuration options (easier to misconfigure)
-- IV management complexity
-
-### Option 3: External Vault (HashiCorp)
-**Description:** Store keys in external secrets manager
-
-**Pros:**
-- Enterprise-grade security
-- Audit logging
-- Key rotation built-in
-
-**Cons:**
-- Added infrastructure dependency
-- Increased complexity
-- Overkill for most TYPO3 installations
-
-## Decision
-
-We chose **sodium_crypto_secretbox** because:
-1. No external dependencies
-2. Simple API with secure defaults
-3. Built into modern PHP
-4. Authenticated encryption prevents tampering
-
-## Implementation
-
-Key derivation uses TYPO3's encryptionKey with domain separation:
-
-```php
-private function getEncryptionKey(): string
-{
-    return hash('sha256', $this->encryptionKey . ':provider_encryption', true);
-}
-
-public function encrypt(string $plaintext): string
-{
-    $nonce = random_bytes(SODIUM_CRYPTO_SECRETBOX_NONCEBYTES);
-    $ciphertext = sodium_crypto_secretbox($plaintext, $nonce, $this->getEncryptionKey());
-    sodium_memzero($plaintext);
-    return 'enc:' . base64_encode($nonce . $ciphertext);
-}
-```
-
-## Consequences
-
-### Positive
-- API keys protected at rest
-- No plaintext keys in database dumps
-- Tampering is detectable
-- Compatible with TYPO3 security model
-
-### Negative
-- Keys visible in memory during encryption/decryption
-- Key rotation requires re-encryption of all values
-- Encrypted values are longer than plaintext
-
-### Risks
-- Loss of TYPO3 encryptionKey = loss of all API keys
-- Backup/restore must preserve encryptionKey
-
-## Related Decisions
-
-- ADR-013: Three-level configuration architecture
-```
-
-### ADR-013: Three-Level Configuration Architecture
-
-```markdown
-# ADR-013: Three-Level Configuration Architecture
-
-## Status
-
-Accepted
-
-## Date
-
-2024-12-20
-
-## Context
-
-The extension needs to support:
-- Multiple API keys per provider (production/development)
-- Custom endpoints (Azure OpenAI, self-hosted models)
-- Reusable model definitions
-- Use-case-specific configurations
-
-The existing single-table design cannot represent these relationships cleanly.
-
-## Decision
-
-Implement a three-tier architecture:
-
-```
-Configuration (use-case settings)
-      ↓ references
-Model (capability definitions)
-      ↓ references
-Provider (API connection)
-```
-
-## Implementation
-
-Three database tables with Extbase relations:
-- tx_nrllm_provider: Connection credentials
-- tx_nrllm_model: Model capabilities
-- tx_nrllm_configuration: Use-case settings
-
-## Consequences
-
-### Positive
-- Multiple credentials per provider type
-- Clean separation of concerns
-- Reusable model definitions
-- Testability (swap providers in tests)
-
-### Negative
-- More complex database schema
-- Migration needed for existing data
-- Three TCA files to maintain
-```
+Full worked examples (security-decision and configuration-hierarchy ADRs
+following the extended template) live in the nr_llm extension:
+https://github.com/netresearch/t3x-nr-llm — `Documentation/Developer/Adr/`.
+This file deliberately does not duplicate them; use the templates above.
 
 ## Best Practices
 
@@ -354,25 +184,16 @@ Three database tables with Extbase relations:
    :maxdepth: 2
    :caption: Architecture Decisions
 
-   ArchitectureDecisions/ADR-001-InitialArchitecture
-   ArchitectureDecisions/ADR-012-ApiKeyEncryption
-   ArchitectureDecisions/ADR-013-ThreeLevelConfiguration
+   Adr/Adr001InitialArchitecture
+   Adr/Adr012ApiKeyEncryption
+   Adr/Adr013ThreeLevelConfiguration
 ```
 
-### AI-Readable Format (claudedocs/)
+### One Set of ADRs, Not Two
 
-Keep a parallel set of ADRs in Markdown for AI assistants:
-
-```
-claudedocs/
-├── README.md                    # Overview for AI
-├── ADR-001-initial-architecture.md
-├── ADR-012-api-key-encryption.md
-├── context-architecture.md      # Current state summary
-└── patterns/                    # Reusable patterns
-    ├── adapter-registry.md
-    └── encryption-service.md
-```
+Keep ADRs only in `Documentation/Developer/Adr/` (rendered, checked by
+TD-49). Do not maintain a parallel Markdown set under `claudedocs/` — two
+copies drift, and agents read the rendered documentation source anyway.
 
 ## ADR Lifecycle
 
