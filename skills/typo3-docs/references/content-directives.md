@@ -1,15 +1,15 @@
 # Content Directives Reference
 
-Complete reference for TYPO3 documentation content directives: accordions, admonitions, cards, tabs, tables, versions, and viewhelpers.
-
-Based on:
+Routing tables, decision guides and observed pitfalls for TYPO3 content
+directives. Syntax lives upstream — canonical sources (win on conflict, see
+`canonical-sources.md`):
 - https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Content/Accordion.html
 - https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Content/Admonitions.html
 - https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Content/Cards.html
 - https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Content/Tabs.html
 - https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Content/Tables.html
 - https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Content/Versions.html
-- https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Content/Viewhelper.html
+- https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Content/ViewHelper.html
 
 ## When to Use What
 
@@ -25,33 +25,11 @@ Based on:
 
 ## Accordion
 
-Collapsible content sections for FAQ-style presentation or optional details.
-
-### Basic Syntax
-
-```rst
-..  accordion::
-    :name: faq-accordion
-
-    ..  accordion-item:: First question?
-        :name: faq-first
-
-        Answer to the first question.
-
-    ..  accordion-item:: Second question?
-        :name: faq-second
-        :show:
-
-        Answer to the second question.
-        This one is open by default.
-```
-
-### Options
-
-| Option | Purpose |
-|--------|---------|
-| `:name:` | Unique identifier for linking (`:ref:`) |
-| `:show:` | Display accordion item expanded by default (upstream also documents `:header-level:`) |
+Syntax and options (`accordion`, `accordion-item` with `:name:`, `:show:`,
+`:header-level:`):
+[Accordion](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Content/Accordion.html)
+`[upstream]`. Note: there is no `:open:` option — an earlier version of this
+file invented one.
 
 ### Best Practices
 
@@ -62,59 +40,17 @@ Collapsible content sections for FAQ-style presentation or optional details.
 
 ## Admonitions
 
-Visual callouts to highlight important information.
+Types and syntax (`note`, `tip`, `warning`, `attention`, `seealso`; `hint`/
+`caution`/`danger` as alternatives — upstream prefers `tip` over `hint`):
+[Admonitions](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Content/Admonitions.html)
+`[upstream]`. `important` and `error` are NOT documented upstream — render
+before using them.
 
-### Available Types
+### Options — unverified
 
-| Type | Purpose | Visual |
-|------|---------|--------|
-| `note` | General information | Blue info icon |
-| `tip` | Helpful suggestions | Green lightbulb |
-| `hint` | Subtle suggestions | Similar to tip |
-| `warning` | Potential issues | Yellow warning |
-| `caution` | Exercise care | Yellow caution |
-| `attention` | Important notice | Yellow attention |
-| `important` | Critical information | Yellow important |
-| `danger` | Serious problems | Red danger |
-| `error` | Error conditions | Red error |
-| `seealso` | Related links | Blue links |
-
-### Syntax Examples
-
-**Note (most common):**
-```rst
-..  note::
-    This is important background information.
-```
-
-**Tip with title:**
-```rst
-..  tip::
-    :title: Performance Optimization
-
-    Consider caching the result for better performance.
-```
-
-**Warning:**
-```rst
-..  warning::
-    This action cannot be undone.
-```
-
-**See Also:**
-```rst
-..  seealso::
-    - :ref:`related-topic`
-    - `External Resource <https://example.com>`_
-```
-
-### Options
-
-| Option | Purpose |
-|--------|---------|
-| `:title:` | Custom heading (default: directive name) |
-| `:class:` | Additional CSS classes |
-| `:name:` | Label for cross-referencing |
+`[regression]` Upstream's Admonitions page documents **no** options.
+`:title:`, `:class:`, `:name:` previously listed here are unverified — render
+locally before relying on them.
 
 ### Decision Guide
 
@@ -129,116 +65,18 @@ Visual callouts to highlight important information.
 
 ## Cards
 
-Grid-based presentation for overview pages and feature lists.
-
-### Basic Card Grid
-
-```rst
-..  card-grid::
-    :columns: 2
-    :columns-md: 3
-    :gap: 4
-    :class: pb-4
-    :card-height: 100
-
-    ..  card:: Feature One
-
-        Description of the first feature.
-
-    ..  card:: Feature Two
-
-        Description of the second feature.
-
-    ..  card:: :ref:`Linked Card <target-label>`
-
-        Card with a linked title.
-```
-
-### Card Grid Options
-
-| Option | Purpose | Example |
-|--------|---------|---------|
-| `:columns:` | Columns on small screens | `:columns: 1` |
-| `:columns-md:` | Columns on medium screens | `:columns-md: 2` |
-| `:columns-lg:` | Columns on large screens | `:columns-lg: 3` |
-| `:gap:` | Spacing between cards (0-5) | `:gap: 4` |
-| `:card-height:` | Uniform card height | `:card-height: 100` |
-| `:class:` | CSS classes | `:class: pb-4` |
-
-### Card Options
-
-| Option | Purpose |
-|--------|---------|
-| `:headline-level:` | Heading level (default 2) |
-| `:link:` | Make entire card clickable |
-
-### Use Cases
-
-- Documentation landing pages
-- Feature overview sections
-- Navigation hub pages
-- Comparison layouts
+`card-grid`, `card`, `card-footer` (`:button-style:` incl. `stretched-link`)
+and `card-image` (`:alt:`, `:position:`):
+[Cards](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Content/Cards.html)
+`[upstream]`. Previously listed here but NOT documented upstream (verify by
+render before use): `:columns-lg:`, `:headline-level:`, `:link:`.
 
 ## Tabs
 
-Grouped content with synchronized tab switching.
-
-### Basic Syntax
-
-```rst
-..  tabs::
-
-    ..  group-tab:: PHP
-
-        ..  code-block:: php
-
-            <?php
-            $value = 'example';
-
-    ..  group-tab:: TypoScript
-
-        ..  code-block:: typoscript
-
-            lib.example = TEXT
-            lib.example.value = example
-```
-
-### Synchronized Tabs
-
-Tabs with the same name synchronize across the page:
-
-```rst
-First example:
-
-..  tabs::
-
-    ..  group-tab:: Composer
-
-        Run :bash:`composer require vendor/package`
-
-    ..  group-tab:: Classic
-
-        Download and install manually.
-
-Second example (tabs sync with above):
-
-..  tabs::
-
-    ..  group-tab:: Composer
-
-        Update with :bash:`composer update`
-
-    ..  group-tab:: Classic
-
-        Download the new version.
-```
-
-### Use Cases
-
-- Multi-language code examples (PHP, TypoScript, Fluid)
-- Installation methods (Composer vs Classic)
-- TYPO3 version variations
-- Platform-specific instructions (Linux, macOS, Windows)
+`..  tabs::` with inner `..  group-tab::`; tab changes synchronize across all
+tab groups on the page:
+[Tabs](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Content/Tabs.html)
+`[upstream]`. (`..  tab::` is not documented upstream — do not use it.)
 
 ### Best Practices
 
@@ -249,74 +87,21 @@ Second example (tabs sync with above):
 
 ## Tables
 
-Structured data presentation with multiple syntaxes.
-
-### Simple Table (Quick)
-
-```rst
-=====  =====  ======
-Col 1  Col 2  Col 3
-=====  =====  ======
-A      B      C
-D      E      F
-=====  =====  ======
-```
-
-### Grid Table (Complex)
-
-```rst
-+------------+------------+-----------+
-| Header 1   | Header 2   | Header 3  |
-+============+============+===========+
-| Cell 1     | Cell 2     | Cell 3    |
-+------------+------------+-----------+
-| Cell 4     | Merged cell            |
-+------------+------------+-----------+
-```
-
-### CSV Table (Data-Heavy)
-
-```rst
-..  csv-table:: Example Data
-    :header: "Name", "Value", "Description"
-    :widths: 20, 10, 70
-
-    "Option A", "1", "First option"
-    "Option B", "2", "Second option"
-```
+Simple, grid and `csv-table` forms:
+[Tables](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Content/Tables.html)
+`[upstream]`.
 
 ### t3-field-list-table (TYPO3 Specific)
 
-`[upstream]` caveat the table below must not hide: upstream warns this is a
-custom directive that **should not be used** when the RST files must also
-render on other platforms (e.g. GitHub) — plain tables are portable, this one
-is not.
-
-For TCA field documentation:
-
-```rst
-..  t3-field-list-table::
-    :header-rows: 1
-
-    -   :Field:         Name
-        :Description:   Purpose
-
-    -   :Field:         `title`
-        :Description:   The page title
-
-    -   :Field:         `hidden`
-        :Description:   Visibility flag
-```
+`[upstream]` — documented on the Tables page, **with a caveat the old copy
+here hid**: it is a custom directive that should not be used when the RST
+must also render on other platforms (e.g. GitHub); plain tables are portable.
 
 ### Table Options
 
-| Option | Purpose |
-|--------|---------|
-| `:header-rows:` | Number of header rows |
-| `:widths:` | Column width ratios |
-| `:width:` | Total table width |
-| `:class:` | CSS classes |
-| `:name:` | Reference label |
+`[upstream]` documents `:header:`, `:widths:`, `:header-rows:`. Previously
+also listed here but unverified upstream: `:width:`, `:class:`, `:name:` —
+render before relying on them.
 
 ### Decision Guide
 
@@ -329,59 +114,11 @@ For TCA field documentation:
 
 ## Version Directives
 
-Document version-specific changes.
-
-### versionadded
-
-New features or additions:
-
-```rst
-..  versionadded:: 12.0
-    The `newMethod()` was added for improved performance.
-```
-
-### versionchanged
-
-Modified behavior:
-
-```rst
-..  versionchanged:: 13.0
-    The default value changed from `false` to `true`.
-```
-
-### deprecated
-
-Features to be removed:
-
-```rst
-..  deprecated:: 12.4
-    Use :php:`NewClass` instead. Will be removed in TYPO3 14.0.
-```
-
-### Placement
-
-Version directives should appear:
-- After the heading they relate to
-- Before the detailed description
-- At the beginning of the relevant section
-
-### Example
-
-```rst
-Configuration options
-=====================
-
-..  confval:: legacyMode
-    :name: ext-myext-legacyMode
-    :type: bool
-    :default: false
-
-    ..  deprecated:: 13.0
-        This option will be removed in TYPO3 15.0.
-        Use the new :confval:`modernMode` instead.
-
-    Enable legacy compatibility mode.
-```
+`versionadded` / `versionchanged` / `deprecated`, incl. nesting inside
+admonitions:
+[Versions](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Content/Versions.html)
+`[upstream]`. Skill rule (`[regression]`): only released versions — see
+`rst-syntax.md` ("Version Directive Accuracy").
 
 ## ViewHelper Documentation
 
@@ -404,35 +141,14 @@ does not render as intended). Canonical reference:
 | `:sortBy:` | Argument ordering: `name` (alphabetical) or `json` (file order) |
 | `:noindex:` | Prevent indexing when the same ViewHelper appears multiple times |
 
-## Comments
+## Comments and Special Characters
 
-RST comments are not rendered:
-
-```rst
-..  This is a comment.
-    It can span multiple lines
-    as long as they are indented.
-
-Regular content continues here.
-```
-
-Use comments for:
-- TODO notes during development
-- Explanatory notes for other authors
-- Temporarily hiding content
-
-## Special Characters
-
-UTF-8 encoding supports all Unicode characters directly:
-
-```rst
-The em dash — is commonly used.
-Arrows: → ← ↑ ↓
-Check marks: ✓ ✗
-Copyright: ©
-```
-
-No escape sequences needed with UTF-8 encoding.
+[Comments](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Content/Comments.html)
+and
+[Special characters](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Content/SpecialCharacters.html)
+`[upstream]`. Skill rule (`[regression]`): `.. todo::` must not survive into
+published documentation — resolve it or demote to a comment (see
+`rst-syntax.md`).
 
 ## Pre-Commit Checklist
 
@@ -453,4 +169,4 @@ No escape sequences needed with UTF-8 encoding.
 - **Tabs:** https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Content/Tabs.html
 - **Tables:** https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Content/Tables.html
 - **Versions:** https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Content/Versions.html
-- **ViewHelper:** https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Content/Viewhelper.html
+- **ViewHelper:** https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Content/ViewHelper.html

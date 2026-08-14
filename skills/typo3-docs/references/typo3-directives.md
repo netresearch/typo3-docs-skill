@@ -1,10 +1,23 @@
 # TYPO3-Specific Directives
 
-Comprehensive reference for TYPO3-specific RST directives and extensions.
+Routing, observed failure modes and labelled house rules for TYPO3 RST
+directives. Directive syntax itself lives upstream — **canonical source (wins
+on conflict, see `canonical-sources.md`):**
+[reStructuredText reference](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Index.html)
+`[upstream]` with per-topic subpages (Confval, Phpdomain, Cards, Tabs,
+Versions, Diagrams, …).
 
 ## Permalink Anchors (Labels)
 
 Every section in TYPO3 documentation **MUST** have a permalink anchor (label) for deep linking.
+
+`[NR policy]` The MUST and the hierarchical-prefix naming below are stricter
+than upstream: [Anchors](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Links/Anchors.html)
+says anchors *should* be alphanumeric-plus-hyphen (derived from the
+headline), and the CGL says each headline *should* have a unique anchor.
+Upstream also treats published anchors as permanent — once a page reaches
+`main`, its anchors must keep working. Do not present the stricter parts as a
+TYPO3 standard.
 
 **Syntax:**
 ```rst
@@ -20,7 +33,7 @@ Section heading
 - Use **descriptive, hierarchical names** reflecting the document structure
 - Labels enable `:ref:` cross-references and URL anchors
 
-**Example from Mass Approval documentation:**
+**Example (hierarchical prefixes):**
 ```rst
 ..  _crowdin-mass-approval:
 
@@ -33,34 +46,9 @@ Mass approval on Crowdin
 Crowdin API workflow
 ====================
 
-..  _crowdin-mass-approval-api:
-
-API endpoints
--------------
-
-..  _crowdin-mass-approval-authentication:
+..  _crowdin-mass-approval-workflow-authentication:
 
 Authentication
---------------
-
-..  _crowdin-mass-approval-implementation:
-
-PHP implementation
-==================
-
-..  _crowdin-mass-approval-implementation-usage:
-
-Usage
------
-
-..  _crowdin-mass-approval-best-practices:
-
-Best practices
-==============
-
-..  _crowdin-mass-approval-best-practices-error:
-
-Error handling
 --------------
 ```
 
@@ -78,88 +66,15 @@ Error handling
 
 ## Configuration Values (confval)
 
-Document configuration options with structured metadata.
+Full directive reference (options `:type:`, `:default:`, `:required:`,
+`:name:`, `:class:`, `noindex`, plus free-form attributes, and
+`confval-menu`):
+[Confval](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Code/Confval.html)
+`[upstream]`.
 
-**Basic Syntax:**
-```rst
-..  confval:: settingName
-    :name: confval-settingname
-    :type: boolean
-    :Default: true
-    :Path: $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['ext_key']['setting']
-
-    Description of the configuration value.
-```
-
-**Reserved Attributes (Special Handling):**
-- `:name:` - **REQUIRED** Unique identifier for cross-referencing (case-insensitive, lowercase with hyphens)
-- `:type:` - Data type: boolean, string, integer, array, object
-- `:default:` or `:Default:` - Default value
-- `:required:` - Boolean indicating if the setting is mandatory
-- `:noindex:` - Exclude from indexes and references
-
-**Custom Attributes (Display as-is):**
-- `:Path:` - Full path to the setting in TYPO3 configuration
-- `:Scope:` - Where setting applies (frontend, backend, global)
-- Any other attribute displays as written
-
-**Cross-Referencing confvals:**
-```rst
-# Reference with :confval: role
-See :confval:`settingName <confval-settingname>` for details.
-
-# The <confval-settingname> part uses the :name: value
-```
-
-**confval-menu Directive:**
-List all confvals on a page:
-```rst
-..  confval-menu::
-    :name: confval-menu-settings
-    :display: table
-    :exclude-noindex:
-```
-
-Options:
-- `:display:` - `table`, `list`, or `tree` format
-- `:name:` - Unique identifier for "to top" button
-- `:exclude:` - Comma-separated confvals to omit
-- `:exclude-noindex:` - Remove entries marked with `:noindex:`
-
-**Example:**
-```rst
-.. confval:: fetchExternalImages
-
-   :type: boolean
-   :Default: true
-   :Path: $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['rte_ckeditor_image']['fetchExternalImages']
-
-   Controls whether external image URLs are automatically fetched and uploaded
-   to the current backend user's upload folder. When enabled, pasting image
-   URLs will trigger automatic download and FAL integration.
-```
-
-**TSConfig Example:**
-```rst
-.. confval:: RTE.default.buttons.image.options.magic.maxWidth
-
-   :type: integer
-   :Default: 300
-
-   Maximum width in pixels for images inserted through the RTE.
-   Images exceeding this width will be automatically scaled down.
-```
-
-**YAML Configuration Example:**
-```rst
-.. confval:: editor.externalPlugins.typo3image.allowedExtensions
-
-   :type: string
-   :Default: Value from ``$GLOBALS['TYPO3_CONF_VARS']['GFX']['imagefile_ext']``
-
-   Comma-separated list of allowed image file extensions for the CKEditor
-   image plugin. Overrides global TYPO3 image extension settings.
-```
+One nuance this skill grades stricter: upstream requires `:name:` only when
+the confval title is not unique within the manual; always setting it is
+`[NR policy]` (stable anchors), not an upstream requirement.
 
 ### Two-Level Configuration Pattern
 
@@ -176,7 +91,7 @@ Many TYPO3 features support two-level configuration:
 
 **Documentation Structure:**
 
-```rst
+```text
 ## Configuration
 
 The noScale feature can be configured at two levels:
@@ -263,87 +178,19 @@ The noScale feature uses this pattern:
 
 ## Version Information
 
-Document version-specific changes with proper directives.
-
-**Version Added:**
-```rst
-.. versionadded:: 13.0.0
-   The CKEditor plugin now requires ``StyleUtils`` and ``GeneralHtmlSupport``
-   dependencies for style functionality. Previous versions did not have this requirement.
-```
-
-**Version Changed:**
-```rst
-.. versionchanged:: 13.1.0
-   Image processing now uses TYPO3's native image processing service instead
-   of custom processing logic.
-```
-
-**Deprecated:**
-```rst
-.. deprecated:: 13.2.0
-   The ``oldSetting`` configuration option is deprecated. Use ``newSetting`` instead.
-   This option will be removed in version 14.0.0.
-```
-
-**Placement:** Place version directives immediately before or after the relevant content they describe.
+`versionadded` / `versionchanged` / `deprecated`:
+[Versions](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Content/Versions.html)
+`[upstream]` (also shows nesting them inside admonitions). Skill rule that is
+NOT upstream (`[regression]`, from v13 doc reviews): only reference
+**released** versions — verify against `git tag --list` and `ext_emconf.php`
+before writing a version directive (see `rst-syntax.md`).
 
 ## PHP Domain
 
-Document PHP classes, methods, and properties. Only document public, non-internal entities.
-
-### Namespace Declaration
-
-```rst
-..  php:namespace:: Netresearch\RteCKEditorImage\Controller
-```
-
-Sets the namespace context for all following PHP entities.
-
-### Class Documentation
-
-```rst
-..  php:class:: SelectImageController
-
-    Main controller for image selection wizard.
-
-    Extends :php:`TYPO3\CMS\Backend\Controller\ElementBrowserController`.
-```
-
-### Interface Documentation
-
-```rst
-..  php:interface:: ImageProcessorInterface
-
-    Interface for image processing implementations.
-```
-
-### Trait Documentation
-
-```rst
-..  php:trait:: LoggerAwareTrait
-
-    Provides PSR-3 logger injection capability.
-```
-
-### Method Documentation
-
-```rst
-..  php:method:: infoAction(ServerRequestInterface $request): ResponseInterface
-
-    Retrieves image information and processed file details.
-
-    :param \Psr\Http\Message\ServerRequestInterface $request: PSR-7 server request.
-    :returns: JSON response with image data or error response.
-    :returntype: \Psr\Http\Message\ResponseInterface
-    :throws \RuntimeException: When file is not found or invalid.
-```
-
-**Method Options:**
-- `:param type $name:` - Parameter with type and description
-- `:returns:` - Description of return value
-- `:returntype:` - Return type (use full namespace)
-- `:throws:` - Exception class and condition
+Directives (`php:namespace`, `php:class`, `php:interface`, `php:trait`,
+`php:method`, `php:attr`, `php:const`, `php:exc`) and cross-reference roles:
+[PHP domain](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Code/Phpdomain.html)
+`[upstream]`. Document only public, non-internal entities.
 
 ### Method Signature Limitations
 
@@ -392,60 +239,6 @@ The `php:method` directive has strict syntax requirements that differ from PHP 8
 - Build will fail or produce warnings with modern PHP type syntax
 - Use `:returntype:` and `:param type:` annotations for complex types
 
-### Property Documentation
-
-```rst
-..  php:attr:: resourceFactory
-
-    :type: \TYPO3\CMS\Core\Resource\ResourceFactory
-
-    Resource factory for file operations.
-```
-
-### Constant Documentation
-
-```rst
-..  php:const:: QUALITY_RETINA
-
-    :type: string
-    :value: 'retina'
-
-    Quality multiplier for high-DPI displays (2x).
-```
-
-### Exception Documentation
-
-```rst
-..  php:exception:: InvalidFileException
-
-    Thrown when a file reference cannot be resolved.
-```
-
-### Cross-Referencing PHP Entities
-
-```rst
-# Reference a class
-:php:class:`SelectImageController`
-
-# Reference a method
-:php:meth:`SelectImageController::infoAction`
-
-# Reference an interface
-:php:interface:`ImageProcessorInterface`
-
-# Reference a trait
-:php:trait:`LoggerAwareTrait`
-
-# Reference an exception
-:php:exc:`InvalidFileException`
-
-# Reference a constant
-:php:const:`QUALITY_RETINA`
-
-# Universal reference (auto-detects type)
-:any:`SelectImageController`
-```
-
 ### PHP Domain Best Practices
 
 1. **Use full namespaces** in `:returntype:` and `:throws:`
@@ -455,184 +248,46 @@ The `php:method` directive has strict syntax requirements that differ from PHP 8
 
 ## Card Grids
 
-Create visual card layouts for navigation.
-
-**Basic Card Grid:**
-```rst
-.. card-grid::
-    :columns: 1
-    :columns-md: 2
-    :gap: 4
-    :card-height: 100
-
-    ..  card:: 📘 Introduction
-
-        The RTE CKEditor Image extension provides comprehensive image handling
-        capabilities for CKEditor in TYPO3.
-
-        ..  card-footer:: :ref:`Read more <introduction>`
-            :button-style: btn btn-primary stretched-link
-
-    ..  card:: 🔧 Configuration
-
-        Learn how to configure the extension with TSConfig, YAML, and TypoScript
-        settings for your specific needs.
-
-        ..  card-footer:: :ref:`Read more <configuration>`
-            :button-style: btn btn-secondary stretched-link
-```
-
-**Card Grid Options:**
-- `:columns:` - Number of columns (default layout)
-- `:columns-md:` - Columns for medium+ screens
-- `:gap:` - Gap between cards (1-5)
-- `:card-height:` - Card height (100 for equal height)
-- `:class:` - Additional CSS classes
-
-**Card Footer Styles:**
-- `btn btn-primary stretched-link` - Primary button with full card click
-- `btn btn-secondary stretched-link` - Secondary button with full card click
-- `btn btn-light stretched-link` - Light button
-
-**UTF-8 Emoji Icons:**
-Use in card titles for visual appeal:
-- 📘 Documentation
-- 🔧 Configuration
-- 🎨 Design
-- 🔍 Search
-- ⚡ Performance
-- 🛡️ Security
-- 📊 API
-- 🆘 Troubleshooting
+`card-grid`, `card`, `card-footer` (incl. `:button-style:` with
+`stretched-link`) and `card-image` (`:alt:`, `:position:`):
+[Cards](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Content/Cards.html)
+`[upstream]`.
 
 ## Intersphinx References
 
-Cross-reference TYPO3 core documentation.
-
-**TSRef (TypoScript Reference):**
-```rst
-:ref:`t3tsref:start`
-:ref:`t3tsref:stdwrap`
-:ref:`t3tsref:cobj-image`
-```
-
-**Core API:**
-```rst
-:ref:`t3coreapi:start`
-:ref:`t3coreapi:fal`
-:ref:`t3coreapi:dependency-injection`
-```
-
-**TSConfig:**
-```rst
-:ref:`t3tsconfig:start`
-:ref:`t3tsconfig:pagetsconfig`
-```
-
-**TCA:**
-```rst
-:ref:`t3tca:start`
-:ref:`t3tca:columns-types`
-```
-
-**Fluid:**
-```rst
-:ref:`t3viewhelper:start`
-:ref:`t3viewhelper:typo3-fluid-image`
-```
+The standard inventories (18 ids incl. `t3coreapi`, `t3tca`, `t3tsref`,
+`changelog`, `h2document`) are **auto-provided** — listing them in
+`guides.xml` is no longer necessary:
+[Interlink inventories](https://docs.typo3.org/other/typo3/render-guides/main/en-us/Developer/InterlinkInventories.html)
+`[upstream]`. Usage syntax: see `text-roles-inline-code.md` and
+[Cross-references](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Links/Documentation.html).
 
 ## Index and Glossary
 
-**Index Entry:**
-```rst
-.. index:: Image Processing, FAL, CKEditor
-
-.. _image-processing:
-
-Image Processing
-================
-```
-
-**Glossary:**
-```rst
-.. glossary::
-
-   FAL
-      File Abstraction Layer - TYPO3's file management system
-
-   Magic Image
-      Automatically processed image with dimension constraints
-```
-
-**Reference Glossary:**
-```rst
-See :term:`FAL` for details.
-```
+Generic Sphinx (`.. index::`, `.. glossary::`) — not part of the TYPO3 RST
+reference; see the Sphinx directives documentation if needed.
 
 ## Tabs
 
-Create tabbed content for multiple options.
-
-```rst
-.. tabs::
-
-   .. tab:: Composer
-
-      .. code-block:: bash
-
-         composer require netresearch/rte-ckeditor-image
-
-   .. tab:: Extension Manager
-
-      Install via TYPO3 Extension Manager:
-
-      1. Go to Admin Tools > Extensions
-      2. Search for "rte_ckeditor_image"
-      3. Click Install
-```
+Use `..  tabs::` with inner `..  group-tab::` (synchronized across the page):
+[Tabs](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Content/Tabs.html)
+`[upstream]`. An earlier version of this section showed `..  tab::`, which is
+not documented upstream — see `content-directives.md` for the correct form.
 
 ## Special TYPO3 Directives
 
-**Include Partial:**
-```rst
-.. include:: ../Includes.rst.txt
-```
-
-**File Tree:**
-```rst
-.. directory-tree::
-
-   * Classes/
-
-     * Controller/
-     * Database/
-     * Utils/
-
-   * Resources/
-
-     * Public/
-
-       * JavaScript/
-```
-
-**YouTube Video:**
-```rst
-.. youtube:: VIDEO_ID
-```
-
-**Download Link:**
-```rst
-:download:`Download PDF <../_static/manual.pdf>`
-```
+`include` → [Including files](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Menus/IncludingFiles.html);
+`directory-tree` (incl. `:level:`, `:show-file-icons:`) → [Directory tree](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Lists/DirectoryTree.html);
+`youtube` → [YouTube videos](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Content/YoutubeVideos.html);
+`:download:` is generic Sphinx. All `[upstream]`.
 
 ## PHP Code CGL Compliance
 
-PHP code examples in TYPO3 documentation **MUST** pass CGL (Coding Guidelines) checks.
-
-**Why:**
-- TYPO3 documentation builds enforce coding standards
-- Non-compliant code causes build warnings/failures
-- Consistent formatting improves readability
+`[NR policy]` PHP code examples in documentation MUST pass CGL (Coding
+Guidelines) checks. This is a house quality rule — no upstream page states
+that documentation builds enforce CGL on embedded examples, and `make
+fix-cgl` is a project-local target. Rationale: examples get copied verbatim;
+non-compliant examples propagate non-compliant code.
 
 **Validation:**
 ```bash
@@ -670,103 +325,14 @@ function getItems(int $id): array
 
 ## PlantUML Diagrams
 
-Create UML diagrams using PlantUML syntax, rendered during documentation build.
-
-### Inline Diagrams
-
-```rst
-..  uml::
-    :caption: Service pipeline architecture
-
-    skinparam componentStyle rectangle
-
-    component "Parser" as Parser {
-        note right: HTML Parsing
-    }
-
-    component "Resolver" as Resolver {
-        note right: Business Logic
-    }
-
-    component "Renderer" as Renderer {
-        note right: Fluid Templates
-    }
-
-    Parser --> Resolver : Raw attributes
-    Resolver --> Renderer : DTO
-```
-
-### External Diagram Files
-
-For complex diagrams, create a `.plantuml` file:
-
-```rst
-..  uml:: _diagrams/architecture.plantuml
-    :caption: System architecture
-    :align: center
-    :width: 800
-```
-
-### Directive Options
-
-| Option | Purpose | Example |
-|--------|---------|---------|
-| `:caption:` | Figure caption | `:caption: Security layers` |
-| `:align:` | Alignment (left, center, right) | `:align: center` |
-| `:width:` | Width in pixels | `:width: 1000` |
-| `:height:` | Height in pixels | `:height: 600` |
-
-### Diagram Types
-
-**Sequence Diagrams:**
-```plantuml
-@startuml
-participant Client
-participant Server
-Client -> Server: Request
-Server --> Client: Response
-@enduml
-```
-
-**Class Diagrams:**
-```plantuml
-@startuml
-interface ImageProcessorInterface
-class ImageResolverService implements ImageProcessorInterface
-class ImageRenderingService
-ImageResolverService --> ImageRenderingService
-@enduml
-```
-
-**Component Diagrams:**
-```plantuml
-@startuml
-component "Frontend" as FE
-component "Backend" as BE
-database "Database" as DB
-FE --> BE
-BE --> DB
-@enduml
-```
-
-### Skinparam Options
-
-Common styling options:
-```plantuml
-skinparam componentStyle rectangle
-skinparam backgroundColor white
-skinparam shadowing false
-skinparam defaultFontName Arial
-skinparam monochrome true
-```
-
-### Best Practices
-
-1. **Use for architecture visualization** - not for simple flows
-2. **Keep diagrams focused** - one concept per diagram
-3. **Add captions** - always include descriptive captions
-4. **External files for complex diagrams** - improves maintainability
-5. **Test rendering** - diagrams are rendered via PlantUML server
+The `..  uml::` directive IS officially rendered (PlantUML is integrated into
+the toolchain), in both inline and external-file form with `:caption:`,
+`:align:`, `:width:`:
+[Diagrams](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Graphics/Diagrams.html)
+`[upstream]`. PlantUML language syntax: https://plantuml.com/. Two skill
+rules survive (`[regression]`): `code-block:: plantuml` has no highlighter
+and fails the render log (checkpoint TD-47), and hand-authored SVG is
+preferred where reviewable diffs matter (see `screenshots.md`).
 
 ## Best Practices
 
@@ -798,86 +364,16 @@ skinparam monochrome true
 
 ## guides.xml Configuration
 
-The `guides.xml` file configures modern PHP-based documentation rendering. It replaces the legacy `Settings.cfg`.
-
-**Template:**
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<guides
-    xmlns="https://www.phpdoc.org/guides"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="https://www.phpdoc.org/guides ../vendor/phpdocumentor/guides-cli/resources/schema/guides.xsd"
-    theme="typo3docs"
->
-    <project title="Extension Name"
-             version="1.0"
-             release="1.0.0"
-             copyright="Vendor Name"
-    />
-
-    <extension
-        class="\T3Docs\Typo3DocsTheme\DependencyInjection\Typo3DocsThemeExtension"
-        project-home="https://github.com/vendor/extension"
-        project-contact="https://github.com/vendor/extension/issues"
-        project-repository="https://github.com/vendor/extension"
-        edit-on-github="vendor/extension"
-        edit-on-github-branch="main"
-    />
-
-    <inventory id="t3coreapi"
-               url="https://docs.typo3.org/m/typo3/reference-coreapi/main/en-us/"
-    />
-</guides>
-```
-
-**Root Attributes (`<guides>`):**
-
-| Attribute | Purpose |
-|-----------|---------|
-| `theme` | Theme name (e.g., `typo3docs`) - **must be attribute, not element** |
-| `links-are-relative` | Use relative links in output (default: `false`) |
-
-**Key Elements:**
-
-| Element | Purpose |
-|---------|---------|
-| `<project>` | Extension metadata (title, version, copyright) |
-| `<extension>` | Theme extension and GitHub integration |
-| `<inventory>` | Intersphinx references to other TYPO3 docs |
-
-**Extension Attributes:**
-
-- `class` (mandatory): Always use `\T3Docs\Typo3DocsTheme\DependencyInjection\Typo3DocsThemeExtension`
-- `project-home`: Extension homepage URL
-- `project-contact`: Issues/support URL
-- `project-repository`: Git repository URL
-- `edit-on-github`: Repository in format `owner/repo` (enables "Edit on GitHub" button)
-- `edit-on-github-branch`: Branch name (default: `main`)
-
-**Common Inventories:**
-
-```xml
-<inventory id="t3coreapi" url="https://docs.typo3.org/m/typo3/reference-coreapi/main/en-us/" />
-<inventory id="t3tsconfig" url="https://docs.typo3.org/m/typo3/reference-tsconfig/main/en-us/" />
-<inventory id="t3tsref" url="https://docs.typo3.org/m/typo3/reference-typoscript/main/en-us/" />
-```
-
-**⚠️ Common Mistakes:**
-
-```xml
-<!-- ❌ WRONG - <theme> as element causes "Invalid type for path guides.theme" error -->
-<guides ...>
-    <theme name="typo3docs" />
-</guides>
-
-<!-- ✅ CORRECT - theme is an ATTRIBUTE on <guides>, not a child element -->
-<guides theme="typo3docs" ...>
-</guides>
-```
-
-**Note on schemaLocation:** The format is `namespace-URI schema-path`. The namespace
-(`https://www.phpdoc.org/guides`) is just an identifier. The schema file is at
-`../vendor/phpdocumentor/guides-cli/resources/schema/guides.xsd` (relative to Documentation/).
+Owned by `references/guides-xml.md` (extraction workflow, labelled NR
+policies) with the upstream
+[guides.xml reference](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/GuidesXml.html)
+as canonical source — this file does not duplicate it. Two observed failure
+modes worth keeping (`[regression]`): a `<theme>` **child element** fails the
+build with `Invalid type for path guides.theme` (and a `theme` attribute is
+unnecessary — the TYPO3 theme comes from `<extension class=…>`); the
+`xsi:schemaLocation` format is `namespace-URI schema-path`, where the
+namespace is only an identifier and the schema path is relative to
+`Documentation/`.
 
 ## References
 
@@ -885,4 +381,4 @@ The `guides.xml` file configures modern PHP-based documentation rendering. It re
 - **Confval Reference:** https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Code/Confval.html
 - **Version Directives:** https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Content/Versions.html
 - **PHP Domain:** https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Code/Phpdomain.html
-- **Card Grid:** https://sphinxcontrib-typo3-theme.readthedocs.io/en-us/latest/
+- **Card Grid:** https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Content/Cards.html
