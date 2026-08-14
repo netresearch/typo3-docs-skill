@@ -233,6 +233,17 @@ mechanical:
     source: "Render log 'Language \"plantuml\" is not available to highlight code'; uml:: verified rendered per https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Graphics/Diagrams.html"
     verified: 2026-08-14
 
+  # === UNSUPPORTED LITERALINCLUDE OPTIONS ===
+  - id: TD-51
+    type: command
+    pattern: "grep -rnE ':(lines|start-after|end-before|start-at|end-at):' Documentation/ 2>/dev/null | head -1 && echo 'Found literalinclude line-selection option(s) — the TYPO3 renderer does not implement them; the whole file is rendered and the option is silently ignored.' && exit 1 || exit 0"
+    severity: warning
+    desc: "literalinclude line-selection options (:lines:, :start-after:, :end-before:) are not implemented by the TYPO3 renderer and are silently ignored"
+    provenance: regression
+    source: "https://github.com/TYPO3-Documentation/TYPO3CMS-Guide-HowToDocument/pull/547 (closed after renderer-source check); precedent #490 / render-guides#974"
+    learning_id: retro-20260814-literalinclude-renderer-gap
+    verified: 2026-08-14
+
   # === CHANGELOG VERSION COVERAGE ===
   - id: TD-48
     type: command

@@ -39,6 +39,13 @@ convention: [Code blocks](https://docs.typo3.org/m/typo3/docs-how-to-document/ma
 upstream mentions `literalinclude` without stating a preference. Rationale:
 included files are testable and lintable, embedded blocks are not.
 
+`[regression]` Verify any literalinclude option against the **renderer**
+source before using or documenting it (typo3-docs-theme
+`LiteralincludeDirective`, phpDocumentor guides option mapper) — the
+renderer implements only a subset of Sphinx. Line-selection options
+(`:lines:`, `:start-after:`, `:end-before:`) do not exist and are silently
+ignored (checkpoint TD-51; upstream precedent #490 / render-guides#974).
+
 **`literalinclude` is the preferred way to include code examples** in TYPO3 documentation. It provides:
 
 - **Syntax validation**: IDE support catches errors in source files
