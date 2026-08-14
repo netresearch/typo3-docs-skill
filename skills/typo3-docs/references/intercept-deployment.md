@@ -1,62 +1,17 @@
 # TYPO3 Intercept Deployment & Webhook Setup
 
-Complete guide for setting up automatic documentation deployment using TYPO3 Intercept webhooks.
+Automatic documentation deployment to docs.typo3.org via TYPO3 Intercept.
+**Canonical source (wins on conflict — see `canonical-sources.md`):**
 
-## Overview
+- [Webhook setup](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Howto/WritingDocForExtension/Webhook.html) `[upstream]` — prerequisites (TER registration, repo referenced in TER, `Documentation/` structure), the exact GitHub/GitLab webhook settings for `https://docs-hook.typo3.org`, and additionally **Bitbucket Cloud** setup
+- [Documentation for extensions](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Howto/WritingDocForExtension/Index.html) `[upstream]` — Documentation-Team approval requirement, the published URL pattern, and the **`documentation-draft`** branch (renders to `/p/<vendor>/<package>/draft/en-us/`)
 
-TYPO3 Intercept provides automatic documentation rendering and publishing for TYPO3 extensions. When properly configured, your documentation is automatically built and published to docs.typo3.org whenever you push commits or create version tags.
+Follow the upstream pages for registration and setup — they are more complete
+than any copy here. This file keeps only what upstream does not cover: the
+`gh` CLI automation, delivery-verification semantics, and observed failure
+modes (`[regression]`).
 
-## Prerequisites
-
-Before setting up webhooks, ensure:
-
-1. **Extension Published in TER**: Your extension must be registered in the TYPO3 Extension Repository (TER) with the same extension key specified in `composer.json`
-2. **Git Repository Referenced**: The Git repository URL must be listed on your extension's TER detail page
-3. **Documentation Structure**: Your `Documentation/` directory must contain:
-   - `Index.rst` (main entry point)
-   - `guides.xml` (modern, preferred) OR `Settings.cfg` (legacy)
-   - Valid RST files following TYPO3 documentation standards
-
-> **Note**: `guides.xml` is the modern PHP-based rendering configuration and is preferred over `Settings.cfg` (legacy Sphinx-based). New extensions should use `guides.xml`.
-
-## Webhook Registration
-
-### GitHub Setup
-
-1. **Navigate to Repository Settings**
-   - Go to your GitHub repository
-   - Click **Settings** → **Webhooks**
-   - Click **Add webhook**
-
-2. **Configure Webhook**
-   - **Payload URL**: `https://docs-hook.typo3.org`
-   - **Content type**: `application/json`
-   - **SSL verification**: Enable SSL verification
-   - **Which events**: Select "Just the push event"
-   - **Active**: Check the "Active" checkbox
-
-3. **Save Webhook**
-   - Click **Add webhook** to save
-   - GitHub will send a test ping to verify connectivity
-
-### GitLab Setup
-
-1. **Navigate to Webhooks**
-   - Go to your GitLab project
-   - Click **Settings** → **Webhooks**
-
-2. **Configure Webhook**
-   - **URL**: `https://docs-hook.typo3.org`
-   - **Trigger**: Check both:
-     - Push events
-     - Tag push events
-   - **SSL verification**: Enable SSL verification
-
-3. **Add Webhook**
-   - Click **Add webhook** to save
-   - GitLab will test the connection
-
-### GitHub CLI Automation
+## GitHub CLI Automation `[skill-procedure]`
 
 For faster setup using `gh` CLI:
 
@@ -82,19 +37,13 @@ gh api repos/{owner}/{repo}/hooks/{hook_id}/deliveries \
 gh api repos/{owner}/{repo}/hooks --jq '.[] | {id: .id, url: .config.url}'
 ```
 
-## First-Time Approval
+## First-Time Approval `[upstream]`
 
-The first time you trigger documentation rendering, the TYPO3 Documentation Team must approve your repository:
-
-1. **Automatic Hold**: First webhook trigger is automatically placed on hold
-2. **Manual Review**: Documentation Team reviews:
-   - TER registration matches composer.json extension key
-   - Git repository is properly referenced in TER
-   - Documentation structure is valid
-3. **Approval**: Once approved, future builds are automatic
-4. **Notification**: Check Intercept dashboard for approval status
-
-**Typical Approval Time**: 1-3 business days
+The first webhook trigger is held until the TYPO3 Documentation Team approves
+the repository — see
+[Documentation for extensions](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Howto/WritingDocForExtension/Index.html).
+Observed approval time: 1-3 business days. Check the Intercept dashboard for
+status.
 
 ## Verification
 
@@ -106,7 +55,9 @@ The first time you trigger documentation rendering, the TYPO3 Documentation Team
 3. Scroll to **Recent Deliveries**
 4. Verify delivery shows `200` or `204` response code
 
-**Expected Status Codes:**
+**Expected Status Codes** `[regression]` — upstream documents no
+response-code semantics; these are verified against real deliveries:
+
 | Code | Meaning |
 |------|---------|
 | `200` | Success (ping events) |
@@ -130,22 +81,9 @@ The first time you trigger documentation rendering, the TYPO3 Documentation Team
 
 ### Verify Published Documentation
 
-Once approved and rendered successfully:
-
-**Published URL Pattern**:
-```
-https://docs.typo3.org/p/{vendor}/{extension}/{branch}/en-us/
-```
-
-**Example**:
-```
-https://docs.typo3.org/p/netresearch/rte-ckeditor-image/main/en-us/
-```
-
-**Version-Specific URLs**:
-```
-https://docs.typo3.org/p/{vendor}/{extension}/{version}/en-us/
-```
+URL pattern `[upstream]`: `https://docs.typo3.org/p/{vendor}/{extension}/{branch-or-version}/en-us/`
+(e.g. `https://docs.typo3.org/p/netresearch/rte-ckeditor-image/main/en-us/`);
+a `documentation-draft` branch renders to `/draft/en-us/`.
 
 ## Triggering Documentation Builds
 
@@ -214,7 +152,7 @@ Understanding the rendering pipeline:
 1. **RST Syntax Errors**
    ```bash
    # Validate locally before pushing
-   ~/.claude/skills/typo3-docs/scripts/validate_docs.sh
+   scripts/validate_docs.sh
    ```
 
 2. **Missing Configuration File**
@@ -258,7 +196,7 @@ Understanding the rendering pipeline:
 2. Check build logs for errors
 3. Verify `guides.xml` or `Settings.cfg` has correct project configuration
 
-### Version-Tag Webhook Returns HTTP 500 (typo3.org-side outage)
+### Version-Tag Webhook Returns HTTP 500 (typo3.org-side outage) `[regression]`
 
 A release can be blocked by an Intercept **server-side** failure that affects only
 the **version-tag** webhook while `main` pushes keep rendering fine. The
@@ -314,12 +252,12 @@ Before pushing documentation changes:
 
 ✅ **Validate RST Syntax**
 ```bash
-~/.claude/skills/typo3-docs/scripts/validate_docs.sh /path/to/project
+scripts/validate_docs.sh /path/to/project
 ```
 
 ✅ **Render Locally**
 ```bash
-~/.claude/skills/typo3-docs/scripts/render_docs.sh /path/to/project
+scripts/render_docs.sh /path/to/project
 open Documentation-GENERATED-temp/Index.html
 ```
 
@@ -351,34 +289,12 @@ git push origin 2.1.0
 # Published at: /p/{vendor}/{ext}/2.1.0/en-us/
 ```
 
-### Multi-Version Documentation
+### Multi-Version Documentation `[upstream]`
 
-For supporting multiple TYPO3 versions:
-
-1. **Create Version Branches**
-   ```bash
-   git checkout -b docs-v12
-   git push origin docs-v12
-   ```
-
-2. **Configure guides.xml** (or Settings.cfg) for each branch
-   ```xml
-   <!-- guides.xml (modern) -->
-   <project title="Extension Name"
-            version="2.1.0"
-            copyright="since 2024 by Your Name"/>
-   ```
-   ```ini
-   # Settings.cfg (legacy)
-   [general]
-   project = Extension Name
-   release = 2.1.0
-   version = 2.1
-   ```
-
-3. **Webhook Triggers All Branches**
-   - Pushes to any branch trigger builds
-   - Each branch published separately
+Branch-based multi-version rendering (each pushed branch/tag publishes its own
+version) is covered by the upstream pages linked in the header; rendering is
+triggered only for the pushed version. Keep `guides.xml` `version`/`release`
+in sync per branch (checkpoint TD-30).
 
 ## Security Considerations
 

@@ -1,5 +1,8 @@
 # Documentation Coverage Analysis
 
+`[skill-procedure]` — this skill's own feature-based coverage model and
+scoring (`[heuristic]`/`[NR policy]` where labelled); not a TYPO3 standard.
+
 ## Purpose
 
 Provide context-aware documentation coverage assessment based on actual extension features rather than static file count thresholds.
@@ -200,112 +203,11 @@ Rating: EXCELLENT for scope
 - No API reference
 - Outdated patterns
 
-## Recommendations for TYPO3 Conformance Skill
+## Scoring in other skills
 
-### Update Scoring Logic
-
-Replace static thresholds with feature-based analysis:
-
-```python
-def calculate_documentation_score(extension):
-    """
-    Calculate documentation excellence score based on feature coverage.
-
-    Returns: 0-4 points
-    """
-    # Determine extension scope
-    class_count = count_php_classes(extension)
-    scope = classify_scope(class_count)  # small/medium/large
-
-    # Calculate feature coverage
-    user_coverage = calculate_user_feature_coverage(extension)
-    dev_coverage = calculate_developer_feature_coverage(extension)
-
-    # Assess quality
-    quality_score = assess_documentation_quality(extension)
-
-    # Score based on scope
-    if scope == "small":
-        if user_coverage >= 0.90 and quality_score >= 0.80:
-            return 3  # EXCELLENT
-        elif user_coverage >= 0.75:
-            return 2  # GOOD
-        elif user_coverage >= 0.60:
-            return 1  # ADEQUATE
-        else:
-            return 0  # INSUFFICIENT
-
-    elif scope == "medium":
-        if user_coverage >= 0.90 and dev_coverage >= 0.80:
-            return 4  # OUTSTANDING
-        elif user_coverage >= 0.90 and dev_coverage >= 0.40:
-            return 3  # EXCELLENT
-        elif user_coverage >= 0.80:
-            return 2  # GOOD
-        else:
-            return 1 if user_coverage >= 0.60 else 0
-
-    else:  # large
-        total_coverage = (user_coverage + dev_coverage) / 2
-        if total_coverage >= 0.90:
-            return 4  # OUTSTANDING
-        elif total_coverage >= 0.75:
-            return 3  # EXCELLENT
-        elif total_coverage >= 0.60:
-            return 2  # GOOD
-        else:
-            return 1 if total_coverage >= 0.40 else 0
-```
-
-### Provide Clear Feedback
-
-Documentation assessment should include:
-1. Feature coverage breakdown (user vs. developer)
-2. Quality assessment (directives, examples, tooling)
-3. Scope-appropriate recommendations
-4. Specific missing documentation items
-
-### Example Output
-
-```
-## Documentation Excellence Assessment
-
-**Extension Scope:** Small/Focused (30 classes)
-
-**User Feature Coverage:** 6/6 (100%) ✅
-  ✓ Installation & Setup
-  ✓ Configuration (3 strategies)
-  ✓ Backend Module
-  ✓ Performance Guide
-  ✓ Architecture
-  ✓ Phases Roadmap
-
-**Developer Feature Coverage:** 0/5 (0%) ⚠️
-  ❌ CLI Commands API reference (2 commands)
-  ❌ Scheduler Tasks reference (1 task)
-  ❌ Reports reference (1 report)
-  ❌ EventListener docs
-  ❌ PHP API method-level docs
-
-**Quality Assessment:** 4/5 (80%) ✅
-  ✅ Modern tooling (guides.xml, card-grid)
-  ✅ TYPO3 directives (confval throughout)
-  ✅ Code examples extensive
-  ✅ Cross-references proper
-  ⚠️ Screenshots mentioned but not included
-
-**Score:** 3/4 points (EXCELLENT for extension scope)
-
-**Recommendation:**
-Your user documentation is COMPREHENSIVE (100% coverage). Developer API
-documentation is optional for this extension's scope. Consider adding
-API reference if you expect other developers to extend your extension.
-
-**Impact of Adding Developer Docs:**
-- Current: 22 RST files (100% user coverage, 0% developer)
-- With API reference: ~30 RST files (100% user + 100% developer)
-- Score change: 3/4 → 4/4 (OUTSTANDING)
-```
+The feature-based scoring proposal for the typo3-conformance skill moved to
+an issue in that repo (it addresses that skill's logic, not this one) — see
+[typo3-conformance-skill#102](https://github.com/netresearch/typo3-conformance-skill/issues/102).
 
 ## Summary
 

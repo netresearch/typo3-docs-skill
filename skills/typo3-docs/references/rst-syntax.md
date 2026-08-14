@@ -13,37 +13,19 @@ for permalink anchors and intersphinx `:ref:` targets.
 
 ## Headings
 
-```rst
-===========================
-Page title in sentence case
-===========================
-
-Section heading
-===============
-
-Subsection heading
-------------------
-```
-
-| Level | Character | Usage |
-|-------|-----------|-------|
-| 1 (Title) | `=` above and below | Page title only |
-| 2 | `=` below | Major sections |
-| 3 | `-` below | Subsections |
-| 4 | `~` below | Sub-subsections |
-| 5 | `"` below | Paragraphs |
-| 6 | `'` below | Deep nesting |
-| 7+ | `^`, `#` | Rarely used |
-
-Underline-length and sentence-case rules are in
+Hierarchy (`=` over+under for the title, then `= - ~ " '` underlines),
+sentence case and underline length:
+[Headlines and sections](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Menus/HeadlinesAndSection.html)
+and the [CGL](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/CodingGuidelines/Index.html)
+`[upstream]`. Local deltas: underline-length notes in
 [`coding-guidelines.md`](coding-guidelines.md#heading-hierarchy); permalink
-anchor requirements are in
-[`typo3-directives.md`](typo3-directives.md#permalink-anchors-labels).
+anchors in [`typo3-directives.md`](typo3-directives.md#permalink-anchors-labels).
 
 ## Lists
 
-RST bullet/numbered/definition list syntax is standard Sphinx. TYPO3 house
-style adds one rule:
+RST bullet/numbered/definition list syntax is standard Sphinx
+([Bullet lists](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Lists/BulletLists.html)).
+One added rule — `[NR policy]`, not stated on any upstream list/CGL page:
 
 **Punctuation Rules:**
 - **End with periods**: All list items should end with a period (`.`)
@@ -51,7 +33,7 @@ style adds one rule:
 - ❌ Wrong: `1. Retrieve project metadata to get available languages`
 - Exception: Single-word or very short items may omit periods for readability
 
-## README.md and Documentation/ Synchronization
+## README.md and Documentation/ Synchronization `[NR policy]`
 
 Keep README.md and Documentation/ in sync to avoid contradictions.
 
@@ -179,6 +161,11 @@ Screenshot sections must contain actual images or be clearly marked:
 - **TYPO3 Documentation Guide:** https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/
 
 ## Interlinks: inventories are auto-provided; prefer `:ref:` over raw permalink URLs
+
+`[upstream]` for the auto-provided inventories:
+[Interlink inventories](https://docs.typo3.org/other/typo3/render-guides/main/en-us/Developer/InterlinkInventories.html)
+("It is not necessary anymore to list each of the standard inventories in
+the guides.xml"). The permalink smoke test below is `[regression]`.
 
 - `guides.xml` only declares the repo's own `interlink-shortcode` — the standard inventories (`t3coreapi`, `t3viewhelper`, `t3tca`, …) are injected by the docs theme at build time, so `:ref:`t3viewhelper:…`` works without declaring them.
 - Converting a raw `` `Title <https://docs.typo3.org/permalink/short:anchor>`_ `` link to `` :ref:`Title <short:anchor>` `` is safe AND build-validated (a typo fails the render); raw permalink URLs bypass build validation but can be smoke-tested (`curl -sL -o /dev/null -w "%{http_code}" https://docs.typo3.org/permalink/<short>:<anchor>` — real ones 200-redirect, bogus 404).

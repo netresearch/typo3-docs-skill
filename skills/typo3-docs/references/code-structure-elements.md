@@ -1,13 +1,14 @@
 # Code Blocks and Structure Elements
 
-Complete reference for code blocks, inline code, and structure elements in TYPO3 documentation.
-
-Based on:
-- https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Code/Codeblocks.html
-- https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Code/Confval.html
-- https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Code/InlineCode.html
-- https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Code/Phpdomain.html
-- https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Code/SiteSettings.html
+Code-presentation elements for TYPO3 docs — routing, decision guides and the
+skill's own snippet conventions. Syntax lives upstream (canonical, wins on
+conflict — see `canonical-sources.md`):
+[Code blocks](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Code/Codeblocks.html),
+[Inline code](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Code/InlineCode.html),
+[Confval](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Code/Confval.html),
+[PHP domain](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Code/Phpdomain.html),
+[Site settings](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Code/SiteSettings.html)
+`[upstream]`.
 
 ## When to Use What
 
@@ -27,96 +28,16 @@ Based on:
 
 ## Code Blocks
 
-### Basic Syntax
-
-```rst
-..  code-block:: <language>
-    :caption: <file-path-or-description>
-
-    <code-content>
-```
-
-**Important:** Blank line required between options and code. No blank lines between directive and options.
-
-### Available Options
-
-| Option | Purpose | Example |
-|--------|---------|---------|
-| `:caption:` | File path or description (recommended) | `:caption: EXT:my_ext/ext_localconf.php` |
-| `:linenos:` | Show line numbers | `:linenos:` |
-| `:lineno-start:` | Start line numbering at N | `:lineno-start: 10` |
-| `:emphasize-lines:` | Highlight specific lines | `:emphasize-lines: 3,5-7` |
-| `:name:` | Reference label for linking | `:name: my-code-example` |
-
-### Common Languages
-
-| Language | Identifier |
-|----------|------------|
-| PHP | `php` |
-| TypoScript | `typoscript` |
-| YAML | `yaml` |
-| XML | `xml` |
-| HTML | `html` |
-| JavaScript | `javascript` or `js` |
-| CSS | `css` |
-| Shell/Bash | `bash` or `shell` |
-| SQL | `sql` |
-| JSON | `json` |
-| Plain text | `plaintext` or `text` |
-| Diff | `diff` |
-
-### Examples
-
-**PHP with caption and line numbers:**
-```rst
-..  code-block:: php
-    :caption: EXT:my_extension/Classes/Service/MyService.php
-    :linenos:
-
-    <?php
-    declare(strict_types=1);
-
-    namespace Vendor\MyExtension\Service;
-
-    class MyService
-    {
-        public function doSomething(): void
-        {
-            // Implementation
-        }
-    }
-```
-
-**TypoScript with emphasized lines:**
-```rst
-..  code-block:: typoscript
-    :caption: EXT:my_extension/Configuration/TypoScript/setup.typoscript
-    :emphasize-lines: 3-4
-
-    lib.myContent = TEXT
-    lib.myContent {
-        value = Hello World
-        wrap = <div class="content">|</div>
-    }
-```
-
-### Placeholders
-
-Use angle brackets for variable values:
-```rst
-..  code-block:: php
-
-    $result = $this->myService->process('<your-value>');
-```
-
-For XML/HTML, use comments:
-```rst
-..  code-block:: xml
-
-    <property><!-- your-value --></property>
-```
+Directive syntax, options (`caption`, `linenos`, `lineno-start`,
+`emphasize-lines`, `name`), ~200 language identifiers and the placeholder
+convention: [Code blocks](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Code/Codeblocks.html)
+`[upstream]`. Indent code-block content 4 spaces (CGL).
 
 ## literalinclude Directive (Preferred for Code)
+
+`[NR policy]` The "preferred over code-block" grading is a house rule —
+upstream mentions `literalinclude` without stating a preference. Rationale:
+included files are testable and lintable, embedded blocks are not.
 
 **`literalinclude` is the preferred way to include code examples** in TYPO3 documentation. It provides:
 
@@ -155,252 +76,20 @@ Documentation/
 │   │   └── _DirectUsage.php
 ```
 
-### Basic Syntax
+### Syntax, Options, confval-menu
 
-```rst
-..  literalinclude:: _MyClass.php
-    :language: php
-    :caption: EXT:my_ext/Classes/Service/MyClass.php
-```
-
-### Options
-
-| Option | Purpose |
-|--------|---------|
-| `:language:` | Syntax highlighting language (required) |
-| `:caption:` | Display caption showing target file path |
-| `:lines:` | Include only specific lines (e.g., `15-30`) |
-| `:linenos:` | Show line numbers |
-| `:emphasize-lines:` | Highlight specific lines |
-| `:start-after:` | Start after matching text marker |
-| `:end-before:` | End before matching text marker |
-
-### Example: Complete Service Class
-
-**Source file:**
-```php
-// Documentation/Usage/_TranslationService.php
-<?php
-
-declare(strict_types=1);
-
-namespace Acme\AcmeTranslate\Service;
-
-use Netresearch\NrVault\Http\SecretPlacement;
-use Netresearch\NrVault\Service\VaultServiceInterface;
-
-final class TranslationService
-{
-    public function __construct(
-        private readonly VaultServiceInterface $vault,
-    ) {}
-
-    public function translate(string $text): string
-    {
-        return $this->vault->http()
-            ->withAuthentication($this->apiKey, SecretPlacement::Bearer)
-            ->sendRequest($request);
-    }
-}
-```
-
-**RST usage:**
-```rst
-..  literalinclude:: _TranslationService.php
-    :language: php
-    :caption: EXT:acme_translate/Classes/Service/TranslationService.php
-    :linenos:
-```
-
-### Example: Extract Specific Lines
-
-```rst
-..  literalinclude:: _TranslationService.php
-    :language: php
-    :caption: Key method implementation
-    :lines: 17-22
-    :emphasize-lines: 3-4
-```
-
-### Example: Using Text Markers
-
-For more maintainable line selection, use text markers:
-
-**Source file with markers:**
-```php
-// ... class definition ...
-
-// START: translate-method
-public function translate(string $text): string
-{
-    return $this->vault->http()
-        ->withAuthentication($this->apiKey, SecretPlacement::Bearer)
-        ->sendRequest($request);
-}
-// END: translate-method
-```
-
-**RST usage:**
-```rst
-..  literalinclude:: _TranslationService.php
-    :language: php
-    :caption: Translation method
-    :start-after: // START: translate-method
-    :end-before: // END: translate-method
-```
-
-## Inline Code Roles
-
-### Language-Specific Roles
-
-| Role | Usage | Example |
-|------|-------|---------|
-| `:php:` | PHP code, TYPO3 classes | `:php:`\TYPO3\CMS\Core\Utility\GeneralUtility`` |
-| `:php-short:` | TYPO3 classes (short name) | `:php-short:`\TYPO3\CMS\Core\Utility\GeneralUtility`` |
-| `:typoscript:` | TypoScript code | `:typoscript:`lib.parseFunc`` |
-| `:tsconfig:` | TSconfig | `:tsconfig:`TCEMAIN.table.pages`` |
-| `:yaml:` | YAML values | `:yaml:`imports`` |
-| `:html:` | HTML markup | `:html:`<div class="content">`` |
-| `:css:` | CSS code | `:css:`.my-class`` |
-| `:js:` | JavaScript | `:js:`document.querySelector`` |
-| `:bash:` | Shell commands | `:bash:`composer require`` |
-| `:fluid:` | Fluid template code | `:fluid:`{f:format.html()}`` |
-
-### Utility Roles
-
-| Role | Usage | Example |
-|------|-------|---------|
-| `:file:` | File paths | `:file:`ext_localconf.php`` |
-| `:path:` | Directory paths | `:path:`Configuration/`` |
-| `:guilabel:` | UI elements | `:guilabel:`Save and close`` |
-| `:kbd:` | Keyboard shortcuts | `:kbd:`Ctrl+S`` |
-| `:ref:` | Cross-references | `:ref:`my-section-label`` |
-| `:t3src:` | TYPO3 source link | `:t3src:`core/Classes/...`` |
-
-### Menu Paths with guilabel
-
-Use `>` as separator:
-```rst
-Navigate to :guilabel:`Admin Tools > Settings > Extension Configuration`.
-```
-
-### PHP Class Linking
-
-TYPO3 Core classes automatically link to api.typo3.org:
-```rst
-Use :php:`\TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance()` to create objects.
-```
-
-## confval Directive
-
-Document configuration values in a structured, language-independent way.
-
-### When to Use confval
-
-- Extension configuration options
-- TCA field definitions
-- TypoScript properties
-- YAML configuration options
-- FlexForm settings
-
-### Basic Syntax
-
-```rst
-..  confval:: option_name
-    :name: unique-option-name
-    :type: string
-    :default: 'default value'
-    :required: true
-
-    Description of what this option does and how to use it.
-```
-
-### Available Options
-
-| Option | Purpose |
-|--------|---------|
-| `:name:` | Unique identifier for linking (required for non-unique titles) |
-| `:type:` | Value type (string, int, bool, array, etc.) |
-| `:default:` | Default value |
-| `:required:` | Whether the option is mandatory |
-| `:noindex:` | Exclude from index |
-
-Custom attributes are also supported for domain-specific properties.
-
-### Example: Extension Configuration
-
-```rst
-..  confval:: encryptionMethod
-    :name: ext-myvault-encryptionMethod
-    :type: string
-    :default: 'aes-256-gcm'
-    :required: false
-
-    The encryption algorithm used for storing secrets.
-
-    Supported values:
-
-    - ``aes-256-gcm`` (recommended)
-    - ``xchacha20-poly1305``
-```
-
-### confval-menu Directive
-
-Display a list of confval entries:
-
-```rst
-..  confval-menu::
-    :name: my-extension-options
-    :display: table
-```
-
-Display options: `table`, `list`, `tree`
+[Confval](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Code/Confval.html)
+`[upstream]` — reserved attributes `:type:`, `:default:`, `:required:`,
+`:name:`, `:class:`, `noindex` (free-form attributes render as written), and
+`confval-menu` with `:display:`, `:name:`, `:exclude:`, `:exclude-noindex:`,
+`:class:`.
 
 ## PHP Domain
 
-Document PHP APIs with structured directives.
-
-### Namespace Declaration
-
-```rst
-..  php:namespace:: Vendor\Extension\Service
-```
-
-### Class Documentation
-
-```rst
-..  php:class:: VaultService
-
-    Manages secure storage and retrieval of secrets.
-
-    ..  php:method:: store(string $identifier, string $secret, array $options = []): void
-
-        Store a secret in the vault.
-
-        :param string $identifier: Unique identifier for the secret
-        :param string $secret: The secret value to store
-        :param array $options: Additional storage options
-        :throws: \Vendor\Extension\Exception\VaultException
-
-    ..  php:method:: retrieve(string $identifier): ?string
-
-        Retrieve a secret from the vault.
-
-        :param string $identifier: The secret identifier
-        :returntype: ?string
-```
-
-### Cross-Referencing PHP Elements
-
-| Role | Purpose |
-|------|---------|
-| `:php:class:` | Link to class |
-| `:php:interface:` | Link to interface |
-| `:php:func:` | Link to method/function |
-| `:php:const:` | Link to constant |
-| `:php:exc:` | Link to exception |
-
-**Note:** Escape backslashes: `:php:class:`\\Vendor\\Extension\\MyClass``
+Directives and cross-reference roles:
+[PHP domain](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Code/Phpdomain.html)
+`[upstream]`; signature-parser limitations (`?string`, union types) in
+[`typo3-directives.md`](typo3-directives.md#php-domain).
 
 ### When NOT to Use PHP Domain
 
@@ -411,25 +100,9 @@ Use `confval` instead of PHP domain for:
 
 ## Site Settings Documentation
 
-Auto-document site set settings from YAML definitions.
-
-### Syntax
-
-```rst
-..  typo3:site-set-settings:: PROJECT:/Configuration/Sets/MySet/settings.definitions.yaml
-    :name: my-site-settings
-```
-
-### Options
-
-| Option | Purpose |
-|--------|---------|
-| `:name:` | Namespace prefix for links |
-| `:type:` | Filter by field type |
-| `:Label:` | Column width for labels |
-| `:default:` | Column width for defaults |
-
-The `PROJECT:` prefix loads files from the extension directory.
+[Site settings](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Code/SiteSettings.html)
+`[upstream]` — incl. the `:Label: max=30` / `:default: max=10` syntax and
+`PROJECT:` usage that an excerpt would lose.
 
 ## Decision Guide
 

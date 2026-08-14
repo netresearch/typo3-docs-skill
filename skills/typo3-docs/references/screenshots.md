@@ -77,198 +77,37 @@ await page.screenshot({ path: 'Documentation/Images/Usage/ModuleRun.png' }); // 
 Verify the result height afterwards — a 1440×900 file when you expected a long
 page means `fullPage` silently caught only the outer frame.
 
-### File Location
+### File Location `[NR policy]`
 
-Store images in the `Documentation/Images/` directory, organized by section:
+Store images under `Documentation/Images/`, organized by section
+(`Images/Configuration/…`, `Images/Usage/…`, CamelCase filenames). Note:
+upstream examples use `/_Images/`; both work — this skill deliberately picks
+`Documentation/Images/` for consistency across NR extensions (checkpoint
+TD-12).
 
-```
-Documentation/
-├── Images/
-│   ├── Configuration/
-│   │   ├── ExtensionSettings.png
-│   │   └── SiteConfiguration.png
-│   ├── Usage/
-│   │   └── BackendModule.png
-│   └── Developer/
-│       └── TcaForm.png
-```
+## TYPO3 Backend Setup and Screenshot Container
 
-## TYPO3 Backend Setup
+Backend settings (light mode, modern look, default installation on a
+Composer-based latest LTS or dev-main, `j.doe` user) and the
+`linawolf/typo3-screenshots` container incl. extension installation and
+reset:
+[Guidelines for images](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Advanced/GuidelinesForImages.html)
+and
+[Screenshot container](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ScreenshotContainer/Index.html)
+`[upstream]`.
 
-Before taking screenshots, configure the TYPO3 backend:
+## RST Image Directives, CSS Classes, Zoom
 
-### Required Settings
-
-1. **Light mode** - Use light theme, not dark mode
-2. **Modern look** - Use modern backend styling (default in TYPO3 12+)
-3. **Default installation** - No third-party extensions unless demonstrating them
-4. **Standard username** - Use `j.doe` for consistency across documentation
-5. **Clean state** - Fresh installation or reset environment
-
-### Docker Container for Screenshots
-
-Use the official TYPO3 documentation screenshot container:
-
-```bash
-# Start container
-docker run -d --name typo3-screenshots -p 8080:80 linawolf/typo3-screenshots
-
-# Wait for setup to complete
-docker logs -f typo3-screenshots
-
-# Access TYPO3 backend
-# Navigate to http://localhost:8080/typo3
-```
-
-**Reset for clean screenshots:**
-```bash
-docker stop typo3-screenshots
-docker rm typo3-screenshots
-docker run -d --name typo3-screenshots -p 8080:80 linawolf/typo3-screenshots
-```
-
-The container resets on every run, ensuring consistent environments.
-
-### Installing Extensions in Container
-
-```bash
-# Access container shell
-docker exec -it typo3-screenshots bash
-
-# Install extension
-composer require vendor/extension-name
-./vendor/bin/typo3 extension:setup
-
-# Exit container
-exit
-```
-
-**Note:** Extensions are lost on container restart. Build a custom image for permanent additions.
-
-## RST Image Directives
-
-### Basic Image
-
-```rst
-.. image:: /Images/Configuration/ExtensionSettings.png
-   :alt: Extension configuration screen showing API settings
-```
-
-### Figure with Caption
-
-```rst
-.. figure:: /Images/Configuration/ExtensionSettings.png
-   :alt: Extension configuration screen showing API settings
-
-   Configure the extension in Admin Tools > Settings > Extension Configuration
-```
-
-### Image Options
-
-```rst
-.. figure:: /Images/Usage/BackendModule.png
-   :alt: Backend module showing secret list
-   :width: 600px
-   :class: with-shadow
-
-   The Vault backend module displays all accessible secrets
-```
-
-| Option | Purpose | Example |
-|--------|---------|---------|
-| `:alt:` | **Required** - Accessibility text | `:alt: Backend module screenshot` |
-| `:width:` | Control display width | `:width: 600px` |
-| `:class:` | Apply CSS classes | `:class: with-shadow` |
-| `:target:` | Link to full-size image | `:target: _blank` |
-
-### Available CSS Classes
-
-| Class | Effect |
-|-------|--------|
-| `with-shadow` | Adds drop shadow around image |
-| `with-border` | Adds border around image |
-| `float-left` | Float image left with text wrap |
-| `float-right` | Float image right with text wrap |
-
-## Image Zoom and Lightbox (render-guides 0.36.0+)
-
-The TYPO3 documentation theme provides built-in zoom and lightbox capabilities. Use the `:zoom:` option on figure and image directives.
-
-### Zoom Modes
-
-| Mode | Description | Use Case |
-|------|-------------|----------|
-| `lightbox` | Opens image in full-screen overlay with dark backdrop. Close with Escape or click outside. | **Default for most images** |
-| `gallery` | Gallery viewer with mouse wheel zoom and navigation between grouped images | Step-by-step tutorials, related screenshots |
-| `inline` | Scroll wheel zoom directly on image, drag-to-pan when zoomed | Technical diagrams needing frequent inspection |
-| `lens` | Magnifier lens follows cursor, showing zoomed view in adjacent panel | Detailed UI elements |
-
-### Zoom Examples
-
-**Lightbox (recommended default):**
-
-```rst
-.. figure:: /Images/Configuration/ExtensionSettings.png
-   :alt: Extension configuration screen
-   :zoom: lightbox
-   :class: with-border with-shadow
-
-   Configure the extension in Admin Tools > Settings
-```
-
-**Gallery with grouping:**
-
-```rst
-.. figure:: /Images/Tutorial/Step1.png
-   :alt: Step 1 - Open the module
-   :zoom: gallery
-   :gallery: installation-steps
-
-   Step 1: Navigate to Admin Tools
-
-.. figure:: /Images/Tutorial/Step2.png
-   :alt: Step 2 - Configure settings
-   :zoom: gallery
-   :gallery: installation-steps
-
-   Step 2: Configure the extension
-```
-
-**Inline zoom for diagrams:**
-
-```rst
-.. figure:: /Images/Developer/ArchitectureDiagram.png
-   :alt: Extension architecture showing data flow
-   :zoom: inline
-   :class: with-border
-
-   Architecture overview - scroll to zoom, drag to pan
-```
-
-**Lens mode for detail inspection:**
-
-```rst
-.. figure:: /Images/Usage/DetailedForm.png
-   :alt: TCA form with many fields
-   :zoom: lens
-   :zoom-factor: 3
-
-   Hover over form fields to magnify
-```
-
-### Additional Zoom Options
-
-| Option | Purpose | Default |
-|--------|---------|---------|
-| `:zoom-indicator:` | Show/hide zoom icon | `true` |
-| `:zoom-factor:` | Magnification strength for lens mode | `2` |
-
-### Accessibility
-
-All zoom modes:
-- Support keyboard navigation
-- Maintain proper ARIA attributes for screen readers
-- Respect `prefers-reduced-motion` media query
+`image`/`figure` syntax (`:alt:` required; `:width:`, `:scale:`, `:class:`,
+`:align:`, `:target:`), the theme CSS classes (`with-shadow`, `with-border`,
+`float-left`, `float-right`) and the four zoom modes (`lightbox`, `gallery`,
+`inline`, `lens` with `:gallery:`, `:zoom-indicator:`, `:zoom-factor:`,
+render-guides 0.36.0+, keyboard/ARIA/reduced-motion support):
+[Images](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Graphics/Images.html)
+and
+[Image zoom](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Graphics/ImageZoom.html)
+`[upstream]`. House default (`[NR policy]`): `:zoom: lightbox` +
+`:class: with-border with-shadow` on screenshots.
 
 ## Annotations
 
@@ -281,11 +120,14 @@ Use sufficient contrast to ensure annotations are visible:
 - For readers with color vision differences
 - Against varying background colors in the screenshot
 
-### Recommended Annotation Colors
+### Recommended Annotation Colors `[NR policy]`
+
+House palette — not a TYPO3 convention (the manual prescribes no annotation
+colors; `#FF8700` is the TYPO3 brand orange used by choice):
 
 | Element | Color | Hex |
 |---------|-------|-----|
-| Highlight boxes | TYPO3 Orange | `#FF8700` |
+| Highlight boxes | TYPO3 brand orange | `#FF8700` |
 | Arrows/lines | Dark gray | `#333333` |
 | Numbers/labels | White on dark background | `#FFFFFF` on `#333333` |
 
@@ -356,10 +198,14 @@ Commit diagrams as SVG:
 - It is text, so a reviewer sees the change in the diff instead of a binary
   blob swap. A wrong label is caught in review rather than shipped.
 - It scales, and the same file serves every viewport.
-- No build step, no external renderer, no toolchain to keep alive. A
-  `.. code-block:: plantuml` in the source is not a diagram — the docs build has
-  no `plantuml` highlighter and emits `Language "plantuml" is not available to
-  highlight code` on every render.
+- No build step and no generator dependency for the SVG itself. Two distinct
+  PlantUML facts, do not conflate them: a `.. code-block:: plantuml` is not a
+  diagram — there is no `plantuml` *highlighter*, and every render emits
+  `Language "plantuml" is not available to highlight code`. The `.. uml::`
+  *directive* however IS officially rendered (PlantUML is integrated into the
+  toolchain — see
+  [Diagrams](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Graphics/Diagrams.html)).
+  Hand-authored SVG remains preferable where reviewable diffs matter.
 
 ```rst
 ..  figure:: /Images/diagram-streaming-flow.svg

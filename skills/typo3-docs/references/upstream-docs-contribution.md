@@ -1,9 +1,13 @@
 # Contributing to TYPO3-Documentation Repositories
 
-Conventions and verification techniques for PRs against official TYPO3
-documentation repositories (`TYPO3-Documentation/*`, e.g.
-`TYPO3CMS-Reference-CoreApi`), and for fact-checking documentation claims
-against the TYPO3 core.
+`[regression]`/process knowledge — conventions and verification techniques
+for PRs against official TYPO3 documentation repositories
+(`TYPO3-Documentation/*`, e.g. `TYPO3CMS-Reference-CoreApi`), and for
+fact-checking documentation claims against the TYPO3 core. Verified
+non-duplicative: the upstream contribution page (Howto/Contribute) covers
+only edit-on-GitHub vs local Docker plus the approval requirement — the
+squash-only, backport-label, Releases-trailer and render-gate facts below are
+observed working knowledge.
 
 ## Verify claims against core source, not rendered HTML
 
@@ -43,7 +47,7 @@ can be verified without rendering: a HEAD request answers `307` with a
 - **The `render / Test documentation` CI job is the authoritative render
   gate** — equivalent to a local `render-guides --fail-on-log` run; a green
   job is the evidence a "renders without warnings" claim needs.
-- Member association does not imply triage rights: requesting reviewers or
+- `[regression]` Member association does not imply triage rights: requesting reviewers or
   setting labels may fail (`404` / GraphQL permission error) even for org
   members. Put backport intent in the PR body and @-mention the maintainer
   instead of retrying the API.

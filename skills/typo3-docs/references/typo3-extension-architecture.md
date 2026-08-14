@@ -1,8 +1,18 @@
 # TYPO3 Extension Architecture Reference
 
-Official TYPO3 extension file structure for documentation extraction weighting and categorization.
+Extension file inventory annotated for **documentation extraction weighting**
+(this skill's own model). **Canonical source for the extension file structure
+itself (wins on conflict — see `canonical-sources.md`):**
+[Core API: Files and locations](https://docs.typo3.org/m/typo3/reference-coreapi/main/en-us/ExtensionArchitecture/FileStructure/Index.html)
+`[upstream]`.
 
-**Source:** https://docs.typo3.org/m/typo3/reference-coreapi/main/en-us/ExtensionArchitecture/FileStructure/Index.html
+The inventory below is **not exhaustive** — it lists only the files this
+skill's extraction pipeline weighs. For the complete, current inventory
+(incl. `ext_tables_static+adt.sql`, `ext_typoscript_*.typoscript`,
+`Configuration/Fluid/`, `ContentSecurityPolicies.php`,
+`RequestMiddlewares.php`, `page.tsconfig`/`user.tsconfig`) read the upstream
+page. The Priority/Extract/Map/Weight annotations are `[heuristic]`
+(skill-owned extraction model, not a TYPO3 statement).
 
 ## File Structure Hierarchy
 
@@ -44,7 +54,10 @@ Official TYPO3 extension file structure for documentation extraction weighting a
 - **Map to RST:** Integration guides, Developer/Configuration.rst
 - **Weight:** Important for integration documentation
 
-**ext_tables.php** - Backend configuration
+**ext_tables.php** - Backend configuration — **deprecated upstream**: the
+Core API marks it "(Deprecated)"; modern extensions register backend modules
+and TCA via `Configuration/` instead. When documenting an extension that still
+ships one, note the migration.
 - **Documentation Priority:** MEDIUM
 - **Extract:** Backend module registrations, permissions
 - **Map to RST:** Developer/Backend.rst
@@ -494,9 +507,10 @@ Missing Utility documentation:
 
 **Action:** Document in priority order: 90 → 18 → 12
 
-## Official Structure Validation
+## Structure Checklist `[heuristic]`
 
-### Required Structure Checklist
+What this skill expects before documenting an extension (upstream does not
+mandate a fixed file set — see the Core API page for what each file does):
 
 **Composer-Mode Installation:**
 - ✅ `composer.json` with `"type": "typo3-cms-extension"`
@@ -509,16 +523,15 @@ Missing Utility documentation:
 - ✅ `Documentation/Index.rst`
 - ✅ `Documentation/guides.xml` (modern) OR `Documentation/Settings.cfg` (legacy)
 
-### Reserved Prefixes
+### `ext_*` Files `[upstream]`
 
-**Root Directory:**
-- `ext_*` files are reserved for TYPO3 system use
-- Only allowed: `ext_emconf.php`, `ext_localconf.php`, `ext_tables.php`, `ext_tables.sql`, `ext_conf_template.txt`
-
-**Never Create:**
-- `ext_custom.php`
-- `ext_myconfig.php`
-- Any other `ext_*` files
+The reserved `ext_*` names and their meaning are defined by the Core API page
+linked in the header (`ext_emconf.php`, `ext_localconf.php`, `ext_tables.php`
+(deprecated), `ext_tables.sql`, `ext_tables_static+adt.sql`,
+`ext_conf_template.txt`, `ext_typoscript_constants.typoscript`,
+`ext_typoscript_setup.typoscript`). Upstream states no prohibition on other
+`ext_*` file names — but an unknown `ext_*` file has no TYPO3 semantics, so
+treat one as a smell worth documenting, not as forbidden.
 
 ## Best Practices for Extraction
 

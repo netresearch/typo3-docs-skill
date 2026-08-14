@@ -624,12 +624,11 @@ Generated: 2024-12-15 10:30:00
 
 ## Recommendations
 
-1. Generate missing RST templates: `scripts/generate-templates.sh`
-2. Review generated templates in `Documentation/GENERATED/`
-3. Complete [TODO] sections with usage examples
-4. Move completed files to appropriate Documentation/ folders
-5. Update outdated sections based on mismatches above
-6. Re-run analysis: `scripts/analyze-docs.sh`
+1. Write the missing RST sections (use `assets/` templates; there is no
+   template-generator script)
+2. Complete [TODO] sections with usage examples
+3. Update outdated sections based on mismatches above
+4. Re-run analysis: `scripts/analyze-docs.sh`
 7. Validate: `scripts/validate_docs.sh`
 8. Render: `scripts/render_docs.sh`
 
@@ -715,53 +714,13 @@ Review Status: PENDING
 
 ## Extraction Scripts Reference
 
-### scripts/extract-all.sh
-
-Main orchestration script:
-
-```bash
-#!/usr/bin/env bash
-# Extract all documentation data from project sources
-
-scripts/extract-php.sh
-scripts/extract-extension-config.sh
-scripts/extract-typo3-config.sh
-scripts/extract-composer.sh
-scripts/extract-project-files.sh
-scripts/extract-build-configs.sh  # Optional
-scripts/extract-repo-metadata.sh  # Optional, requires network
-```
-
-### scripts/extract-php.sh
-
-Extract PHP class information:
-
-```bash
-#!/usr/bin/env bash
-# Parse PHP files in Classes/ directory
-# Output: .claude/docs-extraction/data/php_apis.json
-```
-
-### scripts/analyze-docs.sh
-
-Compare extracted data with existing documentation:
-
-```bash
-#!/usr/bin/env bash
-# Compare data/*.json with Documentation/**/*.rst
-# Output: Documentation/ANALYSIS.md
-```
-
-### scripts/generate-templates.sh
-
-Generate RST templates from extracted data:
-
-```bash
-#!/usr/bin/env bash
-# Read data/*.json
-# Generate RST templates
-# Output: Documentation/GENERATED/**/*.rst
-```
+The scripts and their options are documented in `scripts-guide.md`; the
+authoritative list is the `scripts/` directory itself. Orchestration:
+`scripts/extract-all.sh` runs `extract-php.sh`, `extract-extension-config.sh`,
+`extract-composer.sh`, `extract-project-files.sh`, `extract-build-configs.sh`
+(optional) and `extract-repo-metadata.sh` (optional, network);
+`scripts/analyze-docs.sh` compares the extracted JSON with
+`Documentation/**/*.rst`.
 
 ## Quality Standards
 
@@ -814,7 +773,7 @@ User: "Document the ImageProcessor class"
 → User reviews rendered output
 ```
 
-## Code Example Accuracy Validation
+## Code Example Accuracy Validation `[regression]`
 
 Every PHP code example in documentation MUST reference methods that actually exist in the `Classes/` source tree. This section covers common mistakes found during TYPO3 v13 extension documentation reviews and the validation approach to prevent them.
 
@@ -927,17 +886,6 @@ grep -rn 'function get\|function set\|function is\|function has' Classes/Domain/
 - Validate extraction JSON syntax
 - Check RST template syntax
 - Verify output directory exists and is writable
-
-## Future Enhancements
-
-**Planned Features:**
-
-1. **Incremental Extraction**: Only extract changed files
-2. **Smart Merging**: Suggest specific line changes in existing RST
-3. **Example Generation**: AI-generated usage examples for APIs
-4. **Auto-Screenshots**: Generate UI screenshots for editor documentation
-5. **Translation Support**: Multi-language documentation extraction
-6. **CI Integration**: Fail builds if documentation coverage < threshold
 
 ## Resources
 

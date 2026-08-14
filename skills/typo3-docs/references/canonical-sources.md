@@ -29,7 +29,12 @@ upstream PR instead of widening the local copy — see
 | Images and screenshots (formats, necessity, dimensions) | [Guidelines for images](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Advanced/GuidelinesForImages.html) |
 | `guides.xml` settings and their allowed values | [guides.xml reference](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/GuidesXml.html) |
 | File structure and naming | [File structure](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/FileStructure.html) |
-| Directives, text roles, content elements | [reStructuredText reference](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Index.html) |
+| Directives, text roles, content elements | [reStructuredText reference](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Index.html) with per-topic subpages (Confval, Phpdomain, Cards, Tabs, Versions, Accordion, Tables, ViewHelper, Diagrams) |
+| Image/figure directives, CSS classes, zoom modes | [Images](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Graphics/Images.html) and [Image zoom](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Graphics/ImageZoom.html) |
+| Rendering (container, init, watch mode) | [Rendering container](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/RenderingContainer.html) and [Rendering howto](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Howto/RenderingDocs/Index.html) |
+| Webhook/Intercept deployment | [Webhook setup](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Howto/WritingDocForExtension/Webhook.html) and [Documentation for extensions](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Howto/WritingDocForExtension/Index.html) |
+| Extension file/directory anatomy | [Core API: Files and locations](https://docs.typo3.org/m/typo3/reference-coreapi/main/en-us/ExtensionArchitecture/FileStructure/Index.html) |
+| Auto-provided interlink inventories | [render-guides: Interlink inventories](https://docs.typo3.org/other/typo3/render-guides/main/en-us/Developer/InterlinkInventories.html) |
 | Screenshot container setup | [Screenshot container](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ScreenshotContainer/Index.html) |
 | TYPO3 core behaviour cited in docs | TYPO3 core **source** (raw GitHub, see `upstream-docs-contribution.md`) — never rendered HTML, never memory |
 | The extension's own values (version, CLI flags, API signatures) | The extension's code and manifests (`ext_emconf.php`, `Command::configure()`, `Classes/`) |
@@ -55,3 +60,4 @@ Known deliberate deviations from upstream:
 | Screenshot format | PNG **or AVIF** | PNG preferred for consistency; AVIF acceptable | `[NR policy]` (soft) |
 | RST page length | No limit exists | Aim for ≤ ~250 lines, split with `toctree` | `[heuristic]` |
 | Screenshots for backend modules/config | "Consider if one is necessary" | Strongly encouraged where they aid understanding — never blind, necessity check first | `[heuristic]` |
+| Image location | Examples use `/_Images/` | `Documentation/Images/`, organized by section | `[NR policy]` |
