@@ -32,11 +32,11 @@ silently skip it — capture it, or explicitly ask the user to provide one.
 ## Screenshot Workflow
 
 1. Identify all UI elements that need screenshots (see requirements table above)
-2. Set TYPO3 backend to light theme
+2. Set TYPO3 backend to light theme (`[upstream]` [Guidelines for images](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Advanced/GuidelinesForImages.html))
 3. Capture screenshots using one of the methods below
 4. Crop to relevant area
 5. Save as PNG in `Documentation/Images/` with CamelCase naming
-6. Add RST image directive with `:alt:`, `:zoom: lightbox`, and `:class: with-border with-shadow`
+6. Add RST image directive with `:alt:` (`[upstream]` — alt text is required) plus `:zoom: lightbox` and `:class: with-border with-shadow` (`[NR policy]` house style; zoom modes are a render-guides feature, see `screenshots.md`)
 7. Verify screenshots render correctly in documentation build
 
 ### Taking Screenshots

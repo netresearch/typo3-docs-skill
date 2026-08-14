@@ -47,3 +47,35 @@ To add AGENTS.md template to Documentation/ folder:
 ```bash
 scripts/add-agents-md.sh /path/to/extension
 ```
+
+## Validation and Rendering
+
+```bash
+# Validate RST (indentation, alt text, heading hierarchy, editorconfig)
+scripts/validate_docs.sh /path/to/extension
+
+# Heading-hierarchy validation used by validate_docs.sh
+scripts/validate_headings.py Documentation/
+
+# Render with the official container (output: Documentation-GENERATED-temp/)
+scripts/render_docs.sh /path/to/extension
+```
+
+## Checkpoint Helpers
+
+Invoked by `checkpoints.yaml` (see the TD-* entries); runnable standalone
+from the extension root:
+
+```bash
+scripts/check-adr-coverage.sh                 # TD-49: ADR dir for >10-class extensions
+scripts/check-changelog-version-coverage.sh   # TD-48: CHANGELOG covers all git tags
+scripts/check-guides-xml-version-sync.sh      # TD-30: guides.xml version/release == ext_emconf.php
+scripts/check-required-doc-sections.sh        # TD-44: standard sections present
+scripts/check-rst-substitutions-used.sh       # TD-46: Includes.rst.txt substitutions used
+scripts/check-unreleased-versions.sh          # TD-41: versionadded refers to released versions
+scripts/check-untranslated-fluid-strings.sh   # TD-45: hardcoded strings in Fluid templates
+scripts/check-version-match.sh                # version consistency across manifests
+```
+
+The authoritative list is the `scripts/` directory itself — when this page
+and the directory disagree, the directory wins.
