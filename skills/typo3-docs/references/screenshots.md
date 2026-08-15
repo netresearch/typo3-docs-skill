@@ -1,14 +1,21 @@
 # Screenshots Reference
 
 Creating and inserting screenshots in TYPO3 documentation. Canonical source:
-[Guidelines for images](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Advanced/GuidelinesForImages.html)
-`[upstream]` — on conflict the live manual wins. The viewport/iframe sections
-below are `[regression]` knowledge from observed agent failures; that is this
-file's real value.
+[Guidelines for images](https://docs.typo3.org/permalink/h2document:guidelines-for-images)
+`[upstream]` — on conflict the live manual wins.
+
+**Read the canonical page for the rules themselves**: when a screenshot is
+necessary, the accepted formats, the 1400 × 1050 target, the ≥1440 capture
+viewport, and the backend `iframe`/`fullPage` behaviour are all stated there.
+The last two arrived upstream on 2026-08-15 and were `[regression]` knowledge
+here until then. What this file keeps is what upstream does not give you: which
+subjects are worth a screenshot at all, the executable recipe, the NR
+deviations, and the tell that says you got it wrong.
 
 ## When to Add Screenshots
 
-**Before adding a screenshot, consider if one is necessary.** Each screenshot requires ongoing maintenance when the UI changes.
+Upstream states the necessity rule; the two lists below are this skill's
+judgement about which subjects earn one.
 
 ### Screenshots ARE Appropriate For
 
@@ -28,45 +35,29 @@ file's real value.
 
 ## Image Requirements
 
-### Format
+Formats and dimensions are `[upstream]` — PNG or AVIF for bitmaps, SVG for
+vector graphics, 1400 × 1050 for a full page. Only the deviation is ours:
 
-| Type | Format |
-|------|--------|
-| Screenshots | **PNG or AVIF** `[upstream]`; PNG preferred for consistency `[NR policy]` |
-| Diagrams | SVG preferred, PNG acceptable |
-| Photos | PNG (or AVIF) |
+| Deviation | Rule |
+|---|---|
+| Screenshot format | PNG **preferred** for consistency across NR extensions; AVIF is allowed upstream and stays allowed here `[NR policy]` (soft) |
 
-### Dimensions
-
-| Screenshot Type | Dimensions |
-|-----------------|------------|
-| Full-page screenshots | 1400 x 1050 pixels |
-| Cropped screenshots | As small as practical while showing context |
-
-**Best Practice:** Crop to show only relevant portions rather than entire pages.
+Crop to the relevant portion rather than shipping a whole page — as small as
+practical while the surrounding context is still recognisable.
 
 ### Capture Viewport
 
-Resize the browser to **at least 1440 x 1050** before capturing backend
-screenshots. Narrow viewports (≈780px) collapse the TYPO3 module menu, truncate
-table columns, and cut off modal backgrounds — the result reads as "missing
-context" and gets rejected in review.
+The rules are `[upstream]`; this is how to execute them.
 
 ```js
 // Playwright (the Playwright MCP exposes this as browser_resize, same dimensions)
 await page.setViewportSize({ width: 1440, height: 1050 });
 ```
 
-Capture at the wider viewport, then crop the width down to the 1400px target —
-the 40px of slack is why the floor is 1440, not 1400. Don't shrink the window to crop.
+Don't shrink the window to crop — crop the captured file.
 
-**Backend module content lives inside an `iframe` — `fullPage` won't capture it.**
-The TYPO3 backend renders each module in an iframe that scrolls internally, so a
-`fullPage: true` screenshot captures only the outer document (≈ the viewport
-height) and clips the module's lower content — trace output, a completed form,
-the answer panel. To capture a tall module view (e.g. a config form *and* its
-result) in one shot, make the **viewport itself tall** and take a normal
-(non-fullPage) screenshot:
+For a tall module view (a config form *and* its result in one shot), raise the
+viewport height rather than reaching for `fullPage`:
 
 ```js
 // Capture config + output together: tall viewport, NOT fullPage.
@@ -74,8 +65,12 @@ await page.setViewportSize({ width: 1440, height: 1750 });
 await page.screenshot({ path: 'Documentation/Images/Usage/ModuleRun.png' }); // no fullPage
 ```
 
-Verify the result height afterwards — a 1440×900 file when you expected a long
-page means `fullPage` silently caught only the outer frame.
+**The tell:** measure the result afterwards. A file exactly as tall as the
+viewport you set — 1050 px from the first recipe, where the second was meant to
+give you 1750 — means the capture stopped at the outer frame and the module's
+lower content is missing. Upstream states the behaviour; the height check is
+what tells you it happened to *this* screenshot, and it is the reason the
+mistake was ever noticed.
 
 ### File Location `[NR policy]`
 
