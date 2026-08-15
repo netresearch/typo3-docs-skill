@@ -4,8 +4,12 @@ The official TYPO3 How-to-Document manual is the canonical source for TYPO3
 documentation standards. This skill legitimately carries three things:
 
 - **workflow, scripts, and extraction/validation tooling** (its own procedure),
-- **agent-specific failure patterns** observed in real sessions
-  (e.g. the `fullPage`-clips-the-backend-iframe trap),
+- **agent-specific failure patterns** observed in real sessions — for instance
+  the height check that reveals a backend screenshot stopped at the outer
+  frame. Note what that example is *not*: the `fullPage` behaviour itself went
+  upstream on 2026-08-15 and the copy here was pruned the same day. What stays
+  is the tell, because upstream describes the trap and not how to notice you
+  fell into it,
 - **deliberately stricter Netresearch policy**, labelled as such.
 
 Everything else is a *reference* to upstream, not a copy. A duplicated
@@ -20,6 +24,16 @@ follow the live manual, then **report the drift** (e.g. via `/retro`) so the
 skill gets fixed. Where upstream itself is wrong or incomplete, propose an
 upstream PR instead of widening the local copy — see
 `upstream-docs-contribution.md`.
+
+**And when such a PR is accepted, the local copy shrinks the same day.** A copy
+kept after its fact has a canonical home is no longer a stopgap: it is a second
+source that drifts, and the checkpoints keep it green while upstream moves on.
+Prune it to a reference plus whatever genuinely remains agent-specific — the
+executable recipe, the failure tell, the case upstream does not cover — and say
+in the file which date it became `[upstream]`, so the next reader can see the
+copy was retired deliberately rather than forgotten. Done for the screenshot
+viewport/iframe rules and the `Documentation/` symlink rule on 2026-08-15,
+accepted upstream the same day.
 
 ## Topic → canonical source
 
