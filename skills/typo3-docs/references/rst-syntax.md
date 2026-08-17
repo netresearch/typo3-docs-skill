@@ -68,8 +68,11 @@ Patterns of errors found during TYPO3 v13 extension documentation reviews. Check
 
 **Documenting the version you are currently building is correct** — write the
 directive with the feature, so the documentation is ready when the release
-lands. This is how the Core Team works: TYPO3 15.0 is documented with
-`versionadded:: 15.0` while 15.0 is being built.
+lands. Stated by a docs-team maintainer while rejecting the opposite claim
+([HowToDocument#544](https://github.com/TYPO3-Documentation/TYPO3CMS-Guide-HowToDocument/pull/544)):
+TYPO3 15.0 is documented with `versionadded:: 15.0` while 15.0 is being built.
+The [Versions page](https://docs.typo3.org/permalink/h2document:versions)
+documents the directives themselves and does not address the timing either way.
 
 ```rst
 .. Correct -- the release this feature is going into
