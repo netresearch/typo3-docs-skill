@@ -4,6 +4,19 @@ All notable changes to the typo3-docs skill are documented here.
 
 This project follows [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+- Checkpoint TD-51 flags `literalinclude` line-selection options (`:lines:`, `:start-after:`, `:end-before:`, `:start-at:`, `:end-at:`) — the TYPO3 renderer does not implement them, renders the whole file and ignores the option silently (typo3-docs)
+- `objects.inv.json` query recipe for locating moved pages and `:ref:` targets via the manual's published object inventory instead of guessed rendered paths (typo3-docs)
+
+### Changed
+- Screenshot viewport, iframe and "no symlinks in Documentation/" rules shrink to a reference plus the part that is genuinely ours, now that HowToDocument #539 and #543 carry them upstream (typo3-docs)
+
+### Fixed
+- Replace the dead InterlinkInventories URL with its permalink form; the manual lives under `other/t3docs/`, not `other/typo3/render-guides/` (typo3-docs)
+- Correct the todo rationale: the renderer silently drops todo content, so author notes must use plain comments (typo3-docs)
+
 ## [v2.16.0](https://github.com/netresearch/typo3-docs-skill/releases/tag/v2.16.0) — 2026-08-14
 
 ### Added
