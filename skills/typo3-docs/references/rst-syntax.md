@@ -66,19 +66,36 @@ Patterns of errors found during TYPO3 v13 extension documentation reviews. Check
 
 ### Version Directive Accuracy
 
-`versionadded` and `versionchanged` directives must reference actually released versions, not planned or future versions:
+**Documenting the version you are currently building is correct** — write the
+directive with the feature, so the documentation is ready when the release
+lands. Stated by a docs-team maintainer while rejecting the opposite claim
+([HowToDocument#544](https://github.com/TYPO3-Documentation/TYPO3CMS-Guide-HowToDocument/pull/544)):
+TYPO3 15.0 is documented with `versionadded:: 15.0` while 15.0 is being built.
+The [Versions page](https://docs.typo3.org/permalink/h2document:versions)
+documents the directives themselves and does not address the timing either way.
 
 ```rst
-.. Good -- references a released version
-.. versionadded:: 3.0.0
-   Added support for TYPO3 v13.
-
-.. Bad -- references a version that does not exist yet
-.. versionadded:: 3.2.0
-   Will add multi-site support.
+.. Correct -- the release this feature is going into
+.. versionadded:: 1.3.0
+   Added multi-site support.
 ```
 
-**Validation:** Cross-check every version number in directives against git tags (`git tag --list`) and `ext_emconf.php`.
+The residual risk is only the *number*: the next release may turn out to be
+`2.0.0` rather than `1.3.0`, and then the directive names a version that never
+shipped. That happens rarely, it is detectable afterwards, and a stale number
+is tolerable — so it is not worth withholding the directive until release day.
+
+**Deliberately not enforced.** A check for this was written and then removed:
+distinguishing a skipped number from a pending one needs the full tag history,
+and three ordinary situations look identical to a skipped number — a shallow
+clone or a `--no-tags` CI checkout (the release is invisible, not missing), a
+two-component number like `13.4` against a `13.4.0` tag, and a patch release
+prepared on a maintenance line while a higher major already exists. Each of
+those produced a warning against correct documentation, which is the harm the
+old prohibition caused in the first place. For a defect this rare and this
+cheap to live with, a gate that cries wolf is worse than no gate.
+
+If a number does turn out wrong, correct it in the same commit that notices.
 
 ### ChangeLog Completeness
 
@@ -109,7 +126,9 @@ Documentation for unreleased versions (e.g., 3.1.0, 3.2.0, 4.0.0 planned feature
    subject to change. They are not available in the current version.
 ```
 
-- Never use `versionadded` or `versionchanged` for unreleased versions
+This is about features nobody has built yet — not about the version number of a
+feature that exists. A `versionadded` for the release you are building is
+correct; see *Version Directive Accuracy* above.
 
 ### Unresolved TODO Directives
 

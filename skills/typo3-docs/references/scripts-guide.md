@@ -72,7 +72,6 @@ scripts/check-changelog-version-coverage.sh   # TD-48: CHANGELOG covers all git 
 scripts/check-guides-xml-version-sync.sh      # TD-30: guides.xml version/release == ext_emconf.php
 scripts/check-required-doc-sections.sh        # TD-44: standard sections present
 scripts/check-rst-substitutions-used.sh       # TD-46: Includes.rst.txt substitutions used
-scripts/check-unreleased-versions.sh          # TD-41: versionadded refers to released versions
 scripts/check-untranslated-fluid-strings.sh   # TD-45: hardcoded strings in Fluid templates
 scripts/check-version-match.sh                # version consistency across manifests
 ```

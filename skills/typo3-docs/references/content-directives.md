@@ -8,7 +8,7 @@ directives. Syntax lives upstream — canonical sources (win on conflict, see
 - https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Content/Cards.html
 - https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Content/Tabs.html
 - https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Content/Tables.html
-- https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Content/Versions.html
+- https://docs.typo3.org/permalink/h2document:versions
 - https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Content/ViewHelper.html
 
 ## When to Use What
@@ -116,8 +116,8 @@ render before relying on them.
 
 `versionadded` / `versionchanged` / `deprecated`, incl. nesting inside
 admonitions:
-[Versions](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Content/Versions.html)
-`[upstream]`. Skill rule (`[regression]`): only released versions — see
+[Versions](https://docs.typo3.org/permalink/h2document:versions)
+`[upstream]`. Write the directive for the release you are building — see
 `rst-syntax.md` ("Version Directive Accuracy").
 
 ## ViewHelper Documentation
@@ -168,5 +168,5 @@ published documentation — resolve it or demote to a comment (see
 - **Cards:** https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Content/Cards.html
 - **Tabs:** https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Content/Tabs.html
 - **Tables:** https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Content/Tables.html
-- **Versions:** https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Content/Versions.html
+- **Versions:** https://docs.typo3.org/permalink/h2document:versions
 - **ViewHelper:** https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Content/ViewHelper.html

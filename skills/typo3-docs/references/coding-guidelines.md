@@ -117,8 +117,9 @@ Sub-subsection heading
 ## Version Hints `[upstream]`
 
 `versionadded`/`versionchanged`/`deprecated` — see
-[Versions](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Content/Versions.html)
-and the released-versions rule in `rst-syntax.md`.
+[Versions](https://docs.typo3.org/permalink/h2document:versions).
+Write the directive for the release you are building; `rst-syntax.md` covers the
+one case that is a defect, a number the project later skipped.
 
 ## GUI and Keyboard References `[upstream]`
 

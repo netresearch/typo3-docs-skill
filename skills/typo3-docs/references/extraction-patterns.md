@@ -822,7 +822,7 @@ Migration code examples must use actual model method names. When documenting dat
 Version numbers appearing in documentation must match the canonical source:
 
 - `guides.xml` version attribute must match `ext_emconf.php` version
-- Code examples referencing `versionadded` or `versionchanged` must use released versions
+- `versionadded`/`versionchanged` name the release the feature ships in, which may not be tagged yet
 - Composer `branch-alias` versions must be consistent across `composer.json`, `ext_emconf.php`, and docs
 
 ### Validation Approach

@@ -188,11 +188,12 @@ mechanical:
     desc: "Documentation must not reference common wrong method names (getTranslation, importXliffFile, findByIdentifier, findByComponent)"
 
   # === DOCUMENTATION COMPLETENESS ===
-  - id: TD-41
-    type: command
-    pattern: "bash scripts/check-unreleased-versions.sh"
-    severity: warning
-    desc: "versionadded/versionchanged directives should reference released versions only"
+  # Note: TD-41 (versionadded/versionchanged version numbers) removed together
+  # with check-unreleased-versions.sh — a skipped number is indistinguishable
+  # from a pending one without the full tag history, and a shallow clone, a
+  # two-component number and a maintenance-line patch release each warned
+  # against correct documentation. See rst-syntax.md, "Version Directive
+  # Accuracy", for why this is left unenforced.
 
   # Note: TD-43 (guides.xml version+release sync) removed — consolidated into TD-30
   # which now uses check-guides-xml-version-sync.sh (checks both version and release attributes)
