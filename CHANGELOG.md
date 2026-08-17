@@ -6,6 +6,8 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v2.17.0](https://github.com/netresearch/typo3-docs-skill/releases/tag/v2.17.0) — 2026-08-17
+
 ### Added
 - Checkpoint TD-51 flags `literalinclude` line-selection options (`:lines:`, `:start-after:`, `:end-before:`, `:start-at:`, `:end-at:`) — the TYPO3 renderer does not implement them, renders the whole file and ignores the option silently (typo3-docs)
 - `objects.inv.json` query recipe for locating moved pages and `:ref:` targets via the manual's published object inventory instead of guessed rendered paths (typo3-docs)
