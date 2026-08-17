@@ -192,7 +192,7 @@ mechanical:
     type: command
     pattern: "bash scripts/check-unreleased-versions.sh"
     severity: warning
-    desc: "versionadded/versionchanged directives should reference released versions only"
+    desc: "versionadded/versionchanged must not name a version the project skipped (documented 1.3.0, released 1.2.0 → 2.0.0); documenting the release currently being built is correct and stays silent"
 
   # Note: TD-43 (guides.xml version+release sync) removed — consolidated into TD-30
   # which now uses check-guides-xml-version-sync.sh (checks both version and release attributes)
