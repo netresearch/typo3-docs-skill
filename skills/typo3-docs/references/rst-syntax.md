@@ -82,10 +82,17 @@ The residual risk is only the *number*: the next release may turn out to be
 shipped. That happens rarely, it is detectable afterwards, and a stale number
 is tolerable — so it is not worth withholding the directive until release day.
 
-**Validation:** `scripts/check-unreleased-versions.sh` warns only once the
-project has actually moved past the documented number, which is the first
-moment the mistake is decidable. A number no release has reached *yet* is the
-pending release and stays silent (checkpoint TD-41, severity `warning`).
+**Deliberately not enforced.** A check for this was written and then removed:
+distinguishing a skipped number from a pending one needs the full tag history,
+and three ordinary situations look identical to a skipped number — a shallow
+clone or a `--no-tags` CI checkout (the release is invisible, not missing), a
+two-component number like `13.4` against a `13.4.0` tag, and a patch release
+prepared on a maintenance line while a higher major already exists. Each of
+those produced a warning against correct documentation, which is the harm the
+old prohibition caused in the first place. For a defect this rare and this
+cheap to live with, a gate that cries wolf is worse than no gate.
+
+If a number does turn out wrong, correct it in the same commit that notices.
 
 ### ChangeLog Completeness
 

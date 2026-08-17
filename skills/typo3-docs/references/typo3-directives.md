@@ -179,11 +179,11 @@ The noScale feature uses this pattern:
 ## Version Information
 
 `versionadded` / `versionchanged` / `deprecated`:
-[Versions](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Content/Versions.html)
-`[upstream]` (also shows nesting them inside admonitions). Skill rule that is
-NOT upstream (`[regression]`, from v13 doc reviews): only reference
-**released** versions — verify against `git tag --list` and `ext_emconf.php`
-before writing a version directive (see `rst-syntax.md`).
+[Versions](https://docs.typo3.org/permalink/h2document:versions)
+`[upstream]` (also shows nesting them inside admonitions). Name the release the
+feature is going into, including one not yet tagged — the documentation is
+meant to be ready when the release lands (see `rst-syntax.md`, "Version
+Directive Accuracy").
 
 ## PHP Domain
 
@@ -379,6 +379,6 @@ namespace is only an identifier and the schema path is relative to
 
 - **TYPO3 Documentation Guide:** https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/
 - **Confval Reference:** https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Code/Confval.html
-- **Version Directives:** https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Content/Versions.html
+- **Version Directives:** https://docs.typo3.org/permalink/h2document:versions
 - **PHP Domain:** https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Code/Phpdomain.html
 - **Card Grid:** https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Content/Cards.html
