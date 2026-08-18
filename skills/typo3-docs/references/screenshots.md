@@ -233,6 +233,36 @@ Two things worth doing while authoring:
   service rather than from the feature description is what surfaces the
   redaction window nobody had documented.
 
+**Open the render and read it — "the file exists" is not verification.** Three
+defects in one set of eight diagrams were invisible in the source and in a file
+listing, and each was found by looking at the output: an arrow leaving the wrong
+box (a *skipped* task cannot *fail*), a heading centred vertically straight
+through three hand-placed lines, and an arrow whose colour had no `<marker>`
+defined — that one renders headless in a browser and crashes cairosvg, so a
+browser check alone would have passed it.
+
+**Measure text against its shape rather than eyeballing it.** Overflow is the
+failure that survives review, because a diagram with one word poking out of a box
+still looks like a diagram. In a browser, compare each `<text>` element's
+`getBBox()` against the rect that should contain it:
+
+```javascript
+for (const t of svg.querySelectorAll('text')) {
+  const b = t.getBBox();              // compare against the enclosing <rect>
+  if (b.x + b.width > box.x + box.width) console.log('overflow:', t.textContent);
+}
+```
+
+**And when that check reports nothing, make it fail once before believing it.**
+Feed it a deliberately overlong string and watch it flag that. A detector that
+finds nothing because it is broken is indistinguishable from a clean result — the
+same reason a `grep` returning `0` is first a suspect query, not a finding.
+
+**If the SVGs are generated, prove the committed file is what the generator
+emits.** Re-run it over a clean checkout and require `git status --porcelain` to
+be empty. Otherwise the script has quietly stopped being the source and the next
+person edits the one that is not read.
+
 Keep light-on-dark legibility in mind: a page is rendered in both themes, and an
 `<img>` does not inherit `currentColor`. A neutral card with explicit fills
 reads acceptably on both; a diagram drawn in pure black on transparent does not.
