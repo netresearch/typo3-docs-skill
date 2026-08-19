@@ -30,7 +30,6 @@ report=$(find Documentation -name '*.rst' -print0 2>/dev/null \
         in_block = 1; start = FNR
         name = substr($0, RSTART + RLENGTH)
         sub(/[[:space:]].*$/, "", name)
-        indent = match($0, /[^[:space:]]/) - 1
         next
     }
     in_block && /^[[:space:]]*:type:/    { has_type = 1 }
