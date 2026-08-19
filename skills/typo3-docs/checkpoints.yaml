@@ -234,6 +234,48 @@ mechanical:
     source: "Render log 'Language \"plantuml\" is not available to highlight code'; uml:: verified rendered per https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Graphics/Diagrams.html"
     verified: 2026-08-14
 
+  # === DOCUMENTATION QUALITY (relational: the code supplies the denominator) ===
+  # These four ask whether the documentation matches what the extension declares,
+  # never how much of it there is, so a small extension can satisfy them fully.
+  # Each was measured over the 19 documented netresearch t3x-* repositories before
+  # being adopted; two further candidates were dropped there for measuring nothing
+  # (see references/documentation-quality-checks.md).
+  - id: TD-52
+    type: command
+    pattern: "bash scripts/check-settings-documented.sh"
+    severity: warning
+    desc: "every setting declared in ext_conf_template.txt is mentioned in Documentation/"
+    provenance: heuristic
+    source: "Netresearch quality criterion; measured 0-100% across 11 t3x repos with settings"
+    verified: 2026-08-19
+
+  - id: TD-53
+    type: command
+    pattern: "bash scripts/check-confval-completeness.sh"
+    severity: warning
+    desc: "every confval states both :type: and :default: — depth per option instead of number of options"
+    provenance: heuristic
+    source: "Netresearch quality criterion; measured 20-100% across 15 t3x repos with confvals"
+    verified: 2026-08-19
+
+  - id: TD-54
+    type: command
+    pattern: "bash scripts/check-ui-surface-screenshots.sh"
+    severity: warning
+    desc: "an extension registering a backend module or frontend plugin shows it at least once; only the zero case, because how many screenshots are enough is not mechanically decidable"
+    provenance: heuristic
+    source: "Netresearch quality criterion; fires on 8 of 13 t3x repos with a UI surface"
+    verified: 2026-08-19
+
+  - id: TD-55
+    type: command
+    pattern: "bash scripts/check-screenshot-freshness.sh"
+    severity: info
+    desc: "templates and public assets have not changed substantially since the newest screenshot — an outdated screenshot is worse than a missing one"
+    provenance: heuristic
+    source: "Netresearch quality criterion; 5 of 6 t3x repos with screenshots currently miss it, which is what a bonus indicator is for"
+    verified: 2026-08-19
+
   # === UNSUPPORTED LITERALINCLUDE OPTIONS ===
   - id: TD-51
     type: command

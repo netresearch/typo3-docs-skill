@@ -1,0 +1,19 @@
+name: Tests
+
+# Thin caller for the skill-repo-skill reusable, adopted so the checkpoint
+# scripts under skills/typo3-docs/scripts/ have something that runs their tests.
+# Before this, tests/ did not exist here and no job executed one — a script
+# shipped to every consumer repository with nothing exercising it.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions: {}
+
+jobs:
+  tests:
+    uses: netresearch/skill-repo-skill/.github/workflows/tests.yml@main
+    permissions:
+      contents: read
