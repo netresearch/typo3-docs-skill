@@ -51,7 +51,7 @@ drift (`references/canonical-sources.md`).
 
 Upstream:
 
-- **UTF-8**, **4-space** indent, **LF**; wrap at **80 chars** where possible
+- **UTF-8**, **4-space** indent (no tabs), **LF**; wrap at **80 chars** where possible
 - **CamelCase** files, **sentence case** headings
 - **Permalink anchors** (`.. _label:`) before every heading
 - **Index.rst** in every subdirectory
@@ -66,7 +66,7 @@ they help (backend modules, config, workflows).
 
 ## Code Example Validation
 
-Cross-reference code examples against source: grep method names in
+Cross-reference examples against source: grep method names in
 `Classes/`, compare CLI arguments with `configure()`.
 See `references/extraction-patterns.md`.
 

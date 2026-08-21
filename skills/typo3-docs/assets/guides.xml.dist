@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    Copy to Documentation/guides.xml and replace every {PLACEHOLDER}.
+    Copy to Documentation/guides.xml, replace every {PLACEHOLDER}, and
+    delete this comment.
 
     The namespace is not optional and is not a TYPO3 URL. Rendering is done by
     phpDocumentor Guides, so the document lives in the phpDocumentor namespace;
@@ -25,7 +26,7 @@
                project-issues="https://github.com/{VENDOR}/{REPOSITORY}/issues"
                edit-on-github="{VENDOR}/{REPOSITORY}"
                edit-on-github-branch="main"
-               typo3-core-preferred="13.4"
+               typo3-core-preferred="{TYPO3_LTS}"
                interlink-shortcode="{EXTENSION_KEY}"
     />
     <project title="{HUMAN READABLE TITLE}"
