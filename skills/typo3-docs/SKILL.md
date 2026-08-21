@@ -2,7 +2,7 @@
 name: typo3-docs
 description: "Use when creating, editing, or reviewing TYPO3 extension documentation (Documentation/*.rst, guides.xml, README.md, XLF translations), rendering docs with Docker, using TYPO3 RST directives, adding screenshots, deploying to docs.typo3.org, improve docs, fix documentation, or XLIFF 2-space indentation (TYPO3 v14+)."
 license: "(MIT AND CC-BY-SA-4.0). See LICENSE-MIT and LICENSE-CC-BY-SA-4.0"
-compatibility: "Requires php, docker (for rendering). TYPO3 extension with Documentation/ directory."
+compatibility: "Requires php, docker (for rendering). A TYPO3 extension; Documentation/ may be absent."
 metadata:
   author: Netresearch DTT GmbH
   version: "2.17.0"
@@ -16,6 +16,9 @@ Create and maintain TYPO3 extension documentation per docs.typo3.org standards.
 
 ## Core Workflow
 
+0. **No `Documentation/` yet?** Copy `assets/guides.xml.dist` to
+   `Documentation/guides.xml`; never write one from memory -- the namespace is
+   phpDocumentor's, not TYPO3's.
 1. **Run extraction first** to find gaps:
    ```bash
    scripts/extract-all.sh /path/to/extension
@@ -26,7 +29,7 @@ Create and maintain TYPO3 extension documentation per docs.typo3.org standards.
 4. Validate: `scripts/validate_docs.sh /path/to/extension`
 5. Render: `scripts/render_docs.sh /path/to/extension`
 
-> **Critical**: For "show docs", render and display HTML, not raw RST.
+> **Critical**: For "show docs", render HTML, not raw RST.
 
 ## Element Selection Guide
 
@@ -48,39 +51,37 @@ drift (`references/canonical-sources.md`).
 
 Upstream:
 
-- **UTF-8**, **4-space** indent, **LF**; wrap at **80 chars** where possible
+- **UTF-8**, **4-space** indent (no tabs), **LF**; wrap at **80 chars** where possible
 - **CamelCase** files, **sentence case** headings
 - **Permalink anchors** (`.. _label:`) before every heading
 - **Index.rst** in every subdirectory
-- **PNG/AVIF** images with `:alt:`; check screenshot necessity first
+- **PNG/AVIF** images with `:alt:`
 - **PHP domain**: no `?Type`/`Type|null` in `php:method::`; use `:returntype:`
 
 NR policy: **no `mailto:`** (upstream allows it; spam/PII -- use
 Issues/Discussions); **.editorconfig** in `Documentation/`.
 
-Heuristic: **~250 lines** per RST, split with `toctree`; `:zoom: lightbox` on
-figures; screenshots where they help (backend modules, config, workflows).
+Heuristic: **~250 lines** per RST, split with `toctree`; screenshots where
+they help (backend modules, config, workflows).
 
 ## Code Example Validation
 
-Cross-reference code examples against source: grep method names in
+Cross-reference examples against source: grep method names in
 `Classes/`, compare CLI arguments with `configure()`.
 See `references/extraction-patterns.md`.
 
 ## Pre-Commit Checklist
 
-1. `.editorconfig` present, `Index.rst` in every directory
-2. 4-space indent, no tabs, max 80 chars
-3. Code blocks have `:caption:`, inline code uses proper roles
-4. Screenshots exist with `:alt:` and `:zoom: lightbox`
-5. `scripts/validate_docs.sh` passes, render has no warnings
-6. README and Documentation/ synchronized
+1. Code blocks have `:caption:`, inline code uses proper roles
+2. Screenshots exist with `:alt:` and `:zoom: lightbox`
+3. `scripts/validate_docs.sh` passes, render has no warnings
+4. README and Documentation/ synchronized
 
 ## References
 
 - `references/canonical-sources.md` -- topic-to-upstream map, provenance labels
 - `references/file-structure.md` -- layout, naming
-- `references/guides-xml.md` -- build config, interlinks
+- `references/guides-xml.md` -- the guides.xml skeleton, build config, interlinks
 - `references/coding-guidelines.md` -- CGL deltas, .editorconfig
 - `references/rst-syntax.md` -- headings, punctuation pitfalls
 - `references/text-roles-inline-code.md` -- `:php:`, `:guilabel:`, `:ref:`

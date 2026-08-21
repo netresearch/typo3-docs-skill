@@ -6,6 +6,13 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- `assets/guides.xml.dist`, the canonical `guides.xml` to copy when an extension has none, and a step 0 in the Core Workflow that says to copy it rather than write one from memory (typo3-docs)
+
+### Fixed
+- `references/guides-xml.md` was listed as "build config, interlinks", which hid that it also carries the `guides.xml` skeleton — an agent creating documentation from nothing had no reason to open it (typo3-docs)
+- `compatibility` claimed the skill needs "a TYPO3 extension with Documentation/ directory", which excluded the case the skill is most needed for (typo3-docs)
+
 ## [v2.17.0](https://github.com/netresearch/typo3-docs-skill/releases/tag/v2.17.0) — 2026-08-17
 
 ### Added

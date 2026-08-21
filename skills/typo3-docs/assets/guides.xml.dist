@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copy to Documentation/guides.xml, replace every {PLACEHOLDER}, and
+    delete this comment.
+
+    The namespace is not optional and is not a TYPO3 URL. Rendering is done by
+    phpDocumentor Guides, so the document lives in the phpDocumentor namespace;
+    a file declaring anything else is well-formed XML that renders nothing.
+    Verified against georgringer/news, FriendsOfTYPO3/extension_builder,
+    TYPO3-Documentation/TYPO3CMS-Reference-TCA and helhum/typo3-console, which
+    all declare exactly this one.
+
+    <project> carries its data in attributes. An element with the extension key
+    as text is the shape agents reach for and is silently wrong: the renderer
+    reads title, version and release from attributes and finds nothing.
+-->
+<guides xmlns="https://www.phpdoc.org/guides"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="https://www.phpdoc.org/guides vendor/phpdocumentor/guides-cli/resources/schema/guides.xsd"
+        links-are-relative="true"
+        default-code-language="php"
+>
+    <extension class="\T3Docs\Typo3DocsTheme\DependencyInjection\Typo3DocsThemeExtension"
+               project-home="https://extensions.typo3.org/extension/{EXTENSION_KEY}/"
+               project-repository="https://github.com/{VENDOR}/{REPOSITORY}"
+               project-issues="https://github.com/{VENDOR}/{REPOSITORY}/issues"
+               edit-on-github="{VENDOR}/{REPOSITORY}"
+               edit-on-github-branch="main"
+               typo3-core-preferred="{TYPO3_LTS}"
+               interlink-shortcode="{EXTENSION_KEY}"
+    />
+    <project title="{HUMAN READABLE TITLE}"
+             version="{MAJOR.MINOR}"
+             release="{MAJOR.MINOR.PATCH}"
+             copyright="{YEAR} by {AUTHOR}"/>
+</guides>
