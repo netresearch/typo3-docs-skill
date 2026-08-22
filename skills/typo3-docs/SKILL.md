@@ -5,7 +5,7 @@ license: "(MIT AND CC-BY-SA-4.0). See LICENSE-MIT and LICENSE-CC-BY-SA-4.0"
 compatibility: "Requires php, docker (for rendering). A TYPO3 extension; Documentation/ may be absent."
 metadata:
   author: Netresearch DTT GmbH
-  version: "2.17.0"
+  version: "2.18.0"
   repository: https://github.com/netresearch/typo3-docs-skill
 allowed-tools: Bash(php:*) Bash(docker:*) Bash(sed:*) Bash(grep:*) Read Write Glob Grep
 ---
