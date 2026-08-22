@@ -31,8 +31,20 @@ echo "Found $RST_FILES RST files"
 echo ""
 
 # Check for guides.xml (modern) or Settings.cfg (legacy)
+#
+# Existence is not enough and used to be all this checked. A file named
+# guides.xml containing an invented schema was reported as "found" and the run
+# went on to say the documentation was fine — the validator reassured on the
+# defect it should have caught. Measured: of ten guides.xml files recorded from
+# agent runs against netresearch/agent-system-evals, nine will not render, and
+# every one of those nine was "found" here. See issue #91.
 if [ -f "$DOC_DIR/guides.xml" ]; then
-    echo "✅ guides.xml found (modern PHP-based rendering)"
+    if "$(dirname "$0")/check-guides-xml-schema.sh" "$PROJECT_ROOT"; then
+        :
+    else
+        echo "   guides.xml exists but will not render; fix it before continuing"
+        exit 1
+    fi
 elif [ -f "$DOC_DIR/Settings.cfg" ]; then
     echo "✅ Settings.cfg found (legacy Sphinx-based rendering)"
     echo "   ℹ️  Consider migrating to guides.xml for modern rendering"
@@ -87,7 +99,13 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 while IFS= read -r -d '' file; do
     # Check for :ref: references
+    # The patterns are single-quoted on purpose: the backticks and brackets
+    # belong to the RST role and to grep, and letting the shell see them would
+    # start a command substitution. Pre-existing; surfaced by pre-commit only
+    # because this file is being touched.
+    # shellcheck disable=SC2016
     if grep -q ':ref:`[^<]*`' "$file"; then
+        # shellcheck disable=SC2016
         REF_COUNT=$(grep -o ':ref:`[^`]*`' "$file" | wc -l)
         if [ "$REF_COUNT" -gt 0 ]; then
             echo "ℹ️  Found $REF_COUNT :ref: references in $(basename "$file")"
