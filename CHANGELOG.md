@@ -6,6 +6,8 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v2.18.0](https://github.com/netresearch/typo3-docs-skill/releases/tag/v2.18.0) — 2026-08-22
+
 ### Added
 - `assets/guides.xml.dist`, the canonical `guides.xml` to copy when an extension has none, and a step 0 in the Core Workflow that says to copy it rather than write one from memory (typo3-docs)
 
