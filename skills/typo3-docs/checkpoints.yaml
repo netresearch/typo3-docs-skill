@@ -35,12 +35,30 @@ mechanical:
     verified: 2026-08-14
 
   # === GUIDES.XML CONTENT ===
+  # Was `contains "<project"`, which a hallucinated
+  # `<project>my-extension</project>` satisfies — the renderer reads title and
+  # release from ATTRIBUTES, and an element carrying the extension key as text
+  # is the shape agents reach for. Measured against ten guides.xml files
+  # recorded from agent runs in netresearch/agent-system-evals: nine will not
+  # render, and the old pattern passed three of those nine. See issue #91.
+  #
+  # The namespace is phpDocumentor's, not TYPO3's: rendering is done by
+  # phpDocumentor Guides. Verified against georgringer/news,
+  # FriendsOfTYPO3/extension_builder, TYPO3CMS-Reference-TCA and
+  # helhum/typo3-console, which all declare exactly this one.
+  #
+  # Written as a self-contained command rather than a call to
+  # scripts/check-guides-xml-schema.sh, because a checkpoint runs from the
+  # repository root and the skill's own scripts are not there.
   - id: TD-05
-    type: contains
-    target: Documentation/guides.xml
-    pattern: "<project"
+    type: command
+    pattern: >-
+      php -r '$d=new DOMDocument(); if(!@$d->load("Documentation/guides.xml")) exit(1);
+      $n="https://www.phpdoc.org/guides"; if($d->documentElement->namespaceURI!==$n) exit(1);
+      $p=$d->getElementsByTagNameNS($n,"project")->item(0); if($p===null) exit(1);
+      exit(trim($p->getAttribute("title"))!=="" && trim($p->getAttribute("release"))!=="" ? 0 : 1);'
     severity: error
-    desc: "guides.xml must contain project element"
+    desc: "guides.xml must be in the phpDocumentor namespace with <project title=… release=…> as attributes"
 
   - id: TD-06
     type: contains
