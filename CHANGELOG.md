@@ -6,6 +6,8 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v2.19.0](https://github.com/netresearch/typo3-docs-skill/releases/tag/v2.19.0) — 2026-08-22
+
 ### Fixed
 - `scripts/validate_docs.sh` tested only that `Documentation/guides.xml` exists and printed "guides.xml found (modern PHP-based rendering)" for a file in an invented schema — it never opened it. It now parses the file and exits non-zero unless the root element is in `https://www.phpdoc.org/guides` and `<project>` carries non-empty `title` and `release` **attributes** (typo3-docs)
 - Checkpoint `TD-05` was `contains "<project"`, which a hallucinated `<project>my-extension</project>` satisfies. It now asserts the namespace and both attributes (typo3-docs)
