@@ -87,7 +87,7 @@ mechanical:
   # === IMAGE FORMAT ===
   - id: TD-11
     type: command
-    pattern: "find Documentation/ -type f \\( -name '*.jpg' -o -name '*.jpeg' -o -name '*.gif' -o -name '*.bmp' \\) | head -1 && exit 1 || exit 0"
+    pattern: "! find Documentation/ -type f \\( -name '*.jpg' -o -name '*.jpeg' -o -name '*.gif' -o -name '*.bmp' \\) -print -quit | grep -q ."
     severity: warning
     desc: "Images should be PNG (or AVIF), not JPG/GIF/BMP — upstream allows PNG or AVIF"
     provenance: upstream
