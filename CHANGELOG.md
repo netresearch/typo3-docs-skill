@@ -6,6 +6,8 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v2.19.1](https://github.com/netresearch/typo3-docs-skill/releases/tag/v2.19.1) — 2026-08-26
+
 ### Fixed
 - Comments in `check-guides-xml-schema.sh`, `validate_docs.sh` and checkpoint `TD-05` named the benchmark case and repository the measurement came from. A skill that is itself under evaluation must not carry the evaluation's identifiers; the benchmark's contamination check flagged it (typo3-docs)
 
