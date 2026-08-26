@@ -36,7 +36,7 @@ echo ""
 # guides.xml containing an invented schema was reported as "found" and the run
 # went on to say the documentation was fine — the validator reassured on the
 # defect it should have caught. Measured: of ten guides.xml files recorded from
-# agent runs against netresearch/agent-system-evals, nine will not render, and
+# evaluated agent runs against a real extension, nine will not render, and
 # every one of those nine was "found" here. See issue #91.
 if [ -f "$DOC_DIR/guides.xml" ]; then
     if "$(dirname "$0")/check-guides-xml-schema.sh" "$PROJECT_ROOT"; then

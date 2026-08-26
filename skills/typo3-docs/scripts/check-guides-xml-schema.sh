@@ -13,8 +13,8 @@
 # `contains "<project"`, which a hallucinated `<project>my-ext</project>`
 # satisfies.
 #
-# Measured, not assumed: across two recorded series of OFR-TYPO3-DOCS-001 in
-# netresearch/agent-system-evals, agents produced SEVEN distinct fabricated
+# Measured, not assumed: across two recorded series of an agent evaluation
+# against a real extension, agents produced SEVEN distinct fabricated
 # namespaces and not one correct file. Three of them would have passed both
 # gates above. See netresearch/typo3-docs-skill#91.
 #
