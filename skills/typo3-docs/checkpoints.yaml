@@ -39,7 +39,7 @@ mechanical:
   # `<project>my-extension</project>` satisfies — the renderer reads title and
   # release from ATTRIBUTES, and an element carrying the extension key as text
   # is the shape agents reach for. Measured against ten guides.xml files
-  # recorded from agent runs in netresearch/agent-system-evals: nine will not
+  # recorded from evaluated agent runs against a real extension: nine will not
   # render, and the old pattern passed three of those nine. See issue #91.
   #
   # The namespace is phpDocumentor's, not TYPO3's: rendering is done by
