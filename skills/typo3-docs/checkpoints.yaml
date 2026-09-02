@@ -1,5 +1,33 @@
 # Checkpoints for typo3-docs skill
 # Validates TYPO3 extension documentation following docs.typo3.org standards
+#
+# THREE TRAPS THIS FILE HAS BEEN BITTEN BY — read before adding a checkpoint.
+#
+# 1. `cmd | head -1 && echo … && exit 1 || exit 0` can never pass: `head` exits 0
+#    on EMPTY input, so the `&&` branch fires whatever the tree contains. The
+#    runner also rejects `&&`/`||`/`;` outright, so the checkpoint never ran and
+#    the reported failure was the rejection, not a finding. Derive the exit
+#    status from the match itself — `! grep -rq …`.
+#
+# 2. A `find`/`grep -r` with no exclusion for .Build/, vendor/ and node_modules/
+#    matches inside ignored dependency trees. Every recursive scan here carries
+#    `-not -path '*/vendor/*'` (find) or `--exclude-dir=vendor` (grep). The
+#    spelling is `*/vendor/*`, not `./vendor/*`: under `find Documentation/`
+#    paths print as `Documentation/…` with no `./` prefix, so a `./`-anchored
+#    exclusion would never match anything.
+#
+# 3. A checkpoint runs from the root of the repository UNDER ASSESSMENT, where
+#    this skill's own scripts/ directory does not exist — and the runner rejects
+#    any base command carrying a path prefix anyway. `bash scripts/check-foo.sh`
+#    is therefore always a dead checkpoint. Logic that needs loops, `$( )` or
+#    `;` is inlined below as `type: script` with a `command: |` block, which the
+#    runner writes to a temp file and executes with bash (checkpoints-schema.md,
+#    "type: script"). The shipped scripts/*.sh stay as the human-facing entry
+#    point and are the reference these bodies mirror.
+#
+# On `type: script` bodies: they carry no `set -euo pipefail`. Every one of them
+# ends in an explicit `exit`, and under `set -e` a `grep … | head -1 | grep …`
+# capture fails on SIGPIPE — which would be trap 1 again in a different costume.
 
 version: 1
 skill_id: typo3-docs
@@ -50,13 +78,24 @@ mechanical:
   # Written as a self-contained command rather than a call to
   # scripts/check-guides-xml-schema.sh, because a checkpoint runs from the
   # repository root and the skill's own scripts are not there.
+  #
+  # It was spelled `pattern: >-` (a FOLDED block scalar) and therefore never
+  # executed once: run-checkpoints.sh recognises only the LITERAL `|` block
+  # header, so `>-` fell through to the plain-scalar branch and the whole
+  # command reached the allowlist as the two characters `>-`
+  # ("'>-' not in allowed command whitelist"). validate-checkpoints.sh accepts
+  # `>-` as a multi-line shape, so authoring-time validation did not catch it.
+  # Spell a multi-line body `type: script` + `command: |`, nothing else.
   - id: TD-05
-    type: command
-    pattern: >-
-      php -r '$d=new DOMDocument(); if(!@$d->load("Documentation/guides.xml")) exit(1);
-      $n="https://www.phpdoc.org/guides"; if($d->documentElement->namespaceURI!==$n) exit(1);
-      $p=$d->getElementsByTagNameNS($n,"project")->item(0); if($p===null) exit(1);
-      exit(trim($p->getAttribute("title"))!=="" && trim($p->getAttribute("release"))!=="" ? 0 : 1);'
+    type: script
+    command: |
+      php -r '$d = new DOMDocument();
+      if (!@$d->load("Documentation/guides.xml")) { exit(1); }
+      $n = "https://www.phpdoc.org/guides";
+      if ($d->documentElement->namespaceURI !== $n) { exit(1); }
+      $p = $d->getElementsByTagNameNS($n, "project")->item(0);
+      if ($p === null) { exit(1); }
+      exit(trim($p->getAttribute("title")) !== "" && trim($p->getAttribute("release")) !== "" ? 0 : 1);'
     severity: error
     desc: "guides.xml must be in the phpDocumentor namespace with <project title=… release=…> as attributes"
 
@@ -96,16 +135,21 @@ mechanical:
     desc: "Index.rst should have toctree directive"
 
   # === FILE NAMING (CamelCase) ===
+  # Carried both trap 1 and trap 2: `… | head -1 && exit 1 || exit 0` reported a
+  # finding on every tree, and the unfiltered find reached vendored .rst files.
+  # The status now comes from the match — the final `grep -qv` succeeds only if
+  # some lowercase-named path is not an Index.rst, and `!` turns that into a
+  # failure.
   - id: TD-10
     type: command
-    pattern: "find Documentation/ -name '*.rst' | grep -E '/[a-z]' | grep -v Index.rst | head -1 && exit 1 || exit 0"
+    pattern: "! find Documentation/ -name '*.rst' -not -path '*/.Build/*' -not -path '*/vendor/*' -not -path '*/node_modules/*' | grep -E '/[a-z]' | grep -qv Index.rst"
     severity: warning
     desc: "RST files should use CamelCase naming (e.g., Configuration.rst not configuration.rst)"
 
   # === IMAGE FORMAT ===
   - id: TD-11
     type: command
-    pattern: "! find Documentation/ -type f \\( -name '*.jpg' -o -name '*.jpeg' -o -name '*.gif' -o -name '*.bmp' \\) -print -quit | grep -q ."
+    pattern: "! find Documentation/ -type f -not -path '*/.Build/*' -not -path '*/vendor/*' -not -path '*/node_modules/*' \\( -name '*.jpg' -o -name '*.jpeg' -o -name '*.gif' -o -name '*.bmp' \\) -print -quit | grep -q ."
     severity: warning
     desc: "Images should be PNG (or AVIF), not JPG/GIF/BMP — upstream allows PNG or AVIF"
     provenance: upstream
@@ -135,7 +179,7 @@ mechanical:
   # === NO MAILTO LINKS ===
   - id: TD-18
     type: command
-    pattern: "grep -rn 'mailto:' Documentation/ 2>/dev/null | head -1 && exit 1 || exit 0"
+    pattern: "! grep -rq --exclude-dir=.Build --exclude-dir=vendor --exclude-dir=node_modules -- 'mailto:' Documentation/"
     severity: warning
     desc: "No mailto: links; use GitHub Issues/Discussions URLs (NR policy — upstream explicitly allows mailto for project-contact)"
     provenance: org-policy
@@ -143,9 +187,17 @@ mechanical:
     verified: 2026-08-14
 
   # === INDEX.RST IN SUBDIRECTORIES ===
+  # `xargs -I{}` runs one `test -f` per candidate and exits 123 as soon as one
+  # of them fails, which is the loop the runner's ban on `;` forbids writing by
+  # hand. Empty input exits 0 via `-r`.
+  #
+  # This is the one scan here that enumerates DIRECTORIES, so `-not -path
+  # '*/vendor/*'` would not be enough: it excludes what is inside vendor/ and
+  # not vendor/ itself, which would then be reported as a subdirectory missing
+  # its Index.rst. `-prune` excludes the directory and its contents both.
   - id: TD-19
     type: command
-    pattern: "find Documentation/ -mindepth 1 -type d ! -name Images ! -name '_*' 2>/dev/null | while read dir; do [ ! -f \"$dir/Index.rst\" ] && echo \"Missing: $dir/Index.rst\" && exit 1; done; exit 0"
+    pattern: "find Documentation/ -mindepth 1 \\( -name .Build -o -name vendor -o -name node_modules \\) -prune -o -type d ! -name Images ! -name '_*' -printf '%p/Index.rst\\0' | xargs -0 -r -I{} test -f {}"
     severity: warning
     desc: "Every Documentation/ subdirectory must contain an Index.rst file"
 
@@ -158,18 +210,25 @@ mechanical:
     desc: "guides.xml should use theme=\"typo3docs\" for proper TYPO3 documentation rendering"
 
   # === MAX RST PAGE LENGTH ===
+  # `find -exec` is rejected by the runner's dangerous-pattern filter (the
+  # literal token `exec `), in a one-liner and inside a script body alike, so
+  # the line count goes through `xargs … wc -l`. `$2 != "total"` drops wc's
+  # per-batch summary line.
   - id: TD-26
     type: command
-    pattern: "find Documentation/ -name '*.rst' -exec sh -c 'wc -l < \"$1\"' _ {} \\; 2>/dev/null | awk '$1 > 250 {found=1} END {exit found ? 1 : 0}'"
+    pattern: "find Documentation/ -name '*.rst' -not -path '*/.Build/*' -not -path '*/vendor/*' -not -path '*/node_modules/*' -print0 | xargs -0 -r wc -l | awk '$2 != \"total\" { if ($1 > 250) f = 1 } END { exit f + 0 }'"
     severity: info
     desc: "RST pages should stay near ~250 lines; split with toctree (NR heuristic — no upstream limit exists)"
     provenance: heuristic
     source: "Netresearch quality heuristic; not a TYPO3 standard"
 
   # === NO TABS IN RST ===
+  # The old pattern also globbed `Documentation/**/*.rst`, which needs globstar
+  # — off in the runner's child shell, so the second operand reached grep as a
+  # literal path that does not exist.
   - id: TD-27
     type: command
-    pattern: "grep -rPn '\\t' Documentation/*.rst Documentation/**/*.rst 2>/dev/null | head -1 && exit 1 || exit 0"
+    pattern: "! grep -rqP --include='*.rst' --exclude-dir=.Build --exclude-dir=vendor --exclude-dir=node_modules -- '\\t' Documentation/"
     severity: warning
     desc: "RST files must use spaces only (4 spaces), never tabs"
 
@@ -193,15 +252,53 @@ mechanical:
     desc: "Documentation/Introduction/ directory should exist"
 
   # === DOCUMENTATION ACCURACY ===
+  # Mirrors scripts/check-guides-xml-version-sync.sh — with its attribute
+  # extraction corrected. That script reads
+  #   grep -oP 'version="[^"]*"' Documentation/guides.xml | head -1
+  # and a guides.xml opens with `<?xml version="1.0" encoding="UTF-8"?>`, so the
+  # first match is the XML DECLARATION's version, never <project>'s. Measured on
+  # a tree whose guides.xml is entirely correct (version=release=1.0.0,
+  # ext_emconf 1.0.0), the script reports two mismatches and exits 1. Inlining
+  # that verbatim would have turned a dead checkpoint into one that fails every
+  # conforming extension, so the attributes are read off the <project> element.
+  # The shipped script still carries the bug; see the report accompanying this
+  # change.
   - id: TD-30
-    type: command
-    pattern: "bash scripts/check-guides-xml-version-sync.sh"
+    type: script
+    command: |
+      [ -f Documentation/guides.xml ] || exit 0
+      [ -f ext_emconf.php ] || exit 0
+      command -v php >/dev/null 2>&1 || exit 0
+      attrs=$(php -r '$d = new DOMDocument();
+      if (!@$d->load("Documentation/guides.xml")) { exit(1); }
+      $p = $d->getElementsByTagNameNS("https://www.phpdoc.org/guides", "project")->item(0);
+      if ($p === null) { exit(1); }
+      echo trim($p->getAttribute("version")), "\n", trim($p->getAttribute("release")), "\n";' 2>/dev/null)
+      # An unparseable guides.xml or a missing <project> is TD-05's finding.
+      [ -n "$attrs" ] || exit 0
+      guides_version=$(printf '%s\n' "$attrs" | sed -n 1p)
+      guides_release=$(printf '%s\n' "$attrs" | sed -n 2p)
+      emconf_ver=$(grep -oP "'version'\s*=>\s*'[^']*'" ext_emconf.php 2>/dev/null | grep -oP "'[^']*'\$" | tr -d "'")
+      errors=0
+      if [ -n "$guides_version" ] && [ -n "$emconf_ver" ] && [ "$guides_version" != "$emconf_ver" ]; then
+        echo "Version mismatch: guides.xml version=\"$guides_version\" != ext_emconf.php version='$emconf_ver'"
+        errors=1
+      fi
+      if [ -n "$guides_release" ] && [ -n "$emconf_ver" ] && [ "$guides_release" != "$emconf_ver" ]; then
+        echo "Release mismatch: guides.xml release=\"$guides_release\" != ext_emconf.php version='$emconf_ver'"
+        errors=1
+      fi
+      if [ -n "$guides_version" ] && [ -n "$guides_release" ] && [ "$guides_version" != "$guides_release" ]; then
+        echo "Internal mismatch: guides.xml version=\"$guides_version\" != release=\"$guides_release\""
+        errors=1
+      fi
+      exit "$errors"
     severity: error
     desc: "guides.xml version and release attributes must both match ext_emconf.php version"
 
   - id: TD-31
     type: command
-    pattern: "grep -rn 'getTranslation\\|importXliffFile\\|findByIdentifier\\|findByComponent' Documentation/ 2>/dev/null | head -1 && echo 'Found common wrong method names in documentation' && exit 1 || exit 0"
+    pattern: "! grep -rqE --exclude-dir=.Build --exclude-dir=vendor --exclude-dir=node_modules -- 'getTranslation|importXliffFile|findByIdentifier|findByComponent' Documentation/"
     severity: error
     desc: "Documentation must not reference common wrong method names (getTranslation, importXliffFile, findByIdentifier, findByComponent)"
 
@@ -213,39 +310,111 @@ mechanical:
   # against correct documentation. See rst-syntax.md, "Version Directive
   # Accuracy", for why this is left unenforced.
 
-  # Note: TD-43 (guides.xml version+release sync) removed — consolidated into TD-30
-  # which now uses check-guides-xml-version-sync.sh (checks both version and release attributes)
+  # Note: TD-43 (guides.xml version+release sync) removed — consolidated into TD-30,
+  # which mirrors check-guides-xml-version-sync.sh (checks both version and release attributes)
 
   # === REQUIRED DOCUMENTATION SECTIONS ===
+  # Mirrors scripts/check-required-doc-sections.sh.
   - id: TD-44
-    type: command
-    pattern: "bash scripts/check-required-doc-sections.sh"
+    type: script
+    command: |
+      [ -d Documentation ] || exit 1
+      missing=""
+      for section in Introduction Installation Configuration Usage Developer; do
+        if [ ! -f "Documentation/$section/Index.rst" ]; then
+          missing="$missing $section"
+        fi
+      done
+      if [ ! -d Documentation/Troubleshooting ] && [ ! -d Documentation/FAQ ] && [ ! -d Documentation/KnownProblems ]; then
+        missing="$missing Troubleshooting/FAQ"
+      fi
+      is_security=0
+      if [ -f ext_emconf.php ] && grep -qiP "'category'\s*=>\s*'(security|auth)'" ext_emconf.php 2>/dev/null; then
+        is_security=1
+      fi
+      if [ -f composer.json ] && grep -qiP '"keywords".*\b(security|authentication|encryption)\b' composer.json 2>/dev/null; then
+        is_security=1
+      fi
+      if [ "$is_security" -eq 1 ] && [ ! -d Documentation/Security ]; then
+        missing="$missing Security(security-related-extension)"
+      fi
+      [ -z "$missing" ] && exit 0
+      echo "Missing documentation sections:$missing"
+      exit 1
     severity: warning
     desc: "Documentation should include Introduction, Installation, Configuration, Usage, Developer, and Troubleshooting/FAQ sections"
 
   # === UNTRANSLATED FLUID STRINGS ===
+  # Mirrors scripts/check-untranslated-fluid-strings.sh. The shipped script
+  # greps whole lines and then re-greps each attribute out of them; one
+  # `grep -ohP` over the attribute pattern yields the same set of attributes.
   - id: TD-45
-    type: command
-    pattern: "bash scripts/check-untranslated-fluid-strings.sh"
+    type: script
+    command: |
+      files=$(find Resources/Private/ -type f -name '*.html' -not -path '*/.Build/*' -not -path '*/vendor/*' -not -path '*/node_modules/*' 2>/dev/null)
+      [ -n "$files" ] || exit 0
+      found=0
+      while IFS= read -r file; do
+        [ -n "$file" ] || continue
+        while IFS= read -r attr; do
+          [ -n "$attr" ] || continue
+          value=$(printf '%s\n' "$attr" | grep -oP '"[^"]*"' | tr -d '"')
+          [ -n "$value" ] || continue
+          if printf '%s\n' "$value" | grep -qP '(f:translate|LLL:|\{.*\})'; then
+            continue
+          fi
+          words=$(printf '%s\n' "$value" | wc -w)
+          if [ "$words" -gt 3 ]; then
+            echo "$file: hardcoded string ($words words) in attribute: $value"
+            found=1
+          fi
+        done < <(grep -ohP '(title|aria-label|alt)="[^"]*"' "$file" 2>/dev/null)
+      done < <(printf '%s\n' "$files")
+      exit "$found"
     severity: warning
     desc: "Fluid templates should use f:translate for user-facing text; flag hardcoded English strings (>3 words in title/aria-label/alt)"
 
   # === RST SUBSTITUTIONS USAGE ===
+  # Mirrors scripts/check-rst-substitutions-used.sh.
   - id: TD-46
-    type: command
-    pattern: "bash scripts/check-rst-substitutions-used.sh"
+    type: script
+    command: |
+      includes="Documentation/Includes.rst.txt"
+      [ -f "$includes" ] || exit 0
+      subs=$(grep -oP '^\.\.\s*\|[^|]+\|' "$includes" 2>/dev/null | grep -oP '\|[^|]+\|')
+      [ -n "$subs" ] || exit 0
+      found=0
+      for target in Documentation/Introduction/Index.rst Documentation/Installation/Index.rst; do
+        [ -f "$target" ] || continue
+        while IFS= read -r sub; do
+          [ -n "$sub" ] || continue
+          sub_escaped=$(printf '%s\n' "$sub" | sed 's/|/\\|/g')
+          sub_value=$(grep -P "^\.\.\s*${sub_escaped}\s+replace::" "$includes" 2>/dev/null | grep -oP '::\s*.*$' | sed 's/^::\s*//')
+          [ -n "$sub_value" ] || continue
+          if grep -qF -- "$sub_value" "$target" 2>/dev/null && ! grep -qF -- "$sub" "$target" 2>/dev/null; then
+            echo "$target: hardcoded '$sub_value' found — use substitution $sub instead"
+            found=1
+          fi
+        done < <(printf '%s\n' "$subs")
+      done
+      exit "$found"
     severity: info
     desc: "If Includes.rst.txt defines substitutions, they should be used in Introduction/Index.rst and Installation/Index.rst instead of hardcoded values"
 
   # === PLANTUML RENDERING ===
-  # Inverted 2026-08-14: the earlier version flagged `.. uml::` on the false
-  # premise that the toolchain cannot render PlantUML — upstream Graphics/
-  # Diagrams.html documents `uml::` and states PlantUML IS integrated. The
+  # Inverted 2026-08-14: the earlier version flagged the `uml::` directive on
+  # the false premise that the toolchain cannot render PlantUML — upstream
+  # Graphics/Diagrams.html documents it and states PlantUML IS integrated. The
   # genuinely broken form is `code-block:: plantuml` (no such highlighter;
   # render emits 'Language "plantuml" is not available to highlight code').
+  #
+  # The rewrite drops the explanatory `echo`, which was not merely dead weight:
+  # it contained the two dots of the `uml::` directive spelling, and the runner
+  # rejects any pattern containing `..` as path traversal. That rejection was
+  # reported to the user as a plantuml finding on a tree with zero of them.
   - id: TD-47
     type: command
-    pattern: "grep -rnP 'code-block:: *plantuml' Documentation/ 2>/dev/null | head -1 && echo 'Found code-block:: plantuml — no such highlighter exists; use the .. uml:: directive (officially rendered) or commit an SVG.' && exit 1 || exit 0"
+    pattern: "! grep -rqE --exclude-dir=.Build --exclude-dir=vendor --exclude-dir=node_modules -- 'code-block:: *plantuml' Documentation/"
     severity: warning
     desc: "code-block:: plantuml has no highlighter and fails the render log; use the .. uml:: directive or an SVG figure"
     provenance: regression
@@ -258,36 +427,164 @@ mechanical:
   # Each was measured over the 19 documented netresearch t3x-* repositories before
   # being adopted; two further candidates were dropped there for measuring nothing
   # (see references/documentation-quality-checks.md).
+  #
+  # Mirrors scripts/check-settings-documented.sh.
   - id: TD-52
-    type: command
-    pattern: "bash scripts/check-settings-documented.sh"
+    type: script
+    command: |
+      [ -f ext_conf_template.txt ] || exit 0
+      [ -d Documentation ] || exit 0
+      missing=""
+      count=0
+      while IFS= read -r key; do
+        [ -n "$key" ] || continue
+        count=$((count + 1))
+        # A direct file grep, never `printf … | grep -q`: that pipeline inverts
+        # under pipefail once the input passes the pipe buffer.
+        if ! grep -rqF --exclude-dir=.Build --exclude-dir=vendor --exclude-dir=node_modules -- "$key" Documentation/ 2>/dev/null; then
+          missing="$missing $key"
+        fi
+      done < <(sed -e 's/#.*$//' ext_conf_template.txt | grep -oE '^[A-Za-z][A-Za-z0-9_.]*[[:space:]]*=' | sed -e 's/[[:space:]]*=$//' | sort -u)
+      [ "$count" -eq 0 ] && exit 0
+      [ -z "$missing" ] && exit 0
+      echo "Settings declared in ext_conf_template.txt but not mentioned in Documentation/:$missing"
+      echo "  ($count declared; document each one, ideally as a confval so it is typed and linkable)"
+      exit 1
     severity: warning
     desc: "every setting declared in ext_conf_template.txt is mentioned in Documentation/"
     provenance: heuristic
     source: "Netresearch quality criterion; measured 0-100% across 11 t3x repos with settings"
     verified: 2026-08-19
 
+  # Mirrors scripts/check-confval-completeness.sh.
   - id: TD-53
-    type: command
-    pattern: "bash scripts/check-confval-completeness.sh"
+    type: script
+    command: |
+      report=$(find Documentation -name '*.rst' -not -path '*/.Build/*' -not -path '*/vendor/*' -not -path '*/node_modules/*' -print0 2>/dev/null \
+          | xargs -0 -r awk '
+          # A confval block runs until the next directive at the same or lower
+          # indent, or a line at column 0 that is not blank.
+          function flush() {
+              if (in_block) {
+                  if (!(has_type && has_default)) {
+                      missing = (has_type ? "" : ":type: ") (has_default ? "" : ":default:")
+                      printf "%s:%d: confval %s lacks %s\n", file, start, name, missing
+                  }
+              }
+              in_block = 0; has_type = 0; has_default = 0
+          }
+          FNR == 1 { flush(); file = FILENAME }
+          match($0, /^[[:space:]]*\.\.[[:space:]]+confval::[[:space:]]*/) {
+              flush()
+              in_block = 1; start = FNR
+              name = substr($0, RSTART + RLENGTH)
+              sub(/[[:space:]].*$/, "", name)
+              next
+          }
+          in_block && /^[[:space:]]*:type:/ { has_type = 1 }
+          in_block && /^[[:space:]]*:[Dd]efault:/ { has_default = 1 }
+          in_block && /^[[:space:]]*\.\.[[:space:]]+[a-zA-Z:]+::/ { flush() }
+          in_block && /^[^[:space:]]/ && !/^\.\./ { flush() }
+          END { flush() }
+      ')
+      [ -z "$report" ] && exit 0
+      echo "$report"
+      n=$(printf '%s\n' "$report" | grep -c ':')
+      echo "  $n confval block(s) without :type: and/or :default: — state both so the reader"
+      echo "  does not have to open the code to learn what a value may be"
+      exit 1
     severity: warning
     desc: "every confval states both :type: and :default: — depth per option instead of number of options"
     provenance: heuristic
     source: "Netresearch quality criterion; measured 20-100% across 15 t3x repos with confvals"
     verified: 2026-08-19
 
+  # Mirrors scripts/check-ui-surface-screenshots.sh.
   - id: TD-54
-    type: command
-    pattern: "bash scripts/check-ui-surface-screenshots.sh"
+    type: script
+    command: |
+      [ -d Documentation ] || exit 0
+      modules=0
+      estimated=""
+      if [ -f Configuration/Backend/Modules.php ]; then
+        if command -v php >/dev/null 2>&1; then
+          modules=$(php -r '$m = @include "Configuration/Backend/Modules.php";
+            echo is_array($m) ? count($m) : -1;' 2>/dev/null)
+          modules=${modules:--1}
+        else
+          modules=-1
+        fi
+        if [ "$modules" = "-1" ]; then
+          # Old-style registration (ExtensionManagementUtility::addModule) does
+          # not return an array. Count registrations instead, and say the number
+          # is an estimate rather than presenting it as a measurement.
+          modules=$({ grep -cE "addModule|^ {4}'[A-Za-z0-9_]+' *=>" Configuration/Backend/Modules.php 2>/dev/null || true; } | head -1)
+          modules=${modules:-0}
+          estimated=" (estimated: this Modules.php does not return an array)"
+        fi
+      fi
+      plugins=0
+      if [ -d Configuration/TCA/Overrides ]; then
+        # `grep` exits 1 when it matches nothing, and under `set -e` with
+        # `pipefail` that killed the shipped script before it reached the image
+        # count — a silent exit 1 that reads as a finding.
+        plugins=$({ grep -rhoE 'registerPlugin|addPlugin' Configuration/TCA/Overrides/ 2>/dev/null || true; } | wc -l)
+      fi
+      surfaces=$((modules + plugins))
+      [ "$surfaces" -gt 0 ] || exit 0
+      images=0
+      for dir in Documentation/Images Documentation/_Images; do
+        [ -d "$dir" ] || continue
+        found=$({ find "$dir" -type f \( -iname '*.png' -o -iname '*.avif' -o -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.gif' -o -iname '*.webp' \) 2>/dev/null || true; } | wc -l)
+        images=$((images + found))
+      done
+      [ "$images" -gt 0 ] && exit 0
+      echo "This extension registers $surfaces user-interface surface(s)$estimated but Documentation/ has no screenshot."
+      echo "  A reader cannot tell what the module or plugin looks like before installing it."
+      exit 1
     severity: warning
     desc: "an extension registering a backend module or frontend plugin shows it at least once; only the zero case, because how many screenshots are enough is not mechanically decidable"
     provenance: heuristic
     source: "Netresearch quality criterion; fires on 8 of 13 t3x repos with a UI surface"
     verified: 2026-08-19
 
+  # Mirrors scripts/check-screenshot-freshness.sh. The 200-line threshold is
+  # calibrated, not invented: across the netresearch t3x fleet the observed
+  # magnitudes were 37 lines for the one current repository and 255 to 1354 for
+  # the rest. It sits in the gap, not at either edge.
   - id: TD-55
-    type: command
-    pattern: "bash scripts/check-screenshot-freshness.sh"
+    type: script
+    command: |
+      [ -d Documentation ] || exit 0
+      git rev-parse --git-dir >/dev/null 2>&1 || exit 0
+      # A shallow clone or a --no-tags CI checkout knows a truncated history, and
+      # the comparison would describe the checkout rather than the repository.
+      [ "$(git rev-parse --is-shallow-repository 2>/dev/null)" = "true" ] && exit 0
+      image_dir=""
+      for dir in Documentation/Images Documentation/_Images; do
+        [ -d "$dir" ] || continue
+        if find "$dir" -type f \( -iname '*.png' -o -iname '*.avif' -o -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.gif' -o -iname '*.webp' \) 2>/dev/null | grep -q .; then
+          image_dir="$dir"
+          break
+        fi
+      done
+      # No screenshots at all is TD-54's business, not this check's.
+      [ -n "$image_dir" ] || exit 0
+      visual=""
+      for p in Resources/Private/Templates Resources/Private/Partials Resources/Public; do
+        [ -e "$p" ] && visual="$visual $p"
+      done
+      [ -n "$visual" ] || exit 0
+      last_image=$(git log -1 --format=%H -- "$image_dir" 2>/dev/null)
+      [ -n "$last_image" ] || exit 0
+      changed=$(git diff --shortstat "$last_image" HEAD -- $visual 2>/dev/null)
+      lines=$(printf '%s' "$changed" | grep -oE '[0-9]+ (insertion|deletion)' | grep -oE '^[0-9]+' | paste -sd+ -)
+      total=$(( ${lines:-0} + 0 ))
+      [ "$total" -le 200 ] && exit 0
+      days=$(( ( $(git log -1 --format=%ct HEAD) - $(git log -1 --format=%ct "$last_image") ) / 86400 ))
+      echo "Templates and public assets changed by $total lines since the newest screenshot (${days} days ago)."
+      echo "  Re-take the screenshots that show those surfaces, or confirm they still match."
+      exit 1
     severity: info
     desc: "templates and public assets have not changed substantially since the newest screenshot — an outdated screenshot is worse than a missing one"
     provenance: heuristic
@@ -295,9 +592,11 @@ mechanical:
     verified: 2026-08-19
 
   # === UNSUPPORTED LITERALINCLUDE OPTIONS ===
+  # Same rewrite as TD-47, same history: the `head -1 && echo … && exit 1` shape
+  # reported literalinclude line options on a tree containing none.
   - id: TD-51
     type: command
-    pattern: "grep -rnE ':(lines|start-after|end-before|start-at|end-at):' Documentation/ 2>/dev/null | head -1 && echo 'Found literalinclude line-selection option(s) — the TYPO3 renderer does not implement them; the whole file is rendered and the option is silently ignored.' && exit 1 || exit 0"
+    pattern: "! grep -rqE --exclude-dir=.Build --exclude-dir=vendor --exclude-dir=node_modules -- ':(lines|start-after|end-before|start-at|end-at):' Documentation/"
     severity: warning
     desc: "literalinclude line-selection options (:lines:, :start-after:, :end-before:) are not implemented by the TYPO3 renderer and are silently ignored"
     provenance: regression
@@ -306,16 +605,52 @@ mechanical:
     verified: 2026-08-14
 
   # === CHANGELOG VERSION COVERAGE ===
+  # Mirrors scripts/check-changelog-version-coverage.sh. The shipped script runs
+  # two tag greps in a brace group; `^v?\d+\.\d+` with the `v` stripped
+  # afterwards selects the same set.
   - id: TD-48
-    type: command
-    pattern: "bash scripts/check-changelog-version-coverage.sh"
+    type: script
+    command: |
+      changelog=""
+      for f in CHANGELOG.md Changelog.md changelog.md Documentation/ChangeLog/Index.rst; do
+        if [ -f "$f" ]; then
+          changelog="$f"
+          break
+        fi
+      done
+      if [ -z "$changelog" ]; then
+        echo "No changelog file found"
+        exit 1
+      fi
+      tags=$(git tag -l 2>/dev/null | grep -P '^v?\d+\.\d+' | sed 's/^v//')
+      [ -n "$tags" ] || exit 0
+      missing=""
+      while IFS= read -r version; do
+        [ -n "$version" ] || continue
+        if ! grep -qF -- "[$version]" "$changelog" 2>/dev/null; then
+          missing="$missing $version"
+        fi
+      done < <(printf '%s\n' "$tags")
+      [ -z "$missing" ] && exit 0
+      echo "Versions missing from $changelog:$missing"
+      exit 1
     severity: warning
     desc: "CHANGELOG.md should have entries for all git tags between initial and current version"
 
   # === ADR COVERAGE ===
+  # Mirrors scripts/check-adr-coverage.sh.
   - id: TD-49
-    type: command
-    pattern: "bash scripts/check-adr-coverage.sh"
+    type: script
+    command: |
+      [ -d Classes ] || exit 0
+      class_count=$(find Classes/ -type f -name '*.php' -not -path '*/.Build/*' -not -path '*/vendor/*' -not -path '*/node_modules/*' 2>/dev/null | wc -l)
+      [ "$class_count" -gt 10 ] || exit 0
+      if [ -d Documentation/Developer/Adr ] || [ -d Documentation/Developer/ADR ] || [ -d docs/adr ]; then
+        exit 0
+      fi
+      echo "Extension has $class_count classes but no ADR directory (Documentation/Developer/Adr/)"
+      echo "Significant architectural decisions should be documented as Architecture Decision Records"
+      exit 1
     severity: info
     desc: "Extensions with >10 classes should have Documentation/Developer/Adr/ for significant architectural decisions"
 
