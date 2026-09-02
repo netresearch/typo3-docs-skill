@@ -499,7 +499,9 @@ mechanical:
     source: "Netresearch quality criterion; measured 20-100% across 15 t3x repos with confvals"
     verified: 2026-08-19
 
-  # Mirrors scripts/check-ui-surface-screenshots.sh.
+  # Mirrors scripts/check-ui-surface-screenshots.sh, except that the module
+  # count is greped rather than obtained by `@include`ing the audited
+  # Modules.php — see the comment in the body.
   - id: TD-54
     type: script
     command: |
@@ -507,21 +509,22 @@ mechanical:
       modules=0
       estimated=""
       if [ -f Configuration/Backend/Modules.php ]; then
-        if command -v php >/dev/null 2>&1; then
-          modules=$(php -r '$m = @include "Configuration/Backend/Modules.php";
-            echo is_array($m) ? count($m) : -1;' 2>/dev/null)
-          modules=${modules:--1}
-        else
-          modules=-1
-        fi
-        if [ "$modules" = "-1" ]; then
-          # Old-style registration (ExtensionManagementUtility::addModule) does
-          # not return an array. Count registrations instead, and say the number
-          # is an estimate rather than presenting it as a measurement.
-          modules=$({ grep -cE "addModule|^ {4}'[A-Za-z0-9_]+' *=>" Configuration/Backend/Modules.php 2>/dev/null || true; } | head -1)
-          modules=${modules:-0}
-          estimated=" (estimated: this Modules.php does not return an array)"
-        fi
+        # Counted by pattern, never executed. The shipped script `@include`s
+        # this file; the repository under assessment is not trusted input, and
+        # a Modules.php can require other files, open connections or write to
+        # disk. Every other check here parses only, and this is the one
+        # divergence from scripts/check-ui-surface-screenshots.sh.
+        #
+        # Three registration shapes, each anchored so that nested property
+        # lines at deeper indentation are never counted: a top-level key of a
+        # returning array at one indent level (single- or double-quoted), the
+        # same key on a compact single-line `return [...]`, and old-style
+        # addModule(). The compact branch counts lines, so a one-liner
+        # declaring two modules reports 1 — only zero-vs-nonzero decides this
+        # check, so the undercount is harmless and the label says "estimated".
+        modules=$({ grep -cE "addModule|^ {4}['\"][A-Za-z0-9_]+['\"] *=>|return \[['\"][A-Za-z0-9_]+['\"] *=>" Configuration/Backend/Modules.php 2>/dev/null || true; } | head -1)
+        modules=${modules:-0}
+        estimated=" (estimated: registrations counted by pattern, not executed)"
       fi
       plugins=0
       if [ -d Configuration/TCA/Overrides ]; then
@@ -607,7 +610,8 @@ mechanical:
   # === CHANGELOG VERSION COVERAGE ===
   # Mirrors scripts/check-changelog-version-coverage.sh. The shipped script runs
   # two tag greps in a brace group; `^v?\d+\.\d+` with the `v` stripped
-  # afterwards selects the same set.
+  # afterwards selects the same set. It diverges in one place: an RST changelog
+  # is also matched on the bare version — see the comment in the loop.
   - id: TD-48
     type: script
     command: |
@@ -627,6 +631,23 @@ mechanical:
       missing=""
       while IFS= read -r version; do
         [ -n "$version" ] || continue
+        # `[1.2.0]` is the Keep-a-Changelog spelling, and it is a Markdown
+        # convention. An RST changelog writes the version as a section heading
+        # — `1.2.0` over an underline, or `Version 1.2.0` — so requiring the
+        # brackets reported every tag as missing for a project using the
+        # Documentation/ChangeLog/Index.rst candidate accepted above. Accept
+        # the bare version for an RST changelog only, bounded by non-version
+        # characters so `1.2.0` is not satisfied by `11.2.0` or `1.2.01`.
+        # This is the one divergence from
+        # scripts/check-changelog-version-coverage.sh.
+        case "$changelog" in
+          *.rst)
+            esc=$(printf '%s' "$version" | sed 's/\./\\./g')
+            if grep -qE -- "(^|[^0-9.])${esc}([^0-9.]|$)" "$changelog" 2>/dev/null; then
+              continue
+            fi
+            ;;
+        esac
         if ! grep -qF -- "[$version]" "$changelog" 2>/dev/null; then
           missing="$missing $version"
         fi
