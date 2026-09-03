@@ -6,6 +6,15 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- Renovate manages the pre-commit hooks
+
+### Fixed
+
+- Checkpoints no longer execute repository code to count backend modules
+- Checks that could never pass repaired
+
 ## [v2.19.1](https://github.com/netresearch/typo3-docs-skill/releases/tag/v2.19.1) — 2026-08-26
 
 ### Fixed
