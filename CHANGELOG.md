@@ -6,6 +6,8 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v2.19.2](https://github.com/netresearch/typo3-docs-skill/releases/tag/v2.19.2) — 2026-09-03
+
 ### Changed
 
 - Renovate manages the pre-commit hooks
