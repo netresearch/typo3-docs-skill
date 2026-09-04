@@ -241,6 +241,20 @@ gh api -X POST "repos/$REPO/hooks/$HOOK/deliveries/$DID/attempts"
 gh run rerun <releaseRunId> --failed
 ```
 
+> **Note**: The 500 above is the *version-tag* case. Before redelivering a 500
+> on the **first** push from a newly configured repository (approval still
+> pending), check whether the effect already happened. There Intercept has often
+> done the work and only failed while rendering the *response*: the repository is
+> already registered and a "New extension documentation awaiting approval"
+> message is already in
+> [#typo3-documentation](https://typo3.slack.com/archives/C028JEPJL). A
+> redelivery then returns `204` and posts a **second identical approval request**
+> to the volunteers who handle them. Check
+> https://intercept.typo3.com/admin/docs/deployments for a pending entry for your
+> package, or the channel, before retrying. This caveat is specific to the
+> first-push/approval case; for an established repository whose tag delivery
+> 500s, no render run was created and the recovery above is exactly right.
+
 Main-branch pushes rendering fine while only the version tag 500s is the signature
 of this outage — it is not a fault in your `guides.xml`, tag, or release workflow.
 
