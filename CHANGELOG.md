@@ -6,6 +6,8 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v2.19.3](https://github.com/netresearch/typo3-docs-skill/releases/tag/v2.19.3) — 2026-09-05
+
 ### Changed
 
 - intercept-deployment: a first-push 500 may already have notified volunteers
