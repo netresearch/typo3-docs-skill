@@ -6,6 +6,8 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v2.19.4](https://github.com/netresearch/typo3-docs-skill/releases/tag/v2.19.4) — 2026-09-11
+
 ### Added
 
 - README: the `/plugin install` step missing from the marketplace section, a "Without a marketplace" section covering the skills-directory route, and a note that `npx skills` installs `SKILL.md` skills only — not the hooks this repo also ships
