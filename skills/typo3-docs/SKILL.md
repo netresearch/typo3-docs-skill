@@ -97,3 +97,4 @@ See `references/extraction-patterns.md`.
 - `references/scripts-guide.md` -- script options
 - `references/typo3-extension-architecture.md` -- extension layout
 - `references/upstream-docs-contribution.md` -- upstream docs PRs
+- `references/render-guides-development.md` -- changing the renderer itself: directive options, interlink parsing, integration-fixture semantics
