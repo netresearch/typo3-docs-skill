@@ -6,6 +6,12 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v2.20.0](https://github.com/netresearch/typo3-docs-skill/releases/tag/v2.20.0) — 2026-09-12
+
+### Added
+
+- `references/render-guides-development.md` — changing the renderer itself: how directive options arrive (an option written without a value is the boolean `true`, and a value on the following line is appended to its stringified form), why the value must be read untrimmed, the theme's widened interlink parser, what the integration suite actually compares, and that the committed `theme.css` is not rebuilt by any CI job
+
 ## [v2.19.4](https://github.com/netresearch/typo3-docs-skill/releases/tag/v2.19.4) — 2026-09-11
 
 ### Added

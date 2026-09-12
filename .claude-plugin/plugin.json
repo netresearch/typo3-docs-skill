@@ -1,6 +1,6 @@
 {
   "name": "typo3-docs",
-  "version": "2.19.4",
+  "version": "2.20.0",
   "description": "Create and maintain TYPO3 extension documentation with RST validation",
   "author": {
     "name": "Netresearch DTT GmbH",
