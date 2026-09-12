@@ -2,8 +2,12 @@
 
 For changing the renderer — `TYPO3-Documentation/render-guides`, the
 `typo3-docs-theme` package and its integration fixtures — not for writing
-documentation with it. Everything here was measured against the repository; none
-of it is stated in the project's own docs.
+documentation with it. Everything here was measured against the repository
+rather than taken from its documentation, which does not describe any of the
+parsing or fixture behaviour below. The one overlap is the committed stylesheet:
+`references/screenshots.md` already notes that it is a build artifact that must
+be rebuilt in the same commit — the section here adds why CI will not catch a
+missed rebuild.
 
 ## Directive options do not arrive as you wrote them
 
@@ -92,9 +96,14 @@ like an expectation to a recursive grep.
 
 ## The committed theme assets are not gated
 
-`packages/typo3-docs-theme/resources/public/css/theme.css` is built by
-`npm run build` and committed, but **no CI job runs that build** — the workflows
-run `npm ci` and `npm test` only. A SCSS change whose compiled asset is not
-rebuilt and committed passes CI and ships nothing. Rebuild locally, and confirm
-first that a no-op rebuild on `main` is byte-identical, so the diff carries your
+`packages/typo3-docs-theme/resources/public/css/theme.css` is committed, and
+**no CI job rebuilds it**: `.github/workflows/main.yaml` runs `npm ci` and
+`npm test` and nothing else. A SCSS change whose compiled asset is not rebuilt
+passes CI and ships nothing.
+
+Rebuild from `packages/typo3-docs-theme`. `npx grunt sass` regenerates the
+stylesheet alone; `npm run build` is `vite build && grunt build`, where the
+grunt default also runs `stylelint`, the JS pipeline and `removesourcemap` — use
+it when anything beyond the CSS is involved. Either way, confirm first that a
+no-op rebuild on `main` leaves the tree byte-identical, so your diff carries the
 one change and not the churn of a different toolchain version.
