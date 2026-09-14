@@ -32,6 +32,14 @@
 version: 1
 skill_id: typo3-docs
 
+# Only run for TYPO3 extensions (SKILL.md compatibility: "A TYPO3 extension;
+# Documentation/ may be absent"), so a missing Documentation/ is still reported
+# there. Without this gate /assess ran every check against a Python repository.
+preconditions:
+  - type: json_path
+    target: composer.json
+    pattern: '.type == "typo3-cms-extension"'
+
 mechanical:
   # === DIRECTORY STRUCTURE ===
   - id: TD-01
