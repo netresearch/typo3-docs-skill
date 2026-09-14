@@ -83,6 +83,8 @@
       "files": [],
       "project_path": "/home/cybot/projects/t3x-cowriter/main",
       "assertions": [
+        "The root element declares xmlns='https://www.phpdoc.org/guides', not a typo3.org address",
+        "<project> carries title, version and release as attributes, not the extension key as element text",
         "guides.xml has theme='typo3docs' as attribute on <guides> element, not as child element",
         "Extension element has class attribute with T3Docs Typo3DocsTheme extension class",
         "edit-on-github uses owner/repo format, not full URL",
