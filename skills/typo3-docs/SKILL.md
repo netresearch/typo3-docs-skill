@@ -17,8 +17,21 @@ Create and maintain TYPO3 extension documentation per docs.typo3.org standards.
 ## Core Workflow
 
 0. **No `Documentation/` yet?** Copy `assets/guides.xml.dist` to
-   `Documentation/guides.xml`; never write one from memory -- the namespace is
-   phpDocumentor's, not TYPO3's.
+   `Documentation/guides.xml` and replace every `{PLACEHOLDER}`. Written from
+   memory the file comes out wrong in one of two ways, and both are
+   well-formed XML that renders nothing:
+
+   ```xml
+   <guides xmlns="https://www.phpdoc.org/guides">
+       <project title="My Extension" version="2.4" release="2.4.2"/>
+   </guides>
+   ```
+
+   The namespace is phpDocumentor's, not TYPO3's -- `https://guides.typo3.org/...`
+   is an address nobody serves and no schema knows. And `<project>` carries
+   title, version and release **as attributes**; an element whose text is the
+   extension key has none of them. Everything else the file needs is in the
+   template.
 1. **Run extraction first** to find gaps:
    ```bash
    scripts/extract-all.sh /path/to/extension
