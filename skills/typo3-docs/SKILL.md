@@ -1,6 +1,6 @@
 ---
 name: typo3-docs
-description: "Use when a TYPO3 extension has no documentation yet and one has to be written from scratch, when documentation has to reach docs.typo3.org, or when creating, editing or reviewing TYPO3 extension documentation (Documentation/*.rst, guides.xml, README.md, XLF translations), rendering docs with Docker, using TYPO3 RST directives, adding screenshots, improving or fixing docs, or XLIFF 2-space indentation (TYPO3 v14+)."
+description: "Use when a TYPO3 extension has no documentation yet and one has to be written from scratch, when documentation has to reach docs.typo3.org, or when creating, editing or reviewing TYPO3 extension documentation (Documentation/*.rst, guides.xml — which replaced Settings.cfg — README.md, XLF translations), rendering docs with Docker, using TYPO3 RST directives, adding screenshots, improving or fixing docs, or XLIFF 2-space indentation (TYPO3 v14+)."
 license: "(MIT AND CC-BY-SA-4.0). See LICENSE-MIT and LICENSE-CC-BY-SA-4.0"
 compatibility: "Requires php, docker (for rendering). A TYPO3 extension; Documentation/ may be absent."
 metadata:
@@ -31,6 +31,10 @@ Create and maintain TYPO3 extension documentation per docs.typo3.org standards.
    XML
    grep -Fc 'xmlns="https://www.phpdoc.org/guides"' Documentation/guides.xml
    ```
+
+   `Settings.cfg` is the file `guides.xml` replaced. Nothing reads it any
+   more, so writing one leaves the extension with no rendered documentation
+   and no error to show for it.
 
    The `grep` prints `1` when the namespace is right and `0` when it is not.
    Then replace TITLE and both versions. `<project>` carries them **as
