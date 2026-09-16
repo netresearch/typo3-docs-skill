@@ -29,7 +29,7 @@ Create and maintain TYPO3 extension documentation per docs.typo3.org standards.
        <project title="TITLE" version="MAJOR.MINOR" release="MAJOR.MINOR.PATCH"/>
    </guides>
    XML
-   grep -c 'xmlns="https://www.phpdoc.org/guides"' Documentation/guides.xml
+   grep -Fc 'xmlns="https://www.phpdoc.org/guides"' Documentation/guides.xml
    ```
 
    The `grep` prints `1` when the namespace is right and `0` when it is not.
