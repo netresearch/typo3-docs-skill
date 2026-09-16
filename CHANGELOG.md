@@ -10,7 +10,7 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
-- Step 0 of the guides.xml workflow told the agent to copy `assets/guides.xml.dist` and named the namespace in prose only. Measured on OFR-TYPO3-DOCS-001 (19 trials, Haiku 4.5): no trial opened the template, none opened `references/guides-xml.md`, and 14 of 19 failed the case on the root element alone — seven wrote an invented namespace, five wrote `<project>` with the extension key as element text instead of attributes, two produced XML that does not parse. The step now carries the two lines that decide it: the phpDocumentor namespace, and `<project>` with `title`, `version` and `release` as attributes. The template stays the source for everything else
+- Step 0 of the guides.xml workflow told the agent to copy `assets/guides.xml.dist` and named the namespace in prose only. Written from memory the file comes out wrong in one of two ways, and both are well-formed XML that renders nothing: an invented namespace, or `<project>` carrying the extension key as element text where the renderer reads attributes. The step now carries the two lines that decide it: the phpDocumentor namespace, and `<project>` with `title`, `version` and `release` as attributes. The template stays the source for everything else
 - `checkpoints.yaml` declared no preconditions, so `/assess` ran every check against any repository. On a Python repository it reported 16 failures out of 35 checks that were not about that repository. The skill is now gated on `composer.json` `type == "typo3-cms-extension"`, the scope `SKILL.md` declares in `compatibility:`. Gating on `Documentation/` instead would hide TD-01 on extensions that have none
 
 ### Changed
