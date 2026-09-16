@@ -13,7 +13,7 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
-- The `generate-guides-xml` eval asserted the theme attribute, the extension class, the GitHub attributes and the inventory URLs — everything except the two properties that decided 14 of 19 measured trials: the namespace of the root element, and whether `<project>` carries its data in attributes. A file failing both would have passed it
+- The `generate-guides-xml` eval now asserts the namespace of the root element and whether `<project>` carries its data in attributes — the two properties that decided 14 of 19 measured trials. It previously asserted the theme attribute, the extension class, the GitHub attributes and the inventory URLs, so a file failing both of those properties would have passed it
 
 ## [v2.20.0](https://github.com/netresearch/typo3-docs-skill/releases/tag/v2.20.0) — 2026-09-12
 
