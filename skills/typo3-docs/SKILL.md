@@ -1,6 +1,6 @@
 ---
 name: typo3-docs
-description: "Use when a TYPO3 extension has no documentation yet and one has to be written from scratch, when documentation has to reach docs.typo3.org, or when creating, editing or reviewing TYPO3 extension documentation (Documentation/*.rst, guides.xml — which replaced Settings.cfg — README.md, XLF translations), rendering docs with Docker, using TYPO3 RST directives, adding screenshots, improving or fixing docs, or XLIFF 2-space indentation (TYPO3 v14+)."
+description: "Use when TYPO3 extension documentation has to render on docs.typo3.org, which builds from Documentation/guides.xml and reads no Settings.cfg: when an extension has none yet and one has to be written from scratch, or when creating, editing or reviewing Documentation/*.rst, guides.xml, README.md or XLF translations, rendering docs with Docker, using TYPO3 RST directives, adding screenshots, improving or fixing docs, or XLIFF 2-space indentation (TYPO3 v14+)."
 license: "(MIT AND CC-BY-SA-4.0). See LICENSE-MIT and LICENSE-CC-BY-SA-4.0"
 compatibility: "Requires php, docker (for rendering). A TYPO3 extension; Documentation/ may be absent."
 metadata:
