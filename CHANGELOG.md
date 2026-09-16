@@ -6,6 +6,8 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v2.20.1](https://github.com/netresearch/typo3-docs-skill/releases/tag/v2.20.1) — 2026-09-16
+
 ### Fixed
 
 - Step 0 of the guides.xml workflow told the agent to copy `assets/guides.xml.dist` and named the namespace in prose only. Measured on OFR-TYPO3-DOCS-001 (19 trials, Haiku 4.5): no trial opened the template, none opened `references/guides-xml.md`, and 14 of 19 failed the case on the root element alone — seven wrote an invented namespace, five wrote `<project>` with the extension key as element text instead of attributes, two produced XML that does not parse. The step now carries the two lines that decide it: the phpDocumentor namespace, and `<project>` with `title`, `version` and `release` as attributes. The template stays the source for everything else
