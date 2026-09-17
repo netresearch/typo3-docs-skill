@@ -6,6 +6,8 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v2.20.2](https://github.com/netresearch/typo3-docs-skill/releases/tag/v2.20.2) — 2026-09-17
+
 ### Fixed
 
 - The description now opens with what docs.typo3.org reads — it builds from `Documentation/guides.xml` and reads no `Settings.cfg` — and names `README.rst`/`README.md` as the single-file path beside the manual. Measured over recorded rounds on a case asking for an extension's first documentation set (Haiku 4.5, six trials each): the skill was loaded in 1 of 6 trials while its description opened with "creating, editing, or reviewing TYPO3 extension documentation" and named docs.typo3.org eleven words later; the occasion — an extension that has no documentation yet — appeared nowhere. Naming the occasion moved the output directory from `docs/` to `Documentation/`, three trials to nothing. Naming `Settings.cfg` as the replaced file did not stop three of three from writing one, so the description now leads with the consequence rather than the occasion, because what the agent lacks is a fact about what renders
