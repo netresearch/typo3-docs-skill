@@ -58,18 +58,22 @@ can be verified without rendering: a HEAD request answers `307` with a
   the free text `backport 13.4, backport 14.3` plus a comment asking for the
   scope waited five weeks for an answer that was "use the trailer". The
   `AGENTS.md` did not exist yet; it does now.)
-- **`AGENTS.md` is loaded, but not reliably obeyed — re-read your trailers
-  before you push.** Measured 2026-09-18, Haiku 4.5 in headless `claude -p`
-  sessions: a clone with one uncommitted one-sentence edit, four runs per
-  arm, the only difference being whether `AGENTS.md` was present (reached
-  through the `CLAUDE.md` that holds `@AGENTS.md`; a repo carrying only
-  `AGENTS.md` was not tested). With it, 3 of 4 messages carried a TYPO3
-  subject prefix and `Releases:`; without it, 0 of 4 did, every run producing
-  `docs: …` with no trailers at all. But the `main, 14.3` default appeared in
-  2 of 4, the prescribed trailer order in 2 of 4, and every trailer in the
-  repo's own form in 1 of 4 — a personal `AGENT_NAME:MODEL_VERSION`
-  convention in a user-level `CLAUDE.md` usually wins that field. Where the
-  two disagree, the repo wins; check the message, do not assume.
+- **`AGENTS.md` is loaded, but on its own it does not carry — re-read your
+  trailers before you push.** Measured 2026-09-18, Haiku 4.5 in headless
+  `claude -p` sessions against a clone with one uncommitted one-sentence
+  edit, asked only for the commit message. Removing `AGENTS.md` (reached
+  through the `CLAUDE.md` that holds `@AGENTS.md`) takes a TYPO3 subject
+  prefix and `Releases:` to 0 of 4, every run producing `docs: …` with no
+  trailers — so the file is read. With it and nothing else, `Releases:`
+  appeared in 6 of 10 runs, the `main, 14.3` default in 4 of 10, the
+  prescribed trailer order complete in 4 of 10, and every trailer in the
+  repo's own form in 2 of 10: a personal `AGENT_NAME:MODEL_VERSION`
+  convention in a user-level `CLAUDE.md` usually wins that field. With the
+  two bullets above also in context — the state this reference creates — the
+  same setup gave `Releases: main, 14.3` and the full order in 6 of 6, and
+  the repo's `Assisted-by:` form in 3 of 6. That is why this bullet exists as
+  a pointer rather than being left to the repository alone. Where the two
+  disagree, the repo wins; check the message, do not assume.
 - **The `render / Test documentation` CI job is the authoritative render
   gate** — equivalent to a local `render-guides --fail-on-log` run; a green
   job is the evidence a "renders without warnings" claim needs.
