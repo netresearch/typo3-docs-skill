@@ -49,10 +49,13 @@ can be verified without rendering: a HEAD request answers `307` with a
   set by maintainers *reading the trailer*. Write
   `Releases: main, 14.3, 13.4` into the commit message of every commit,
   naming the branches the change's own scope requires — a limitation that
-  exists since v13.0 belongs on `13.4` as well as on `14.3`. The trailer
-  survives the squash merge; free text in the PR body does not, and nobody
-  parses it. Do not ask about labels in a comment and do not try to set them
-  yourself. Format and the other trailers (`Signed-off-by:`,
+  exists since v13.0 belongs on `13.4` as well as on `14.3`. The squash
+  commit keeps the branch commits' bodies, so the trailer lands on the target
+  branch — verified in the merges of #6988, #6984 and #6979, each of which
+  carries `Releases: main, 14.3` in the squashed message. Free text in the PR
+  body does not survive, and no bot reads the body for backport scope. Do not
+  ask about labels in a comment and do not try to set them yourself. Format
+  and the other trailers (`Signed-off-by:`,
   `Assisted-by: <tool/model name> <contact>`, `Resolves:`) are documented in
   [Advanced/CommitMessages](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Advanced/CommitMessages.html).
   (2026-09-18, CoreApi #6651: the PR body carried the free text
@@ -61,12 +64,16 @@ can be verified without rendering: a HEAD request answers `307` with a
   Then tells the maintainers to add the labels" — came five weeks later.)
 - **`Assisted-by:` here is not the personal trailer format.** These repos
   document `Assisted-by: <tool/model name> <contact>`, e.g.
-  `Assisted-by: Claude Sonnet 5 <noreply@anthropic.com>` — not the
-  `AGENT_NAME:MODEL_VERSION` form used elsewhere. Target-repo rules win.
+  `Assisted-by: Claude Sonnet 5 <noreply@anthropic.com>` — and merged commits
+  use it that way (`Assisted-by: Claude Opus 5 <noreply@anthropic.com>` in
+  #6988, #6984, #6979), not the `AGENT_NAME:MODEL_VERSION` form used
+  elsewhere. Target-repo rules win.
 - **Commit subject prefix**: the documented set is `[TASK]`, `[BUGFIX]`,
-  `[FEATURE]`. `[DOCS]` (the core-contribution habit) is tolerated but rare —
-  63 of 5802 commits on `TYPO3CMS-Reference-CoreApi` `main`, against 2230
-  `[TASK]` (measured 2026-09-18). Use the documented three.
+  `[FEATURE]`; `[!!!]` marks a breaking change. `[DOCS]` (the
+  core-contribution habit) is accepted but rare — 11 of 346 commits on
+  `TYPO3CMS-Reference-CoreApi` `main` since 2026-01-01, against 159 `[TASK]`
+  (measured 2026-09-18). Prefer a documented prefix; most content work is
+  `[TASK]`.
 - **The `render / Test documentation` CI job is the authoritative render
   gate** — equivalent to a local `render-guides --fail-on-log` run; a green
   job is the evidence a "renders without warnings" claim needs.
