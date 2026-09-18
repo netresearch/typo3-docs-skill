@@ -6,6 +6,16 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- `references/upstream-docs-contribution.md` now points at the target repository's own `AGENTS.md` instead of restating backport rules, and says the repo wins where the two disagree. `TYPO3CMS-Reference-CoreApi` has carried one since 2026-08-21, and it owns what this page used to get wrong: `Releases:` in every commit whatever your label permissions, the trailer order, the `Assisted-by:` form, the default `main, 14.3` with `13.4` reserved for a bugfix or security fix, and the `main only` / `changelog` labels. The page previously said backports run via labels and told the reader to put backport intent in the PR body and @-mention a maintainer — in CoreApi #6651 that waited five weeks for the answer "use the trailer"
+- The non-duplicative claim is scoped to what it covers. Beside Howto/Contribute the page now names [Advanced/CommitMessages](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Advanced/CommitMessages.html), which defines the trailers including `Releases:`; only the squash-only and render-gate facts are observed working knowledge on top of them
+- The permission bullet no longer proposes a workaround. A `404` on requesting reviewers or setting labels is expected for an org member without triage rights, and the `Releases:` trailer is the channel — so neither retrying the API nor @-mentioning a maintainer is the answer
+
+### Added
+
+- A measurement of whether that pointer earns its place, because a reference that only repeats a repository's own file is cost without benefit. Haiku 4.5 in headless `claude -p` sessions, against a clone with one uncommitted one-sentence edit, asked only for the commit message: what reaches the session is the `CLAUDE.md` holding `@AGENTS.md`, not the `AGENTS.md` itself. Delete that one-line import and leave `AGENTS.md` in place and `Releases:`, the TYPO3 prefix and every trailer drop to 0 of 6 — indistinguishable from deleting `AGENTS.md` too (0 of 4), pooling to 0 of 10 against 6 of 10 with the import. With the import alone, `Releases:` appeared in 6 of 10 runs, the `main, 14.3` default in 4 of 10 and the prescribed trailer order in 4 of 10; with the two bullets above also in context, `Releases: main, 14.3` and the full order in 6 of 6. A `CLAUDE.md` symlinked to `AGENTS.md` works but is no better, and a Windows clone without `core.symlinks` turns it into a text file whose content is the string `AGENTS.md`
+
 ## [v2.20.2](https://github.com/netresearch/typo3-docs-skill/releases/tag/v2.20.2) — 2026-09-17
 
 ### Fixed
