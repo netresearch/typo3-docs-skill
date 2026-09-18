@@ -3,13 +3,13 @@
 `[regression]`/process knowledge — conventions and verification techniques
 for PRs against official TYPO3 documentation repositories
 (`TYPO3-Documentation/*`, e.g. `TYPO3CMS-Reference-CoreApi`), and for
-fact-checking documentation claims against the TYPO3 core. Two upstream pages
-are binding and come first: Howto/Contribute (edit-on-GitHub vs local Docker,
-approval requirement) and
+fact-checking documentation claims against the TYPO3 core. **The target
+repository's own `AGENTS.md` outranks this page** — see the first bullet
+below. Upstream prose that binds every one of these repos:
+Howto/Contribute (edit-on-GitHub vs local Docker, approval requirement) and
 [Advanced/CommitMessages](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Advanced/CommitMessages.html),
-which defines the commit trailers including `Releases:`. The squash-only,
-backport-label and render-gate facts below are observed working knowledge on
-top of them.
+which defines the commit trailers including `Releases:`. The squash-only and
+render-gate facts below are observed working knowledge on top of them.
 
 ## Verify claims against core source, not rendered HTML
 
@@ -42,43 +42,32 @@ can be verified without rendering: a HEAD request answers `307` with a
   preserved authorship of commits taken over from another PR) survive only as
   `Co-authored-by:` trailers in the squash commit. Rebasing keeps authors in
   the branch history, but a merge never transplants them to the target branch.
-- **A `Releases:` trailer in the commit body is how backport scope is
-  communicated** — it is not decoration. Backports run via labels
-  (`backport 13.4`, `backport 14.3` trigger a backport job after merge;
-  companion labels `backport-done` / `backport-failed`), and the labels are
-  set by maintainers *reading the trailer*. Write
-  `Releases: main, 14.3, 13.4` into the commit message of every commit,
-  naming the branches the change's own scope requires — a limitation that
-  exists since v13.0 belongs on `13.4` as well as on `14.3`. The trailer's
-  job is pre-merge — the maintainer reads it on the PR — so it works whatever
-  the repo's squash-message setting is; free text in the PR body does not
-  work, because no bot reads the body for backport scope. Whether the trailer
-  also reaches the target branch depends on that setting
-  (`COMMIT_MESSAGES` keeps the branch commits' bodies, `PR_BODY` replaces
-  them), which GitHub does not expose to non-admins: on
-  `TYPO3CMS-Reference-CoreApi` the merges of #6988, #6984 and #6979 each
-  carry `Releases: main, 14.3` in the squashed message, so it is kept there —
-  a per-repo observation, not a general rule. Do not
-  ask about labels in a comment and do not try to set them yourself. Format
-  and the other trailers (`Signed-off-by:`,
-  `Assisted-by: <tool/model name> <contact>`, `Resolves:`) are documented in
-  [Advanced/CommitMessages](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Advanced/CommitMessages.html).
-  (2026-09-18, CoreApi #6651: the PR body carried the free text
-  `backport 13.4, backport 14.3` and a comment asking a maintainer to decide
-  the scope; the answer — "Next time use a trailer as is documented here …
-  Then tells the maintainers to add the labels" — came five weeks later.)
-- **`Assisted-by:` here is not the personal trailer format.** These repos
-  document `Assisted-by: <tool/model name> <contact>`, e.g.
-  `Assisted-by: Claude Sonnet 5 <noreply@anthropic.com>` — and merged commits
-  use it that way (`Assisted-by: Claude Opus 5 <noreply@anthropic.com>` in
-  #6988, #6984, #6979), not the `AGENT_NAME:MODEL_VERSION` form used
-  elsewhere. Target-repo rules win.
-- **Commit subject prefix**: the documented set is `[TASK]`, `[BUGFIX]`,
-  `[FEATURE]`; `[!!!]` marks a breaking change. `[DOCS]` (the
-  core-contribution habit) is accepted but rare — 11 of 346 commits on
-  `TYPO3CMS-Reference-CoreApi` `main` since 2026-01-01, against 159 `[TASK]`
-  (measured 2026-09-18). Prefer a documented prefix; most content work is
-  `[TASK]`.
+- **Read the repository's `AGENTS.md` before the first commit — it owns
+  trailers and backport scope, and it is more specific than anything here.**
+  `TYPO3CMS-Reference-CoreApi` has carried one since 2026-08-21 (its
+  `CLAUDE.md` is the single line `@AGENTS.md`), and it fixes what this page
+  used to get wrong: `Releases:` in *every* commit whatever your label
+  permissions, the trailer order (`Resolves:`/`References:`, `Releases:`,
+  `Assisted-by:`, `Signed-off-by:`), `Assisted-by:` in the
+  `<model> <contact>` form, the default `main, 14.3` with `13.4` reserved for
+  a bugfix or security fix worth backporting that far — *not* for plain
+  content or style changes — the `main only` and `changelog` labels, and how
+  to verify the backport bot's PRs actually landed. Do not restate those
+  rules from memory and do not ask a maintainer which labels apply: the
+  trailer is the channel they read. (2026-08-13, CoreApi #6651: a PR body carrying
+  the free text `backport 13.4, backport 14.3` plus a comment asking for the
+  scope waited five weeks for an answer that was "use the trailer". The
+  `AGENTS.md` did not exist yet; it does now.)
+- **`AGENTS.md` is loaded, but not reliably obeyed — re-read your trailers
+  before you push.** Measured 2026-09-18 on a clone with one uncommitted
+  one-sentence edit, four headless runs per arm, the only difference being
+  whether `AGENTS.md` was present: with it, 3 of 4 messages carried a TYPO3
+  subject prefix and `Releases:`; without it, 0 of 4 did, every run producing
+  `docs: …` with no trailers. But the full trailer order appeared complete in
+  only 1 of 4, the `main, 14.3` default in 2 of 4, and the repo's
+  `Assisted-by:` form in 1 of 4 — a personal `AGENT_NAME:MODEL_VERSION`
+  convention in a user-level `CLAUDE.md` usually wins that field. Where the
+  two disagree, the repo wins; check the message, do not assume.
 - **The `render / Test documentation` CI job is the authoritative render
   gate** — equivalent to a local `render-guides --fail-on-log` run; a green
   job is the evidence a "renders without warnings" claim needs.
