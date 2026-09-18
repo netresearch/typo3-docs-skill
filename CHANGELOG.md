@@ -6,6 +6,8 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v2.20.3](https://github.com/netresearch/typo3-docs-skill/releases/tag/v2.20.3) — 2026-09-18
+
 ### Changed
 
 - `references/upstream-docs-contribution.md` now points at the target repository's own `AGENTS.md` instead of restating backport rules, and says the repo wins where the two disagree. `TYPO3CMS-Reference-CoreApi` has carried one since 2026-08-21, and it owns what this page used to get wrong: `Releases:` in every commit whatever your label permissions, the trailer order, the `Assisted-by:` form, the default `main, 14.3` with `13.4` reserved for a bugfix or security fix, and the `main only` / `changelog` labels. The page previously said backports run via labels and told the reader to put backport intent in the PR body and @-mention a maintainer — in CoreApi #6651 that waited five weeks for the answer "use the trailer"
