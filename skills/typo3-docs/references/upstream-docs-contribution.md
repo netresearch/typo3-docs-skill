@@ -58,14 +58,20 @@ can be verified without rendering: a HEAD request answers `307` with a
   the free text `backport 13.4, backport 14.3` plus a comment asking for the
   scope waited five weeks for an answer that was "use the trailer". The
   `AGENTS.md` did not exist yet; it does now.)
-- **`AGENTS.md` is loaded, but on its own it does not carry — re-read your
-  trailers before you push.** Measured 2026-09-18, Haiku 4.5 in headless
+- **The repo's rules reach a session only through its `CLAUDE.md` import,
+  and even then do not carry on their own — re-read your trailers before you
+  push.** Measured 2026-09-18, Haiku 4.5 in headless
   `claude -p` sessions against a clone with one uncommitted one-sentence
-  edit, asked only for the commit message. Removing `AGENTS.md` (reached
-  through the `CLAUDE.md` that holds `@AGENTS.md`) takes a TYPO3 subject
-  prefix and `Releases:` to 0 of 4, every run producing `docs: …` with no
-  trailers — so the file is read. With it and nothing else, `Releases:`
-  appeared in 6 of 10 runs, the `main, 14.3` default in 4 of 10, the
+  edit, asked only for the commit message. **What reaches the session is the
+  `CLAUDE.md` holding `@AGENTS.md`, not the `AGENTS.md` itself**: delete that
+  one-line `CLAUDE.md` and leave `AGENTS.md` in place, and `Releases:`, the
+  TYPO3 prefix and every trailer drop to 0 of 6 — indistinguishable from
+  deleting `AGENTS.md` too (0 of 4), pooling to 0 of 10 against 6 of 10 with
+  the import. A `CLAUDE.md` symlinked to `AGENTS.md` works but is no better
+  (`Releases:` 2 of 6 against the import's 3 of 6, within noise) and a
+  Windows clone without `core.symlinks` turns it into a text file whose
+  content is the string `AGENTS.md`. With the import and nothing else,
+  `Releases:` appeared in 6 of 10 runs, the `main, 14.3` default in 4 of 10, the
   prescribed trailer order complete in 4 of 10, and every trailer in the
   repo's own form in 2 of 10: a personal `AGENT_NAME:MODEL_VERSION`
   convention in a user-level `CLAUDE.md` usually wins that field. With the
