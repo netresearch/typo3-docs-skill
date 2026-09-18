@@ -49,11 +49,16 @@ can be verified without rendering: a HEAD request answers `307` with a
   set by maintainers *reading the trailer*. Write
   `Releases: main, 14.3, 13.4` into the commit message of every commit,
   naming the branches the change's own scope requires — a limitation that
-  exists since v13.0 belongs on `13.4` as well as on `14.3`. The squash
-  commit keeps the branch commits' bodies, so the trailer lands on the target
-  branch — verified in the merges of #6988, #6984 and #6979, each of which
-  carries `Releases: main, 14.3` in the squashed message. Free text in the PR
-  body does not survive, and no bot reads the body for backport scope. Do not
+  exists since v13.0 belongs on `13.4` as well as on `14.3`. The trailer's
+  job is pre-merge — the maintainer reads it on the PR — so it works whatever
+  the repo's squash-message setting is; free text in the PR body does not
+  work, because no bot reads the body for backport scope. Whether the trailer
+  also reaches the target branch depends on that setting
+  (`COMMIT_MESSAGES` keeps the branch commits' bodies, `PR_BODY` replaces
+  them), which GitHub does not expose to non-admins: on
+  `TYPO3CMS-Reference-CoreApi` the merges of #6988, #6984 and #6979 each
+  carry `Releases: main, 14.3` in the squashed message, so it is kept there —
+  a per-repo observation, not a general rule. Do not
   ask about labels in a comment and do not try to set them yourself. Format
   and the other trailers (`Signed-off-by:`,
   `Assisted-by: <tool/model name> <contact>`, `Resolves:`) are documented in
