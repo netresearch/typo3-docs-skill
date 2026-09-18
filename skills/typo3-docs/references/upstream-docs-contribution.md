@@ -59,13 +59,15 @@ can be verified without rendering: a HEAD request answers `307` with a
   scope waited five weeks for an answer that was "use the trailer". The
   `AGENTS.md` did not exist yet; it does now.)
 - **`AGENTS.md` is loaded, but not reliably obeyed — re-read your trailers
-  before you push.** Measured 2026-09-18 on a clone with one uncommitted
-  one-sentence edit, four headless runs per arm, the only difference being
-  whether `AGENTS.md` was present: with it, 3 of 4 messages carried a TYPO3
+  before you push.** Measured 2026-09-18, Haiku 4.5 in headless `claude -p`
+  sessions: a clone with one uncommitted one-sentence edit, four runs per
+  arm, the only difference being whether `AGENTS.md` was present (reached
+  through the `CLAUDE.md` that holds `@AGENTS.md`; a repo carrying only
+  `AGENTS.md` was not tested). With it, 3 of 4 messages carried a TYPO3
   subject prefix and `Releases:`; without it, 0 of 4 did, every run producing
-  `docs: …` with no trailers. But the full trailer order appeared complete in
-  only 1 of 4, the `main, 14.3` default in 2 of 4, and the repo's
-  `Assisted-by:` form in 1 of 4 — a personal `AGENT_NAME:MODEL_VERSION`
+  `docs: …` with no trailers at all. But the `main, 14.3` default appeared in
+  2 of 4, the prescribed trailer order in 2 of 4, and every trailer in the
+  repo's own form in 1 of 4 — a personal `AGENT_NAME:MODEL_VERSION`
   convention in a user-level `CLAUDE.md` usually wins that field. Where the
   two disagree, the repo wins; check the message, do not assume.
 - **The `render / Test documentation` CI job is the authoritative render
