@@ -55,16 +55,12 @@ status.
 3. Scroll to **Recent Deliveries**
 4. Verify delivery shows `200` or `204` response code
 
-**Expected Status Codes** `[regression]` — upstream documents no
-response-code semantics; these are verified against real deliveries:
-
-| Code | Meaning |
-|------|---------|
-| `200` | Success (ping events) |
-| `204` | Success (push events accepted) |
-| `412` | Precondition Failed - expected on first-time test pushes before approval |
-
-> **Note**: A `412` error on test push delivery is normal for repositories not yet approved. The actual push after commits will trigger the approval workflow.
+**Expected status codes** `[upstream]` since 2026-08-17 — `200` ping accepted,
+`204` push accepted, `412` repository not yet approved: [Reading the webhook
+deliveries](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Howto/WritingDocForExtension/Webhook.html#webhook-deliveries).
+That page also carries the point that costs the most time: a branch push and a
+tag push are separate deliveries, so a missing version on docs.typo3.org is a
+question about the **tag** delivery.
 
 **GitLab:**
 1. Go to **Settings** → **Webhooks**

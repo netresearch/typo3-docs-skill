@@ -95,7 +95,7 @@ Documentation/
 
 Directives and cross-reference roles:
 [PHP domain](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Reference/ReStructuredText/Code/Phpdomain.html)
-`[upstream]`; signature-parser limitations (`?string`, union types) in
+`[upstream]`; the signature-parser limit (the RETURN type, not the parameters) in
 [`typo3-directives.md`](typo3-directives.md#php-domain).
 
 ### When NOT to Use PHP Domain
