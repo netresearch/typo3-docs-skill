@@ -19,8 +19,19 @@ missing=()
 while IFS= read -r tag; do
     [ -z "$tag" ] && continue
     # Strip leading 'v' for matching
-    version=$(echo "$tag" | sed 's/^v//')
-    if ! grep -qF "[${version}]" "$changelog" 2>/dev/null; then
+    version=${tag#v}
+    # The 'v' may sit INSIDE the brackets: both `## [2.19.1]` and
+    # `## [v2.19.1](…/releases/tag/v2.19.1)` are in use across the fleet, and a
+    # literal search for `[2.19.1]` reported every heading of the second kind
+    # as missing — 59 false positives on a changelog that was complete, for a
+    # repository that had simply picked the other convention. Accept either.
+    #
+    # Regex, so the version's dots have to be escaped: unescaped, `[2.19.2]`
+    # would also match `[2019x2]` and a genuinely missing version would go
+    # unreported, which is the one direction this check must not get wrong.
+    version_re=${version//./\\.}
+    version_re=${version_re//+/\\+}
+    if ! grep -qE "\[v?${version_re}\]" "$changelog" 2>/dev/null; then
         missing+=("$version")
     fi
 done <<< "$tags"
