@@ -658,11 +658,10 @@ mechanical:
         esac
         # The `v` may sit INSIDE the brackets: `## [v2.19.1](…/tag/v2.19.1)`
         # is as common across the fleet as `## [2.19.1]`, and a literal search
-        # reported every heading of the first kind as missing. Regex, so the
-        # dots are escaped — unescaped, `[2.19.2]` would also match `[2019x2]`
-        # and a genuinely missing version would go unreported.
-        esc_md=$(printf '%s' "$version" | sed 's/[][\\.*^$(){}?+|/]/\\&/g')
-        if ! grep -qE -- "\[v?${esc_md}\]" "$changelog" 2>/dev/null; then
+        # for one spelling reported every heading of the other kind as missing.
+        # Two fixed strings rather than a regex: a legal tag may contain `(`,
+        # `{` or `$`, which a pattern would either mis-escape or mis-match.
+        if ! grep -qF -e "[$version]" -e "[v$version]" "$changelog" 2>/dev/null; then
           missing="$missing $version"
         fi
       done < <(printf '%s\n' "$tags")

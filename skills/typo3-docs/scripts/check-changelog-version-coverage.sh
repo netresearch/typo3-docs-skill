@@ -26,12 +26,13 @@ while IFS= read -r tag; do
     # as missing — 59 false positives on a changelog that was complete, for a
     # repository that had simply picked the other convention. Accept either.
     #
-    # Regex, so the version's dots have to be escaped: unescaped, `[2.19.2]`
-    # would also match `[2019x2]` and a genuinely missing version would go
-    # unreported, which is the one direction this check must not get wrong.
-    version_re=${version//./\\.}
-    version_re=${version_re//+/\\+}
-    if ! grep -qE "\[v?${version_re}\]" "$changelog" 2>/dev/null; then
+    # Two FIXED strings rather than one regex. A regex needs the version
+    # escaped, and escaping only `.` and `+` still mis-handles a legal tag like
+    # `v2.19.2(1)` — `git check-ref-format` accepts `(`, `{` and `$` in a tag
+    # name — which would be reported missing although its heading is there, and
+    # would additionally let `[2.19.21]` satisfy it. grep -F has no pattern
+    # language, so neither can happen.
+    if ! grep -qF -e "[${version}]" -e "[v${version}]" "$changelog" 2>/dev/null; then
         missing+=("$version")
     fi
 done <<< "$tags"

@@ -101,6 +101,24 @@ run '# Changelog
 check "exits 1" "1" "$RC"
 check_contains "still reported" "2.19.2" "$OUT"
 
+echo "case: a version with regex metacharacters in it"
+# `git check-ref-format` accepts `(`, `{` and `$` in a tag name. Under a regex
+# these would need escaping, and an incomplete escape both rejects a version
+# whose heading IS present and lets a different one satisfy it. Review finding
+# on PR #139.
+run '# Changelog
+
+## [v2.19.2(1)](https://example.invalid/releases/tag/v2.19.2%281%29) — 2026-09-03' 'v2.19.2(1)'
+check "exits 0" "0" "$RC"
+check "reports nothing missing" "" "$OUT"
+
+echo "case: and it does not satisfy a neighbouring version"
+run '# Changelog
+
+## [2.19.21] — 2026-09-03' 'v2.19.2(1)'
+check "exits 1" "1" "$RC"
+check_contains "names the missing one" "2.19.2(1)" "$OUT"
+
 echo "case: no tags at all"
 run '# Changelog'
 check "exits 0" "0" "$RC"
