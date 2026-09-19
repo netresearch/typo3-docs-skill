@@ -126,6 +126,216 @@ This project follows [Semantic Versioning](https://semver.org/).
 ### Added
 - Add Agent Plugins 1.0.0 portable manifest (manifest)
 
+## [v2.14.4](https://github.com/netresearch/typo3-docs-skill/releases/tag/v2.14.4) — 2026-08-06
+
+### Added
+
+- Rendering: symlinks under `Documentation/` break the renderer — use permalinks
+  for outbound links ([#65](https://github.com/netresearch/typo3-docs-skill/pull/65))
+- Theme-screenshot verification and interlink facts
+  ([#66](https://github.com/netresearch/typo3-docs-skill/pull/66))
+
+## [v2.14.3](https://github.com/netresearch/typo3-docs-skill/releases/tag/v2.14.3) — 2026-08-03
+
+### Added
+
+- Rendering: `--output` is resolved inside the container, so a host path that is
+  not mounted discards the render while printing success
+  ([#60](https://github.com/netresearch/typo3-docs-skill/pull/60))
+- Secret and workflow scanning in `security.yml`
+  ([#61](https://github.com/netresearch/typo3-docs-skill/pull/61))
+
+### Changed
+
+- Adopted the shared skill template
+  ([#62](https://github.com/netresearch/typo3-docs-skill/pull/62))
+- Dropped the local zizmor policy copy — the reusable workflow supplies it
+  ([#63](https://github.com/netresearch/typo3-docs-skill/pull/63))
+
+### Fixed
+
+- ruff 0.16.0 compatibility
+  ([#59](https://github.com/netresearch/typo3-docs-skill/pull/59))
+
+## [v2.14.2](https://github.com/netresearch/typo3-docs-skill/releases/tag/v2.14.2) — 2026-07-13
+
+### Changed
+
+- `rst-syntax`: cut generic RST/Sphinx tutorial content
+  ([#57](https://github.com/netresearch/typo3-docs-skill/pull/57))
+
+## [v2.14.1](https://github.com/netresearch/typo3-docs-skill/releases/tag/v2.14.1) — 2026-07-06
+
+### Added
+
+- The version-tag webhook's HTTP 500 from docs-hook.typo3.org diagnosed and
+  documented ([#54](https://github.com/netresearch/typo3-docs-skill/pull/54))
+- Screenshots: `fullPage` clips backend-module content because it sits in an
+  iframe ([#55](https://github.com/netresearch/typo3-docs-skill/pull/55))
+
+## [v2.14.0](https://github.com/netresearch/typo3-docs-skill/releases/tag/v2.14.0) — 2026-05-28
+
+### Added
+
+- `.pre-commit-config.yaml` mirroring the CI checks
+  ([#50](https://github.com/netresearch/typo3-docs-skill/pull/50))
+
+### Changed
+
+- Screenshots require a capture viewport of 1440px or wider
+  ([#51](https://github.com/netresearch/typo3-docs-skill/pull/51))
+
+## [v2.13.2](https://github.com/netresearch/typo3-docs-skill/releases/tag/v2.13.2) — 2026-05-15
+
+### Added
+
+- ADR, coverage, scripts and extension-architecture references are cited from
+  SKILL.md where they are referenced, so the documentation surface is linked
+  from the entry point instead of being found by directory crawl
+  ([#48](https://github.com/netresearch/typo3-docs-skill/pull/48))
+- `id-token: write` and `attestations: write` on the release caller, so SLSA
+  build provenance and cosign signatures can be emitted
+  ([#46](https://github.com/netresearch/typo3-docs-skill/pull/46))
+
+### Changed
+
+- SKILL.md trimmed to the 500-word cap the skill-repo validator enforces
+  ([2133b7d](https://github.com/netresearch/typo3-docs-skill/commit/2133b7d))
+- Release caller simplified to the signed-tag-only model: the deprecated
+  `with: bump:` block and the `workflow_dispatch.bump` input are gone, and a
+  release happens by pushing a locally signed tag
+  ([#47](https://github.com/netresearch/typo3-docs-skill/pull/47))
+
+### Fixed
+
+- yamllint: trailing newline on the release workflow file
+  ([97f7b10](https://github.com/netresearch/typo3-docs-skill/commit/97f7b10))
+
+## [v2.13.1](https://github.com/netresearch/typo3-docs-skill/releases/tag/v2.13.1) — 2026-04-25
+
+### Fixed
+
+- Forward the bump input to the reusable release workflow
+  ([#43](https://github.com/netresearch/typo3-docs-skill/pull/43))
+- TD-07: multiline `guides.xml` and the interlink slash form
+  ([#44](https://github.com/netresearch/typo3-docs-skill/pull/44))
+
+## [v2.13.0](https://github.com/netresearch/typo3-docs-skill/releases/tag/v2.13.0) — 2026-04-22
+
+### Added
+
+- XLF 2-space indentation documented as the canonical style, with concrete v14
+  translation-extraction examples including a Composer example that runs
+  through v14.3
+- The reusable `pr-quality` workflow from `skill-repo-skill`, with the
+  `SECURITY` note on `pull_request_target` restored for the caller
+- The reusable `harness-verify` workflow from `skill-repo-skill`
+- The `eval-validate` workflow, running the skill evals on every change
+
+### Changed
+
+- The indent table clarified after review so the guidance does not contradict
+  tooling defaults
+
+### Fixed
+
+- The `auto-merge-deps` reusable workflow reference, so dependency PRs
+  auto-merge again
+- Trailing blank line removed from `harness-verify.yml` to satisfy the reusable
+  workflow's YAML check
+
+## [v2.12.0](https://github.com/netresearch/typo3-docs-skill/releases/tag/v2.12.0) — 2026-04-01
+
+### Added
+
+- Eval suite expanded to 20 cases
+  ([#36](https://github.com/netresearch/typo3-docs-skill/pull/36))
+
+### Changed
+
+- Skill text improved from the A/B findings those evals produced
+  ([#36](https://github.com/netresearch/typo3-docs-skill/pull/36))
+
+## [v2.11.0](https://github.com/netresearch/typo3-docs-skill/releases/tag/v2.11.0) — 2026-03-29
+
+### Added
+
+- Eight documentation-completeness checkpoints, TD-43 through TD-50, covering
+  mechanical validation and LLM-assisted review:
+  - **TD-43** `guides.xml` version and release stay in sync with
+    `ext_emconf.php` (consolidated into TD-30)
+  - **TD-44** all six expected sections present: Introduction, Installation,
+    Configuration, Usage, Developer, FAQ
+  - **TD-45** untranslated literal strings in Fluid templates that should use
+    `f:translate`
+  - **TD-46** RST substitutions defined in `Includes.rst.txt` are actually used
+  - **TD-47** PlantUML directives that may not render on docs.typo3.org
+  - **TD-48** every git tag has a `CHANGELOG.md` entry
+  - **TD-49** extensions with more than 10 classes that lack an `Adr/` directory
+  - **TD-50** LLM review of code examples against the actual API
+
+### Changed
+
+- `.serena/` removed from version control — it holds local project
+  configuration
+
+## [v2.10.0](https://github.com/netresearch/typo3-docs-skill/releases/tag/v2.10.0) — 2026-03-28
+
+### Added
+
+- Documentation accuracy and completeness checkpoints
+  ([#30](https://github.com/netresearch/typo3-docs-skill/pull/30))
+
+### Fixed
+
+- ASCII accepted as valid UTF-8, and heading-hierarchy detection improved
+  ([#31](https://github.com/netresearch/typo3-docs-skill/pull/31))
+
+## [v2.9.1](https://github.com/netresearch/typo3-docs-skill/releases/tag/v2.9.1) — 2026-03-21
+
+### Fixed
+
+- GitHub Actions hardened against supply-chain attacks
+  ([#27](https://github.com/netresearch/typo3-docs-skill/pull/27))
+
+## [v2.9.0](https://github.com/netresearch/typo3-docs-skill/releases/tag/v2.9.0) — 2026-03-17
+
+### Added
+
+- Agent Skills spec frontmatter: `license`, `compatibility`, `metadata`,
+  `allowed-tools`
+- Expanded trigger description, now covering rendering, RST directives and
+  `guides.xml`
+- Eval suite with four cases: create docs from scratch, add a configuration
+  section, validate and fix, add screenshots
+
+### Changed
+
+- SKILL.md trimmed to 484 words, dropping four rarely-needed reference entries
+
+### Fixed
+
+- Broken reference link (`guides-xml-reference.md` → `guides-xml.md`)
+
+## [v2.8.0](https://github.com/netresearch/typo3-docs-skill/releases/tag/v2.8.0) — 2026-03-15
+
+### Fixed
+
+- TD-07 accepts the modern phpdoc/guides extension-key formats
+  ([#26](https://github.com/netresearch/typo3-docs-skill/pull/26))
+
+## [v2.7.0](https://github.com/netresearch/typo3-docs-skill/releases/tag/v2.7.0) — 2026-03-14
+
+### Added
+
+- Renovate configuration
+  ([#23](https://github.com/netresearch/typo3-docs-skill/pull/23))
+
+### Fixed
+
+- DDEV addon name and install command in the documentation
+  ([#25](https://github.com/netresearch/typo3-docs-skill/pull/25))
+
 ## [v2.6.0](https://github.com/netresearch/typo3-docs-skill/releases/tag/v2.6.0) — 2026-02-28
 
 ### Added
