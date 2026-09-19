@@ -149,7 +149,7 @@ TYPO3-specific theme configuration. The `class` attribute loads the TYPO3 docume
 |-----------|----------|-------------|
 | `class` | Yes | Always: `\T3Docs\Typo3DocsTheme\DependencyInjection\Typo3DocsThemeExtension` |
 
-**Why `class` is required:** Without the theme extension class, documentation renders with default phpDocumentor styling instead of TYPO3's official theme. The class enables all TYPO3-specific features like the version switcher, intersphinx cross-references, and branded styling.
+**Why `class` is required:** `[upstream]` since 2026-08-17 — the symptom (no error, the output just looks wrong) is now on the guides.xml reference. Without the theme extension class, documentation renders with default phpDocumentor styling instead of TYPO3's official theme. The class enables all TYPO3-specific features like the version switcher, intersphinx cross-references, and branded styling.
 
 #### Required Attributes `[NR policy]`
 
@@ -373,6 +373,10 @@ Before committing `guides.xml`:
 ```
 
 ### Inventory URL Missing Trailing Slash
+
+`[upstream]` since 2026-08-17, stated on the [guides.xml
+reference](https://docs.typo3.org/permalink/h2document:guides-xml) together
+with the missing-`class` symptom below.
 
 ```xml
 <!-- ❌ WRONG: no trailing slash -->

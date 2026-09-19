@@ -194,15 +194,25 @@ Directives (`php:namespace`, `php:class`, `php:interface`, `php:trait`,
 
 ### Method Signature Limitations
 
-The `php:method` directive has strict syntax requirements that differ from PHP 8+ syntax.
+`[regression]` The restriction is the **return type**, not the parameter list.
+Measured against the shipped parser, `MethodNameService.php:16` on `main`:
 
-**Nullable Return Types:**
+```php
+private const METHOD_SIGNATURE_REGEX = '/^\s*(\w+)\s*\(\s*(.*?)\s*\)\s*(?::\s*(\w+))?\s*$/';
+```
+
+The parameters are `(.*?)` and therefore unrestricted; the return type after the
+colon is `(\w+)`, which `?string` and `string|null` do not match. A signature
+the regex rejects is not parsed as a method at all.
+
+**Return types — the real limit:**
+
 ```rst
-# ❌ WRONG - Parser rejects ?string and string|null in signature
+# ❌ WRONG — `?` and `|` are not \w, so the whole signature fails to match
 ..  php:method:: retrieve(string $identifier): ?string
 ..  php:method:: retrieve(string $identifier): string|null
 
-# ✅ CORRECT - Use :returntype: annotation instead
+# ✅ CORRECT — drop the return type from the signature, annotate it
 ..  php:method:: retrieve(string $identifier)
 
    Retrieve a secret from the vault.
@@ -212,32 +222,31 @@ The `php:method` directive has strict syntax requirements that differ from PHP 8
    :returntype: string|null
 ```
 
-**Nullable Parameters:**
+**Parameters — modern syntax is accepted.** `?string $pattern` and
+`string|array $data` in the parameter list parse, because `(.*?)` matches them.
+Earlier versions of this file told you to rewrite them; that was wrong.
+
 ```rst
-# ❌ WRONG - ?string syntax in parameters
-..  php:method:: list(?string $pattern): array
-
-# ✅ CORRECT - Use = null for nullable parameters
-..  php:method:: list(string $pattern = null): array
-
-   :param string|null $pattern: Optional pattern to filter
+# both of these parse
+..  php:method:: list(?string $pattern)
+..  php:method:: process(string|array $data)
 ```
 
-**Union Types:**
+**A comma inside a default value splits the parameter.** `MethodNameService.php:28`
+splits the parameter list with `preg_split('/\s*,\s*/')`, which knows nothing
+about brackets:
+
 ```rst
-# ❌ WRONG - Union types in signature
-..  php:method:: process(string|array $data): ResponseInterface
-
-# ✅ CORRECT - Simplify signature, document types in :param:
-..  php:method:: process($data): ResponseInterface
-
-   :param string|array $data: Data to process
+# renders as THREE parameters: `array $range = [1`, `2]`, `int $page = 1`
+..  php:method:: paginate(array $range = [1, 2], int $page = 1)
 ```
 
-**Why this matters:**
-- The Sphinx PHP domain parser uses older syntax
-- Build will fail or produce warnings with modern PHP type syntax
-- Use `:returntype:` and `:param type:` annotations for complex types
+Keep array defaults out of the signature and state them in `:param:` instead.
+
+Both defects come from reading a signature with patterns rather than a lexer.
+[guides-php-domain#54](https://github.com/TYPO3-Documentation/guides-php-domain/pull/54)
+hands the work to `token_get_all()` and is open — re-check this section when it
+merges, because the workarounds above stop being necessary.
 
 ### PHP Domain Best Practices
 

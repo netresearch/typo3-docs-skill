@@ -38,11 +38,11 @@ Open this file in a browser to preview the documentation.
 
 #### `--output` is a container path
 
-`--output` is resolved **inside** the container, not on the host. Pointing it
-at a host directory that is not under the `-v` mount writes the HTML into the
-container's own filesystem, which `--rm` then discards — and the render still
-prints `Successfully placed N rendered HTML … files into <path>`, so the run
-looks like a success:
+`[upstream]` since 2026-08-17 — that `--output` resolves inside the container,
+that a path outside the mount disappears with the container, and that the
+command reports the files as placed anyway are all stated on the [Rendering
+container](https://docs.typo3.org/permalink/h2document:rendering-container)
+page. Keep the target below the mount:
 
 ```bash
 # WRONG — /tmp is the container's /tmp; nothing appears on the host
@@ -56,7 +56,8 @@ docker run --rm -v "$(pwd)":/project -w /project \
   --config=Documentation --output=/project/.build/rendered-docs
 ```
 
-This matters when a check *reads back* the rendered HTML — asserting a new
+The delta that stays here is the consequence upstream does not draw: this
+matters when a check *reads back* the rendered HTML — asserting a new
 anchor exists, diffing output between branches, feeding a link checker. The
 assertion then fails with `No such file or directory` on a render that
 genuinely succeeded, which reads as a docs error rather than a path mistake.
