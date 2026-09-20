@@ -6,6 +6,16 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- `scripts/check-changelog-version-coverage.sh` accepts the version with or without the `v` inside the brackets, and matches both heading forms as fixed strings. A heading the script did not recognise counted as a missing release, so the coverage check reported gaps that were not there
+
+### Changed
+
+- `CHANGELOG.md` carries the fifteen releases 2.7.0 through 2.14.4, which were published without an entry here
+- The reference set drops what has landed upstream and corrects what was wrong, so the skill no longer restates rules the TYPO3 documentation now owns
+- The inventory lookup is case-insensitive, and the permalink check is part of it
+
 ## [v2.20.3](https://github.com/netresearch/typo3-docs-skill/releases/tag/v2.20.3) — 2026-09-18
 
 ### Changed
