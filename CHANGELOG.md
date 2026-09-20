@@ -6,6 +6,8 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v2.20.4](https://github.com/netresearch/typo3-docs-skill/releases/tag/v2.20.4) — 2026-09-20
+
 ### Fixed
 
 - `scripts/check-changelog-version-coverage.sh` accepts the version with or without the `v` inside the brackets, and matches both heading forms as fixed strings. A heading the script did not recognise counted as a missing release, so the coverage check reported gaps that were not there
