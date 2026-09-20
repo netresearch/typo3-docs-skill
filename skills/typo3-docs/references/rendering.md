@@ -251,10 +251,13 @@ docker run --rm --pull always -v $(pwd):/project -u $(id -u):$(id -g) -it \
 
 ### What the Rendering Reports, and What It Does Not
 
-Measured against `ghcr.io/typo3-documentation/render-guides:latest` at version
-`0.43.0`, revision `1adeb0a`, on 2026-09-20. The messages below are the
-literal strings the renderer emits; the entries under "Not emitted" were in
-this file until that measurement and are Sphinx wording, not this renderer's.
+Measured on 2026-09-20 with `ghcr.io/typo3-documentation/render-guides:latest`,
+which resolved that day to version `0.43.0`, revision `1adeb0a`. Keep using
+`:latest` — the tag is what the rest of this reference and the CI examples use;
+pin `:0.43.0` or the digest only when a result has to be reproduced exactly.
+The messages below are the literal strings the renderer emits; the entries
+under "Not emitted" were in this file until that measurement and are Sphinx
+wording, not this renderer's.
 
 **The exit code is `0` even after errors.** A render that logs an unresolved
 reference and a missing image still ends on `Successfully placed ... files`
@@ -297,9 +300,13 @@ Each was tested against the image named above and did not reproduce.
   is a style rule in the upstream `CodingGuidelines`, not a parsing
   requirement.
 - **"Render fails immediately — missing `guides.xml`, run `docker run ... init`
-  to scaffold."** A project with no `guides.xml` renders cleanly and exits 0.
-  `init` exists as a wizard; it is not the fix for a failure that does not
-  happen.
+  to scaffold."** A project with no `guides.xml` renders and exits 0; there is
+  no immediate failure to fix, and `init` is a scaffolding wizard rather than
+  a remedy. The one qualification: a missing `guides.xml` also means no
+  interlink inventories, so a page using `:ref:` into another manual logs
+  `Inventory link with key "..." not found.` and drops the link. The render
+  still exits 0, but `--fail-on-log` then exits 1 — measured with a
+  one-page project referencing `t3coreapi`.
 - **"Broken image icon — use `/Images/...` absolute from the Documentation
   root"** and **"Image missing in output — move to `Documentation/Images/`."**
   Both an absolute and a relative image path resolve; images render from any
