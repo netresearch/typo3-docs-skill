@@ -95,7 +95,7 @@ Do not guess rendered paths — every manual publishes its object inventory:
 
 ```bash
 curl -s https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/objects.inv.json \
-  | jq -r '."std:label" | to_entries[] | select(.key|test("confval")) | "\(.key) -> \(.value[2])"'
+  | jq -r '."std:label" | to_entries[] | select(.key|test("confval"; "i")) | "\(.key) -> \(.value[2])"'
 ```
 
 `std:doc` maps document names, `std:label` maps every anchor to its page —
@@ -103,3 +103,26 @@ this is how a moved page or the right `:ref:` target is found in one call
 (located the intersphinx section and the relocated InterlinkInventories page
 this way, 2026-08-14). Works for any manual (render-guides, Core API, …) by
 swapping the base URL.
+
+**Keep the `"i"` flag.** Labels are lowercase, while the term you search for
+usually comes from a page name or a class name and is not. Without the flag a
+search is case-sensitive and answers nothing, which reads like "this topic has
+no anchor": against the Core API inventory on 2026-09-19,
+`test("SiteHandling")` matched 0 labels and `test("sitehandling")` matched 91.
+
+## Check a permalink without rendering
+
+A `HEAD` request resolves a permalink, so a `:ref:` target or an outbound link
+can be verified before the review rather than in it. A valid anchor answers
+`307` and names the page, a wrong one answers `404`:
+
+```bash
+curl -sI https://docs.typo3.org/permalink/t3coreapi:sitehandling-base-variants-functions \
+  | grep -Ei '^(HTTP|Location)'
+```
+
+Do not trim the headers with `head -2`. `docs.typo3.org` sends `Location:` on
+line 6, so the first two lines are the status and `Server: nginx` — the
+resolved page, which is the whole point of the check, never appears. The
+`grep -Ei` form prints both lines and works with BSD grep and with a lowercase
+header name. (Stefan Frömken, review on CoreApi #6992, 2026-09-18.)
