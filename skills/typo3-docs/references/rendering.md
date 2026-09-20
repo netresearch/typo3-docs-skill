@@ -249,16 +249,73 @@ docker run --rm --pull always -v $(pwd):/project -u $(id -u):$(id -g) -it \
   --config=Documentation
 ```
 
-### Warnings During Rendering
+### What the Rendering Reports, and What It Does Not
 
-Common warnings and fixes:
+Measured against `ghcr.io/typo3-documentation/render-guides:latest` at version
+`0.43.0`, revision `1adeb0a`, on 2026-09-20. The messages below are the
+literal strings the renderer emits; the entries under "Not emitted" were in
+this file until that measurement and are Sphinx wording, not this renderer's.
 
-| Warning | Fix |
-|---------|-----|
-| `Unknown directive` | Check directive spelling and available directives |
-| `Duplicate label` | Ensure unique `.. _label:` across all RST files |
-| `Reference not found` | Verify `:ref:` targets exist |
-| `Image not found` | Check image path is relative to RST file |
+**The exit code is `0` even after errors.** A render that logs an unresolved
+reference and a missing image still ends on `Successfully placed ... files`
+and exits `0`. Three options change that:
+
+| Option | Effect |
+|--------|--------|
+| `--fail-on-log` | exit 1 on any logged message, warning included |
+| `--fail-on-error` | exit 1 on an error; a warning still exits 0 |
+| `--minimal-test` | exit 1 on a warning |
+
+A CI job that only checks the exit code of a bare render therefore passes on a
+broken manual. Add one of the three.
+
+**Messages you will actually see:**
+
+| Message | What the renderer does next |
+|---------|-----------------------------|
+| `Document "X" isn't included in any toctree. Use :orphan: ...` | renders the page; add it to a toctree or mark it `:orphan:` |
+| `Menu entry "X" was not found in the document tree. Ignoring it.` | drops that entry, keeps the menu |
+| `Reference X could not be resolved in Y` | renders `<span class="invalid-link">` in place of the link |
+| `Duplicate anchor "X". There is already another anchor of that name in document "Y"` | keeps both pages; a foreign `:ref:` resolves to the first. Fires only for a duplicate **across two files** — two identical anchors in one file produce no message |
+| `No template found for rendering directive "x". Expected template "body/directive/x.html.twig"` | skips the directive |
+| `Image reference not found "..."` — logged as an **error** | renders the page without the image |
+| `The code-block has no content. Did you properly indent the code?` (same for `math` and `list-table`) | renders an empty block |
+| `Inventory with key X not found.` / `Inventory link with key "X:y" (y) not found.` | drops the interlink |
+
+**Not emitted — do not search the log for these:**
+
+- `Unknown directive`, `Duplicate label`, `Reference not found`, `undefined label` — Sphinx wording; this renderer uses the strings in the table above.
+- Any warning about a missing `:alt:`. The only alt-text warning in the stack is Markdown-only, so a reStructuredText image without `:alt:` is silent.
+- Any warning about a code block without a language. Highlighting is simply off.
+
+### Claims This File Carried That Are False
+
+Each was tested against the image named above and did not reproduce.
+
+- **"Page renders blank — check 3-space indent for directive content."** A
+  three-space and a four-space directive body render identically. Four spaces
+  is a style rule in the upstream `CodingGuidelines`, not a parsing
+  requirement.
+- **"Render fails immediately — missing `guides.xml`, run `docker run ... init`
+  to scaffold."** A project with no `guides.xml` renders cleanly and exits 0.
+  `init` exists as a wizard; it is not the fix for a failure that does not
+  happen.
+- **"Broken image icon — use `/Images/...` absolute from the Documentation
+  root"** and **"Image missing in output — move to `Documentation/Images/`."**
+  Both an absolute and a relative image path resolve; images render from any
+  path.
+
+### The One Mistake That Produces No Message
+
+A directive with no blank line above it is absorbed into the paragraph and
+printed as literal source. Nothing is logged, and `--fail-on-log` does not
+catch it, so the only way to find it is to look at the rendered page.
+
+```rst
+Some paragraph text.
+..  note::
+    This is printed as plain text, not rendered as a note.
+```
 
 ### Clearing Cache
 
@@ -267,46 +324,22 @@ If rendering produces unexpected results, clear the generated directory:
 rm -rf Documentation-GENERATED-temp/
 ```
 
-### Common Content Issues
-
-#### RST Not Rendering / Changes Not Appearing
+### Structure and Menus
 
 | Symptom | Cause | Fix |
 |---------|-------|-----|
 | New page not in menu | Missing from `toctree` | Add to parent `Index.rst` toctree directive |
-| Page renders blank | Indentation error | Check 3-space indent for directive content |
-| Code block not highlighted | Missing language | Add language: `.. code-block:: php` |
-| Directive ignored | Missing blank line | Add blank line before and after directive |
-
-#### Images Not Appearing
-
-| Symptom | Cause | Fix |
-|---------|-------|-----|
-| Broken image icon | Wrong path | Use `/Images/...` (absolute from Documentation root) |
-| Image missing in output | Not in Images folder | Move to `Documentation/Images/` |
-| Alt text warning | Missing `:alt:` | Add `:alt: Description` to figure/image |
-
-#### Cross-References Not Working
-
-| Symptom | Cause | Fix |
-|---------|-------|-----|
-| `undefined label` error | Label doesn't exist | Add `.. _my-label:` before target heading |
-| Wrong page linked | Duplicate labels | Use unique labels across all RST files |
-| Interlink fails | Missing inventory | Add to `guides.xml` interlink section |
-
-#### Structure Issues
-
-| Symptom | Cause | Fix |
-|---------|-------|-----|
-| Directory not in menu | Missing Index.rst | Create `Index.rst` in every subdirectory |
-| Render fails immediately | Missing guides.xml | Run `docker run ... init` to scaffold |
 | Menu order wrong | toctree order | Reorder entries in toctree directive |
+| Interlink fails | Missing inventory | Add to `guides.xml` interlink section |
 
 ### Debugging Render Failures
 
-`[regression]` caveat: `--fail-on-log` is not documented in the manual
-(upstream's own CI examples use `--no-progress --minimal-test`). It works
-today; if it disappears, switch to log-grepping the render output.
+`[regression]` caveat: `--fail-on-log` is absent from the manual, though the
+image's own `--help` lists it and upstream's CI examples use `--no-progress
+--minimal-test` instead. Measured working at 0.43.0 (exit 1 on a warning);
+if it disappears, switch to `--minimal-test`, which upstream does document.
+A page documenting all three options is proposed upstream in
+[TYPO3CMS-Guide-HowToDocument#573](https://github.com/TYPO3-Documentation/TYPO3CMS-Guide-HowToDocument/pull/573).
 
 For verbose error output:
 ```bash
