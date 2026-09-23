@@ -6,6 +6,8 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v2.20.5](https://github.com/netresearch/typo3-docs-skill/releases/tag/v2.20.5) — 2026-09-23
+
 ### Fixed
 
 - `references/rendering.md` troubleshooting describes render-guides instead of Sphinx: it lists the warning strings the renderer actually emits, states that a render exits 0 after errors unless `--fail-on-log`, `--fail-on-error` or `--minimal-test` is set, and drops claims that do not reproduce (a three-space indent blanking the page, a missing `guides.xml` failing the render, absolute image paths failing, a missing `:alt:` warning)
