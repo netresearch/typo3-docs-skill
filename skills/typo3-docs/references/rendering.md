@@ -272,6 +272,12 @@ and exits `0`. Three options change that:
 A CI job that only checks the exit code of a bare render therefore passes on a
 broken manual. Add one of the three.
 
+**`--minimal-test` writes only the single-page output.** The renderer writes
+`Documentation-GENERATED-temp/singlehtml/Index.html` and logs
+`Successfully placed N rendered SINGLEPAGE files`. Per-page HTML files such as
+`Reference/.../Versions.html` do not exist in that mode. To check the rendered
+HTML of such a run, search `singlehtml/Index.html`.
+
 **Messages you will actually see:**
 
 | Message | What the renderer does next |

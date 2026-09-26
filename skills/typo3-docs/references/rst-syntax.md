@@ -21,6 +21,22 @@ and the [CGL](https://docs.typo3.org/m/typo3/docs-how-to-document/main/en-us/Ref
 [`coding-guidelines.md`](coding-guidelines.md#heading-hierarchy); permalink
 anchors in [`typo3-directives.md`](typo3-directives.md#permalink-anchors-labels).
 
+**No text roles in headlines** `[regression]`. Do not use `:rst:`, `:php:`,
+`:typoscript:` or any other text role in a headline. Use plain inline code
+with single backticks instead. Source: TYPO3 documentation team review,
+"Avoid using language roles in headlines as they render strangely"
+([TYPO3CMS-Guide-HowToDocument#571](https://github.com/TYPO3-Documentation/TYPO3CMS-Guide-HowToDocument/pull/571#discussion_r4072925264)).
+
+```rst
+.. ❌ WRONG -- text role in a headline
+Linking the changelog entry with :rst:`:changelog:`
+===================================================
+
+.. ✅ CORRECT -- plain inline code
+Linking the changelog entry with `:changelog:`
+==============================================
+```
+
 ## Lists
 
 RST bullet/numbered/definition list syntax is standard Sphinx
