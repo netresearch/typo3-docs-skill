@@ -185,6 +185,27 @@ feature is going into, including one not yet tagged — the documentation is
 meant to be ready when the release lands (see `rst-syntax.md`, "Version
 Directive Accuracy").
 
+`[regression]` The `:changelog:` option of all three directives is not yet in
+the manual; it is proposed upstream in
+[TYPO3CMS-Guide-HowToDocument#571](https://github.com/TYPO3-Documentation/TYPO3CMS-Guide-HowToDocument/pull/571)
+(anchor `rest-versions-changelog-option` on the Versions page). Measured on
+2026-09-27: it exists in render-guides 0.42.0 and later, from
+[render-guides#1303](https://github.com/TYPO3-Documentation/render-guides/pull/1303).
+For a TYPO3 Core changelog entry, the value is the entry identifier
+`<type>-<issue>-<timestamp>`. The version badge then links to the entry, and
+the link text is the entry's title, for example "Feature: #107628 - Improved
+backend module naming and structure". An identifier that matches no entry logs
+`app.WARNING: Inventory link with key "changelog:<id>" (<id>) not found.`, and
+a `--minimal-test` render exits non-zero.
+
+```rst
+..  versionchanged:: 14.0
+    :changelog: feature-107628-1729026000
+
+    Most modules moved from :guilabel:`System` to
+    :guilabel:`Administration`.
+```
+
 ## PHP Domain
 
 Directives (`php:namespace`, `php:class`, `php:interface`, `php:trait`,
