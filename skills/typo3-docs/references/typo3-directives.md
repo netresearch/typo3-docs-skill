@@ -189,7 +189,7 @@ Directive Accuracy").
 the manual; it is proposed upstream in
 [TYPO3CMS-Guide-HowToDocument#571](https://github.com/TYPO3-Documentation/TYPO3CMS-Guide-HowToDocument/pull/571)
 (anchor `rest-versions-changelog-option` on the Versions page). Measured on
-2026-09-27: it exists in render-guides 0.42.0 and later, from
+2026-09-26: it exists in render-guides 0.42.0 and later, from
 [render-guides#1303](https://github.com/TYPO3-Documentation/render-guides/pull/1303).
 For a TYPO3 Core changelog entry, the value is the entry identifier
 `<type>-<issue>-<timestamp>`. The version badge then links to the entry, and
