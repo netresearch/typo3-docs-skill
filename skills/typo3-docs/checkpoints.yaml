@@ -375,32 +375,79 @@ mechanical:
     severity: warning
     desc: "Fluid templates should use f:translate for user-facing text; flag hardcoded English strings (>3 words in title/aria-label/alt)"
 
-  # === RST SUBSTITUTIONS USAGE ===
-  # Mirrors scripts/check-rst-substitutions-used.sh.
+  # === RST SUBSTITUTIONS: DEFINITIONS MUST REACH THE PAGE ===
+  # Mirrors scripts/check-rst-substitutions-resolve.sh (the comment there has
+  # the render evidence).
+  #
+  # Inverted 2026-09-28. The earlier TD-46 told Introduction/ and Installation/
+  # to replace hardcoded values with substitutions from Includes.rst.txt. With
+  # render-guides 0.40.2 (the digest typo3-ci-workflows' docs.yml pins) a
+  # substitution defined in an included file does not reach the including page:
+  # the page shows the literal `|extension_key|` and the render logs
+  # `app.WARNING: No replacement was found for variable |extension_key|`, for
+  # `/Includes.rst.txt`, `../Includes.rst.txt` and an included `.rst` alike.
+  # Following the old advice therefore broke the rendered page. It was also a
+  # substring match (`nr_repurpose` inside `nr_repurpose_tts`, inside ``literals``)
+  # that a single use of the substitution silenced for the whole file.
   - id: TD-46
     type: script
     command: |
-      includes="Documentation/Includes.rst.txt"
-      [ -f "$includes" ] || exit 0
-      subs=$(grep -oP '^\.\.\s*\|[^|]+\|' "$includes" 2>/dev/null | grep -oP '\|[^|]+\|')
-      [ -n "$subs" ] || exit 0
-      found=0
-      for target in Documentation/Introduction/Index.rst Documentation/Installation/Index.rst; do
-        [ -f "$target" ] || continue
-        while IFS= read -r sub; do
-          [ -n "$sub" ] || continue
-          sub_escaped=$(printf '%s\n' "$sub" | sed 's/|/\\|/g')
-          sub_value=$(grep -P "^\.\.\s*${sub_escaped}\s+replace::" "$includes" 2>/dev/null | grep -oP '::\s*.*$' | sed 's/^::\s*//')
-          [ -n "$sub_value" ] || continue
-          if grep -qF -- "$sub_value" "$target" 2>/dev/null && ! grep -qF -- "$sub" "$target" 2>/dev/null; then
-            echo "$target: hardcoded '$sub_value' found — use substitution $sub instead"
-            found=1
-          fi
-        done < <(printf '%s\n' "$subs")
-      done
-      exit "$found"
-    severity: info
-    desc: "If Includes.rst.txt defines substitutions, they should be used in Introduction/Index.rst and Installation/Index.rst instead of hardcoded values"
+      [ -d Documentation ] || exit 0
+
+      defs=$(find Documentation -name '*.rst.txt' -not -path '*GENERATED*' -print0 \
+        | xargs -0 -r perl -ne 'print "$1\n" if /^\.\.\s+\|([^|]+)\|\s+\S+::/' | sort -u)
+      [ -n "$defs" ] || exit 0
+
+      rc=0
+      find Documentation -name '*.rst' -not -path '*GENERATED*' -print0 \
+        | INCLUDE_DEFS="$defs" xargs -0 -r perl -e '
+          my %inc = map { $_ => 1 } grep { length } split /\n/, $ENV{INCLUDE_DEFS};
+          my $found = 0;
+          for my $file (@ARGV) {
+              open my $fh, "<", $file or next;
+              my @lines = <$fh>;
+              close $fh;
+              my (%local, @keep);
+              my $block = -1;    # indent of the line opening a literal block, -1 = none
+              for my $l (@lines) {
+                  if ($l =~ /^\.\.\s+\|([^|]+)\|\s+\S+::/) { $local{$1} = 1; next; }
+                  (my $ind = $l) =~ s/^(\s*).*/length($1)/se;
+                  if ($block >= 0) {
+                      if ($l =~ /^\s*$/ || $ind > $block) { next; }
+                      $block = -1;
+                  }
+                  if ($l =~ /^(\s*)\.\.\s+(code-block|code|sourcecode|literalinclude|uml|raw)::/
+                      || ($l =~ /::\s*$/ && $l !~ /^\s*\.\.\s/)) {
+                      $block = length(($l =~ /^(\s*)/)[0]);
+                      $l =~ s/::\s*$/\n/;
+                      push @keep, $l if $l !~ /^\s*\.\./;
+                      next;
+                  }
+                  next if $l =~ /^\s*\.\.(\s|$)/;    # comment or other directive line
+                  push @keep, $l;
+              }
+              my $text = join "", @keep;
+              $text =~ s/``.*?``//gs;
+              $text =~ s/`[^`]*`_{0,2}//gs;
+              my %seen;
+              while ($text =~ /(?<![\w|])\|([^|\s](?:[^|]*[^|\s])?)\|(?![\w|])/g) {
+                  my $n = $1;
+                  next unless $inc{$n} && !$local{$n} && !$seen{$n}++;
+                  print "$file: |$n| is defined only in an included file and renders as literal text; define it on this page or write the value\n";
+                  $found = 1;
+              }
+          }
+          exit $found;
+        ' || rc=$?
+      # xargs reports a child exit of 1 as 123. Anything else non-zero is the
+      # checker failing, not a finding, and must not read as one.
+      case "$rc" in
+        0) exit 0 ;;
+        123) exit 1 ;;
+        *) echo "check-rst-substitutions-resolve: scan failed (xargs exit $rc)" >&2; exit 2 ;;
+      esac
+    severity: warning
+    desc: "A page must not use a substitution (|name|) that only an included file such as Includes.rst.txt defines: render-guides does not carry it into the page, which then shows the literal |name|"
 
   # === PLANTUML RENDERING ===
   # Inverted 2026-08-14: the earlier version flagged the `uml::` directive on

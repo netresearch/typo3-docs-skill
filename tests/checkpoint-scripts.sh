@@ -230,6 +230,54 @@ d=$(fixture adr-none)
 classes "$d"
 check "eleven classes without an ADR directory fire" 1 "$(run check-adr-coverage.sh "$d")"
 
+echo "check-rst-substitutions-resolve.sh"
+subs_fixture() { # subs_fixture <name> -> fixture whose Includes.rst.txt defines |extension_key|
+    d=$(fixture "$1")
+    printf '.. |extension_key| replace:: my_ext\n' > "$d/Documentation/Includes.rst.txt"
+    echo "$d"
+}
+d=$(subs_fixture subs-include-only)
+printf '.. include:: /Includes.rst.txt\n\nPage\n====\n\nInstall |extension_key| now.\n' > "$d/Documentation/Page.rst"
+check "a substitution defined only in Includes.rst.txt fires" 1 "$(run check-rst-substitutions-resolve.sh "$d")"
+
+d=$(subs_fixture subs-local)
+printf '.. |extension_key| replace:: my_ext\n\nPage\n====\n\nInstall |extension_key| now.\n' > "$d/Documentation/Page.rst"
+check "a substitution defined on the page itself stays silent" 0 "$(run check-rst-substitutions-resolve.sh "$d")"
+
+d=$(subs_fixture subs-hardcoded)
+printf '.. include:: /Includes.rst.txt\n\nPage\n====\n\nInstall my_ext and my_ext_tts now.\n' > "$d/Documentation/Page.rst"
+check "a hardcoded value is not a finding" 0 "$(run check-rst-substitutions-resolve.sh "$d")"
+
+d=$(subs_fixture subs-builtin)
+printf '.. include:: /Includes.rst.txt\n\nPage\n====\n\n:Version: |release|\n:Rendered: |today|\n' > "$d/Documentation/Page.rst"
+check "guides.xml built-ins (|release|, |today|) stay silent" 0 "$(run check-rst-substitutions-resolve.sh "$d")"
+
+d=$(subs_fixture subs-literals)
+cat > "$d/Documentation/Page.rst" <<'EOF'
+.. include:: /Includes.rst.txt
+
+Page
+====
+
+Inline ``|extension_key|`` and a multi-line ``a →
+b|extension_key|c`` literal, plus :php:`$x = '|extension_key|'`.
+
+..  code-block:: bash
+
+    composer req vendor/|extension_key|
+
+::
+
+    status: queued → |extension_key| → done
+EOF
+check "literals, code blocks and interpreted text stay silent" 0 "$(run check-rst-substitutions-resolve.sh "$d")"
+printf '\nAfter the block: |extension_key|.\n' >> "$d/Documentation/Page.rst"
+check "prose after a code block is scanned again" 1 "$(run check-rst-substitutions-resolve.sh "$d")"
+
+d=$(subs_fixture subs-table)
+printf '.. include:: /Includes.rst.txt\n\nPage\n====\n\n+-----+-----+\n| a   | b   |\n+-----+-----+\n\n| line block\n' > "$d/Documentation/Page.rst"
+check "grid tables and line blocks are not substitution references" 0 "$(run check-rst-substitutions-resolve.sh "$d")"
+
 echo
 if [ "$fail" -eq 0 ]; then
     echo "All checkpoint-script tests passed"

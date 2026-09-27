@@ -119,23 +119,38 @@ as canonical source. Not duplicated here.
 
 ## Includes.rst.txt
 
-Central file for substitutions and includes used across all pages:
-
-```rst
-.. This file contains global includes for all documentation files.
-
-.. |extension_key| replace:: my_extension
-.. |extension_name| replace:: My Extension
-.. |vendor| replace:: My Company
-
-.. _vendor-website: https://example.com/
-.. _github-repo: https://github.com/vendor/extension
-```
-
-Include at the top of every RST file:
+Included at the top of every RST file:
 ```rst
 .. include:: /Includes.rst.txt
 ```
+
+**Do not put substitutions or hyperlink targets in it.** render-guides does
+not carry a `.. |name| replace::` definition or a `.. _name: URL` target from
+an included file into the page that includes it. Measured with render-guides
+0.40.2 (`ghcr.io/typo3-documentation/render-guides@sha256:52f3b521…`, the
+digest `netresearch/typo3-ci-workflows` `docs.yml` pins) and with `:latest` of
+2026-09-23:
+
+- `.. include:: /Includes.rst.txt`, `.. include:: ../Includes.rst.txt` and an
+  included `.rst` file all behave the same;
+- the page renders the literal text `|extension_key|`, and the log says
+  `app.WARNING: No replacement was found for variable |extension_key|`;
+- a link to a target defined in the include renders as an invalid link
+  (`Reference vendor-website_ could not be resolved`).
+
+What works instead:
+
+- write the value (`my_extension`) — the normal case;
+- when one page repeats a value, define the substitution on that page:
+
+  ```rst
+  .. |extension_key| replace:: my_extension
+  ```
+
+- `|release|`, `|version|`, `|project|` and `|today|` are built in: the first
+  three come from `guides.xml` `<project>`, and none needs a definition.
+
+TD-46 reports a page that uses a substitution only an included file defines.
 
 ## Validation Checklist
 
