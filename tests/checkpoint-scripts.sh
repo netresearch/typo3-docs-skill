@@ -191,6 +191,45 @@ mkdir -p "$d/Documentation/Images" "$d/Resources/Private/Templates"
 printf 'x' > "$d/Documentation/Images/Module.png"
 check "outside a git repository the check stays silent" 0 "$(run check-screenshot-freshness.sh "$d")"
 
+echo "check-guides-xml-version-sync.sh"
+guides() { # guides <dir> <version> <release> <emconf-version>
+    printf '<?xml version="1.0" encoding="UTF-8"?>\n<guides xmlns="https://www.phpdoc.org/guides">\n    <project title="T" version="%s" release="%s"/>\n</guides>\n' \
+        "$2" "$3" > "$1/Documentation/guides.xml"
+    printf "<?php\n\$EM_CONF[\$_EXTKEY] = [\n    'version' => '%s',\n];\n" "$4" > "$1/ext_emconf.php"
+}
+d=$(fixture guides-short-version)
+guides "$d" 0.8 0.8.2 0.8.2
+check "version=major.minor, release=full (the skill's template) stays silent" 0 "$(run check-guides-xml-version-sync.sh "$d")"
+
+d=$(fixture guides-full-version)
+guides "$d" 0.8.2 0.8.2 0.8.2
+check "version=release=full version stays silent" 0 "$(run check-guides-xml-version-sync.sh "$d")"
+
+d=$(fixture guides-stale-release)
+guides "$d" 0.8 0.8.1 0.8.2
+check "a stale release fires" 1 "$(run check-guides-xml-version-sync.sh "$d")"
+
+d=$(fixture guides-stale-version)
+guides "$d" 0.7 0.8.2 0.8.2
+check "a stale major.minor version fires" 1 "$(run check-guides-xml-version-sync.sh "$d")"
+
+echo "check-adr-coverage.sh"
+classes() { # classes <dir> -> eleven PHP classes
+    mkdir -p "$1/Classes"
+    for i in $(seq 1 11); do printf '<?php\nclass C%s {}\n' "$i" > "$1/Classes/C$i.php"; done
+}
+d=$(fixture adr-developer)
+classes "$d"; mkdir -p "$d/Documentation/Developer/Adr"
+check "Documentation/Developer/Adr/ stays silent" 0 "$(run check-adr-coverage.sh "$d")"
+
+d=$(fixture adr-top-level)
+classes "$d"; mkdir -p "$d/Documentation/Adr"
+check "Documentation/Adr/ stays silent" 0 "$(run check-adr-coverage.sh "$d")"
+
+d=$(fixture adr-none)
+classes "$d"
+check "eleven classes without an ADR directory fire" 1 "$(run check-adr-coverage.sh "$d")"
+
 echo
 if [ "$fail" -eq 0 ]; then
     echo "All checkpoint-script tests passed"

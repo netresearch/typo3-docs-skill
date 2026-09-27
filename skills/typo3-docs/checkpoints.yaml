@@ -260,17 +260,9 @@ mechanical:
     desc: "Documentation/Introduction/ directory should exist"
 
   # === DOCUMENTATION ACCURACY ===
-  # Mirrors scripts/check-guides-xml-version-sync.sh — with its attribute
-  # extraction corrected. That script reads
-  #   grep -oP 'version="[^"]*"' Documentation/guides.xml | head -1
-  # and a guides.xml opens with `<?xml version="1.0" encoding="UTF-8"?>`, so the
-  # first match is the XML DECLARATION's version, never <project>'s. Measured on
-  # a tree whose guides.xml is entirely correct (version=release=1.0.0,
-  # ext_emconf 1.0.0), the script reports two mismatches and exits 1. Inlining
-  # that verbatim would have turned a dead checkpoint into one that fails every
-  # conforming extension, so the attributes are read off the <project> element.
-  # The shipped script still carries the bug; see the report accompanying this
-  # change.
+  # Mirrors scripts/check-guides-xml-version-sync.sh. Both read the attributes
+  # off the <project> element: a plain `grep -oP 'version="[^"]*"' | head -1`
+  # first hits the XML declaration's version="1.0", never <project>'s.
   - id: TD-30
     type: script
     command: |
@@ -287,22 +279,23 @@ mechanical:
       guides_version=$(printf '%s\n' "$attrs" | sed -n 1p)
       guides_release=$(printf '%s\n' "$attrs" | sed -n 2p)
       emconf_ver=$(grep -oP "'version'\s*=>\s*'[^']*'" ext_emconf.php 2>/dev/null | grep -oP "'[^']*'\$" | tr -d "'")
+      [ -n "$emconf_ver" ] || exit 0
+      # SKILL.md and references/guides-xml.md write version="MAJOR.MINOR" and
+      # release="MAJOR.MINOR.PATCH": release carries the full version, version
+      # its major.minor. A version equal to the full version is accepted too.
+      emconf_short=$(printf '%s\n' "$emconf_ver" | cut -d. -f1-2)
       errors=0
-      if [ -n "$guides_version" ] && [ -n "$emconf_ver" ] && [ "$guides_version" != "$emconf_ver" ]; then
-        echo "Version mismatch: guides.xml version=\"$guides_version\" != ext_emconf.php version='$emconf_ver'"
+      if [ -n "$guides_version" ] && [ "$guides_version" != "$emconf_short" ] && [ "$guides_version" != "$emconf_ver" ]; then
+        echo "Version mismatch: guides.xml version=\"$guides_version\" != ext_emconf.php major.minor '$emconf_short' (or full '$emconf_ver')"
         errors=1
       fi
-      if [ -n "$guides_release" ] && [ -n "$emconf_ver" ] && [ "$guides_release" != "$emconf_ver" ]; then
+      if [ -n "$guides_release" ] && [ "$guides_release" != "$emconf_ver" ]; then
         echo "Release mismatch: guides.xml release=\"$guides_release\" != ext_emconf.php version='$emconf_ver'"
-        errors=1
-      fi
-      if [ -n "$guides_version" ] && [ -n "$guides_release" ] && [ "$guides_version" != "$guides_release" ]; then
-        echo "Internal mismatch: guides.xml version=\"$guides_version\" != release=\"$guides_release\""
         errors=1
       fi
       exit "$errors"
     severity: error
-    desc: "guides.xml version and release attributes must both match ext_emconf.php version"
+    desc: "guides.xml release must equal the ext_emconf.php version and guides.xml version its major.minor (or the full version)"
 
   - id: TD-31
     type: command
@@ -679,7 +672,7 @@ mechanical:
       [ -d Classes ] || exit 0
       class_count=$(find Classes/ -type f -name '*.php' -not -path '*/.Build/*' -not -path '*/vendor/*' -not -path '*/node_modules/*' 2>/dev/null | wc -l)
       [ "$class_count" -gt 10 ] || exit 0
-      if [ -d Documentation/Developer/Adr ] || [ -d Documentation/Developer/ADR ] || [ -d docs/adr ]; then
+      if [ -d Documentation/Developer/Adr ] || [ -d Documentation/Developer/ADR ] || [ -d Documentation/Adr ] || [ -d Documentation/ADR ] || [ -d docs/adr ]; then
         exit 0
       fi
       echo "Extension has $class_count classes but no ADR directory (Documentation/Developer/Adr/)"
