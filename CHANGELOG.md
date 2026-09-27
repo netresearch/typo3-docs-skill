@@ -6,6 +6,12 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- `references/typo3-directives.md` documents the `:changelog:` option of `versionadded`, `versionchanged` and `deprecated`, which the manual does not cover yet. Measured on 2026-09-26, it exists in render-guides 0.42.0 and later; for a TYPO3 Core changelog entry the value is the entry identifier `<type>-<issue>-<timestamp>`, the version badge links to the entry with its title as link text, and an identifier that matches no entry logs an `Inventory link with key "changelog:<id>"` warning and makes a `--minimal-test` render exit non-zero
+- `references/rst-syntax.md` forbids text roles such as `:rst:`, `:php:` or `:typoscript:` in a headline and asks for plain inline code instead, following a TYPO3 documentation team review comment
+- `references/rendering.md` states that `--minimal-test` writes only `Documentation-GENERATED-temp/singlehtml/Index.html`; per-page HTML files do not exist in that mode, so rendered HTML of such a run is checked in `singlehtml/Index.html`
+
 ## [v2.20.5](https://github.com/netresearch/typo3-docs-skill/releases/tag/v2.20.5) — 2026-09-23
 
 ### Fixed
