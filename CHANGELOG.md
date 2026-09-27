@@ -6,6 +6,8 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v2.20.6](https://github.com/netresearch/typo3-docs-skill/releases/tag/v2.20.6) — 2026-09-27
+
 ### Added
 
 - `references/typo3-directives.md` documents the `:changelog:` option of `versionadded`, `versionchanged` and `deprecated`, which the manual does not cover yet. Measured on 2026-09-26, it exists in render-guides 0.42.0 and later; for a TYPO3 Core changelog entry the value is the entry identifier `<type>-<issue>-<timestamp>`, the version badge links to the entry with its title as link text, and an identifier that matches no entry logs an `Inventory link with key "changelog:<id>"` warning and makes a `--minimal-test` render exit non-zero
