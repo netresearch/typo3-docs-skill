@@ -19,9 +19,8 @@ RED='\033[0;31m'
 NC='\033[0m'
 
 # Configuration
-PROJECT_DIR="$(pwd)"
-DATA_DIR="${PROJECT_DIR}/.claude/docs-extraction/data"
-CACHE_DIR="${PROJECT_DIR}/.claude/docs-extraction/cache"
+DATA_DIR="${DOCS_EXTRACTION_DIR:-${TMPDIR:-/tmp}/typo3-docs-extraction}/data"
+CACHE_DIR="${DOCS_EXTRACTION_DIR:-${TMPDIR:-/tmp}/typo3-docs-extraction}/cache"
 OUTPUT_FILE="${DATA_DIR}/repo_metadata.json"
 CACHE_FILE="${CACHE_DIR}/repo_metadata.json"
 

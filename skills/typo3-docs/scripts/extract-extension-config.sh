@@ -18,7 +18,7 @@ NC='\033[0m'
 
 # Configuration
 PROJECT_DIR="$(pwd)"
-DATA_DIR="${PROJECT_DIR}/.claude/docs-extraction/data"
+DATA_DIR="${DOCS_EXTRACTION_DIR:-${TMPDIR:-/tmp}/typo3-docs-extraction}/data"
 
 EXT_EMCONF="${PROJECT_DIR}/ext_emconf.php"
 EXT_CONF_TEMPLATE="${PROJECT_DIR}/ext_conf_template.txt"
