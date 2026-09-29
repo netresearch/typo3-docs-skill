@@ -14,10 +14,16 @@
 # defined in any include file and therefore never reported here.
 #
 # Only names defined in an included file are checked: any
-# Documentation/**/*.rst.txt, and any file an `.. include::` names (an included
-# `.rst` fails the same way). Literal blocks, code-ish directives, comments, ``inline literals``
+# Documentation/**/*.rst.txt, and any file an `.. include::` names, whatever its
+# suffix (an included `.rst` and an included `Shared.txt` fail the same way).
+# Literal blocks, code-ish directives, comments, ``inline literals``
 # and `interpreted text` are stripped first, because a substitution is not
 # expanded there. Each page is judged on its own.
+#
+# An opening | after an odd number of backslashes is escaped: render-guides
+# 0.40.2 logs no warning and renders `\|name|` as `|name|` (and `\\\|name|` as
+# `\|name|`). After an even number the backslashes are literal and the
+# reference stays active: `\\|name|` warns and renders `\|name|`.
 set -euo pipefail
 
 [ -d Documentation ] || exit 0
@@ -47,6 +53,15 @@ find Documentation \( -name '*.rst' -o -name '*.rst.txt' \) -not -path '*GENERAT
             my $a = abs_path($t =~ m{^/} ? "$root$t" : dirname($file) . "/$t");
             $src{$a} = 1 if defined $a && -f $a;
         }
+    }
+    # Include targets find did not list (Shared.txt, any other suffix) are read
+    # for their definitions too.
+    my %have = map { (abs_path($_), 1) } keys %text;
+    for my $a (grep { !$have{$_} } keys %src) {
+        open my $fh, "<", $a or next;
+        local $/ = "\n";
+        $text{$a} = [<$fh>];
+        close $fh;
     }
     my %inc;
     for my $file (keys %text) {
@@ -85,7 +100,7 @@ find Documentation \( -name '*.rst' -o -name '*.rst.txt' \) -not -path '*GENERAT
         $text =~ s/``.*?``//gs;
         $text =~ s/`[^`]*`_{0,2}//gs;
         my %seen;
-        while ($text =~ /(?<![\w|])\|([^|\s](?:[^|]*[^|\s])?)\|(?=_{0,2}(?![\w|]))/g) {
+        while ($text =~ /(?:(?<![\w|\\])|(?<!\\)(?:\\\\)+\K)\|([^|\s](?:[^|]*[^|\s])?)\|(?=_{0,2}(?![\w|]))/g) {
             my $n = $1;
             next unless $inc{$n} && !$local{$n} && !$seen{$n}++;
             print "$file: |$n| is defined only in an included file and renders as literal text; define it on this page or write the value\n";

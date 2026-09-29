@@ -389,8 +389,10 @@ mechanical:
   # Following the old advice therefore broke the rendered page. It was also a
   # substring match (`nr_repurpose` inside `nr_repurpose_tts`, inside ``literals``)
   # that a single use of the substitution silenced for the whole file.
-  # "Included" means any *.rst.txt and any file an `.. include::` names, so an
-  # included .rst (measured failing the same way) is covered too.
+  # "Included" means any *.rst.txt and any file an `.. include::` names, whatever
+  # its suffix, so an included .rst or Shared.txt (both measured failing the same
+  # way) is covered too. An opening | after an odd number of backslashes is
+  # escaped and not a reference; after an even number it is (measured as well).
   - id: TD-46
     type: script
     command: |
@@ -421,6 +423,15 @@ mechanical:
                   my $a = abs_path($t =~ m{^/} ? "$root$t" : dirname($file) . "/$t");
                   $src{$a} = 1 if defined $a && -f $a;
               }
+          }
+          # Include targets find did not list (Shared.txt, any other suffix) are read
+          # for their definitions too.
+          my %have = map { (abs_path($_), 1) } keys %text;
+          for my $a (grep { !$have{$_} } keys %src) {
+              open my $fh, "<", $a or next;
+              local $/ = "\n";
+              $text{$a} = [<$fh>];
+              close $fh;
           }
           my %inc;
           for my $file (keys %text) {
@@ -459,7 +470,7 @@ mechanical:
               $text =~ s/``.*?``//gs;
               $text =~ s/`[^`]*`_{0,2}//gs;
               my %seen;
-              while ($text =~ /(?<![\w|])\|([^|\s](?:[^|]*[^|\s])?)\|(?=_{0,2}(?![\w|]))/g) {
+              while ($text =~ /(?:(?<![\w|\\])|(?<!\\)(?:\\\\)+\K)\|([^|\s](?:[^|]*[^|\s])?)\|(?=_{0,2}(?![\w|]))/g) {
                   my $n = $1;
                   next unless $inc{$n} && !$local{$n} && !$seen{$n}++;
                   print "$file: |$n| is defined only in an included file and renders as literal text; define it on this page or write the value\n";

@@ -324,6 +324,38 @@ d=$(subs_fixture subs-directive-body)
 printf '.. include:: /Includes.rst.txt\n\nPage\n====\n\n..  note::\n\n    Install |extension_key| now.\n' > "$d/Documentation/Page.rst"
 check "a substitution in a directive body still fires" 1 "$(run check-rst-substitutions-resolve.sh "$d")"
 
+# An include target with any suffix is read for its definitions: render-guides
+# 0.40.2 does not carry a definition from an included Shared.txt either.
+d=$(fixture subs-shared-txt)
+printf '.. |shared_key| replace:: my_ext\n' > "$d/Documentation/Shared.txt"
+printf '.. include:: Shared.txt\n\nPage\n====\n\nInstall my_ext now.\n' > "$d/Documentation/Page.rst"
+check "an included Shared.txt whose name is not used stays silent" 0 "$(run check-rst-substitutions-resolve.sh "$d")"
+printf '\nInstall |shared_key| now.\n' >> "$d/Documentation/Page.rst"
+check "a substitution defined only in an included Shared.txt fires" 1 "$(run check-rst-substitutions-resolve.sh "$d")"
+
+# A page that another page includes is still reported once, not twice.
+d=$(subs_fixture subs-included-page)
+printf '.. include:: /Includes.rst.txt\n\nPage\n====\n\nInstall |extension_key| now.\n' > "$d/Documentation/Page.rst"
+printf 'Index\n=====\n\n.. include:: Page.rst\n' > "$d/Documentation/Index.rst"
+check "a page included by another page is reported once" 1 \
+    "$( (cd "$d" && bash "$SCRIPTS/check-rst-substitutions-resolve.sh" 2>/dev/null) | grep -c 'Page.rst: |extension_key|')"
+
+# Backslash escapes, measured with render-guides 0.40.2: an odd run before the
+# opening | escapes it (no warning, the text renders), an even run is literal
+# backslashes followed by an active reference (warning, not replaced).
+d=$(subs_fixture subs-escaped)
+cat > "$d/Documentation/Page.rst" <<'EOF'
+.. include:: /Includes.rst.txt
+
+Page
+====
+
+Escaped \|extension_key| and \\\|extension_key| stay text.
+EOF
+check "an escaped opening | (one or three backslashes) stays silent" 0 "$(run check-rst-substitutions-resolve.sh "$d")"
+printf '\nTwo backslashes \\\\|extension_key| do not escape it.\n' >> "$d/Documentation/Page.rst"
+check "two backslashes before | still fire" 1 "$(run check-rst-substitutions-resolve.sh "$d")"
+
 echo
 if [ "$fail" -eq 0 ]; then
     echo "All checkpoint-script tests passed"
