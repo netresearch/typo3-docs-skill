@@ -72,7 +72,13 @@ find Documentation \( -name '*.rst' -o -name '*.rst.txt' \) -not -path '*GENERAT
                 push @keep, $l if $l !~ /^\s*\.\./;
                 next;
             }
-            next if $l =~ /^\s*\.\.(\s|$)/;    # comment or other directive line
+            if ($l =~ /^(\s*)\.\.(\s|$)/) {
+                # A comment, i.e. not a directive, target, substitution definition,
+                # footnote or citation: render-guides drops its indented body.
+                $block = length($1)
+                    if $l !~ /^\s*\.\.\s+(?:\S+::(?:\s|$)|_|\||\[)/;
+                next;
+            }
             push @keep, $l;
         }
         my $text = join "", @keep;
@@ -88,8 +94,10 @@ find Documentation \( -name '*.rst' -o -name '*.rst.txt' \) -not -path '*GENERAT
     }
     exit $found;
   ' || rc=$?
-# 1 is a finding. Anything else non-zero is the checker failing, not a
-# finding, and must not read as one.
+# 1 is a finding. Anything else non-zero is the checker failing; it exits 2
+# with the reason on stderr. automated-assessment's run-checkpoints.sh reports
+# every non-zero exit of a script as `fail` and discards its output, so there
+# a failed scan looks like a finding; only a direct run tells them apart.
 case "$rc" in
   0) exit 0 ;;
   1) exit 1 ;;

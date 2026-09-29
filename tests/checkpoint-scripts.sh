@@ -296,6 +296,34 @@ d=$(subs_fixture subs-table)
 printf '.. include:: /Includes.rst.txt\n\nPage\n====\n\n+-----+-----+\n| a   | b   |\n+-----+-----+\n\n| line block\n' > "$d/Documentation/Page.rst"
 check "grid tables and line blocks are not substitution references" 0 "$(run check-rst-substitutions-resolve.sh "$d")"
 
+# render-guides drops the indented body of a comment, with or without a blank
+# line after the `..` line and with or without comment text on it.
+d=$(subs_fixture subs-comment)
+cat > "$d/Documentation/Page.rst" <<'EOF'
+.. include:: /Includes.rst.txt
+
+Page
+====
+
+..
+   |extension_key| in a comment body
+
+.. a comment with text
+
+   |extension_key| after a blank line
+
+..
+
+   |extension_key| after an empty comment
+EOF
+check "a substitution in a comment body stays silent" 0 "$(run check-rst-substitutions-resolve.sh "$d")"
+printf '\nAfter the comment: |extension_key|.\n' >> "$d/Documentation/Page.rst"
+check "prose after a comment is scanned again" 1 "$(run check-rst-substitutions-resolve.sh "$d")"
+
+d=$(subs_fixture subs-directive-body)
+printf '.. include:: /Includes.rst.txt\n\nPage\n====\n\n..  note::\n\n    Install |extension_key| now.\n' > "$d/Documentation/Page.rst"
+check "a substitution in a directive body still fires" 1 "$(run check-rst-substitutions-resolve.sh "$d")"
+
 echo
 if [ "$fail" -eq 0 ]; then
     echo "All checkpoint-script tests passed"

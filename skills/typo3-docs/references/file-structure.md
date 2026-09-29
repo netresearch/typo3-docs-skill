@@ -124,19 +124,17 @@ Included at the top of every RST file:
 .. include:: /Includes.rst.txt
 ```
 
-**Do not put substitutions or hyperlink targets in it.** render-guides does
-not carry a `.. |name| replace::` definition or a `.. _name: URL` target from
-an included file into the page that includes it. Measured with render-guides
-0.40.2 (`ghcr.io/typo3-documentation/render-guides@sha256:52f3b521…`, the
-digest `netresearch/typo3-ci-workflows` `docs.yml` pins) and with `:latest` of
+**Do not put substitutions in it.** render-guides does not carry a
+`.. |name| replace::` definition from an included file into the page that
+includes it. Measured with render-guides 0.40.2
+(`ghcr.io/typo3-documentation/render-guides@sha256:52f3b521…`, the digest
+`netresearch/typo3-ci-workflows` `docs.yml` pins) and with `:latest` of
 2026-09-23:
 
 - `.. include:: /Includes.rst.txt`, `.. include:: ../Includes.rst.txt` and an
   included `.rst` file all behave the same;
 - the page renders the literal text `|extension_key|`, and the log says
-  `app.WARNING: No replacement was found for variable |extension_key|`;
-- a link to a target defined in the include renders as an invalid link
-  (`Reference vendor-website_ could not be resolved`).
+  `app.WARNING: No replacement was found for variable |extension_key|`.
 
 What works instead:
 
