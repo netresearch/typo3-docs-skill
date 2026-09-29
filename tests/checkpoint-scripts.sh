@@ -191,6 +191,171 @@ mkdir -p "$d/Documentation/Images" "$d/Resources/Private/Templates"
 printf 'x' > "$d/Documentation/Images/Module.png"
 check "outside a git repository the check stays silent" 0 "$(run check-screenshot-freshness.sh "$d")"
 
+echo "check-guides-xml-version-sync.sh"
+guides() { # guides <dir> <version> <release> <emconf-version>
+    printf '<?xml version="1.0" encoding="UTF-8"?>\n<guides xmlns="https://www.phpdoc.org/guides">\n    <project title="T" version="%s" release="%s"/>\n</guides>\n' \
+        "$2" "$3" > "$1/Documentation/guides.xml"
+    printf "<?php\n\$EM_CONF[\$_EXTKEY] = [\n    'version' => '%s',\n];\n" "$4" > "$1/ext_emconf.php"
+}
+d=$(fixture guides-short-version)
+guides "$d" 0.8 0.8.2 0.8.2
+check "version=major.minor, release=full (the skill's template) stays silent" 0 "$(run check-guides-xml-version-sync.sh "$d")"
+
+d=$(fixture guides-full-version)
+guides "$d" 0.8.2 0.8.2 0.8.2
+check "version=release=full version stays silent" 0 "$(run check-guides-xml-version-sync.sh "$d")"
+
+d=$(fixture guides-stale-release)
+guides "$d" 0.8 0.8.1 0.8.2
+check "a stale release fires" 1 "$(run check-guides-xml-version-sync.sh "$d")"
+
+d=$(fixture guides-stale-version)
+guides "$d" 0.7 0.8.2 0.8.2
+check "a stale major.minor version fires" 1 "$(run check-guides-xml-version-sync.sh "$d")"
+
+echo "check-adr-coverage.sh"
+classes() { # classes <dir> -> eleven PHP classes
+    mkdir -p "$1/Classes"
+    for i in $(seq 1 11); do printf '<?php\nclass C%s {}\n' "$i" > "$1/Classes/C$i.php"; done
+}
+d=$(fixture adr-developer)
+classes "$d"; mkdir -p "$d/Documentation/Developer/Adr"
+check "Documentation/Developer/Adr/ stays silent" 0 "$(run check-adr-coverage.sh "$d")"
+
+d=$(fixture adr-top-level)
+classes "$d"; mkdir -p "$d/Documentation/Adr"
+check "Documentation/Adr/ stays silent" 0 "$(run check-adr-coverage.sh "$d")"
+
+d=$(fixture adr-none)
+classes "$d"
+check "eleven classes without an ADR directory fire" 1 "$(run check-adr-coverage.sh "$d")"
+
+echo "check-rst-substitutions-resolve.sh"
+subs_fixture() { # subs_fixture <name> -> fixture whose Includes.rst.txt defines |extension_key|
+    d=$(fixture "$1")
+    printf '.. |extension_key| replace:: my_ext\n' > "$d/Documentation/Includes.rst.txt"
+    echo "$d"
+}
+d=$(subs_fixture subs-include-only)
+printf '.. include:: /Includes.rst.txt\n\nPage\n====\n\nInstall |extension_key| now.\n' > "$d/Documentation/Page.rst"
+check "a substitution defined only in Includes.rst.txt fires" 1 "$(run check-rst-substitutions-resolve.sh "$d")"
+
+d=$(subs_fixture subs-local)
+printf '.. |extension_key| replace:: my_ext\n\nPage\n====\n\nInstall |extension_key| now.\n' > "$d/Documentation/Page.rst"
+check "a substitution defined on the page itself stays silent" 0 "$(run check-rst-substitutions-resolve.sh "$d")"
+
+d=$(subs_fixture subs-hardcoded)
+printf '.. include:: /Includes.rst.txt\n\nPage\n====\n\nInstall my_ext and my_ext_tts now.\n' > "$d/Documentation/Page.rst"
+check "a hardcoded value is not a finding" 0 "$(run check-rst-substitutions-resolve.sh "$d")"
+
+d=$(subs_fixture subs-builtin)
+printf '.. include:: /Includes.rst.txt\n\nPage\n====\n\n:Version: |release|\n:Rendered: |today|\n' > "$d/Documentation/Page.rst"
+check "guides.xml built-ins (|release|, |today|) stay silent" 0 "$(run check-rst-substitutions-resolve.sh "$d")"
+
+d=$(subs_fixture subs-literals)
+cat > "$d/Documentation/Page.rst" <<'EOF'
+.. include:: /Includes.rst.txt
+
+Page
+====
+
+Inline ``|extension_key|`` and a multi-line ``a →
+b|extension_key|c`` literal, plus :php:`$x = '|extension_key|'`.
+
+..  code-block:: bash
+
+    composer req vendor/|extension_key|
+
+::
+
+    status: queued → |extension_key| → done
+EOF
+check "literals, code blocks and interpreted text stay silent" 0 "$(run check-rst-substitutions-resolve.sh "$d")"
+printf '\nAfter the block: |extension_key|.\n' >> "$d/Documentation/Page.rst"
+check "prose after a code block is scanned again" 1 "$(run check-rst-substitutions-resolve.sh "$d")"
+
+d=$(subs_fixture subs-link)
+printf '.. include:: /Includes.rst.txt\n\nPage\n====\n\nSee |extension_key|_ and |extension_key|__ for details.\n' > "$d/Documentation/Page.rst"
+check "a substitution used as a link (|name|_, |name|__) fires" 1 "$(run check-rst-substitutions-resolve.sh "$d")"
+
+d=$(fixture subs-included-rst)
+mkdir -p "$d/Documentation/Snippets" "$d/Documentation/Guide"
+printf '.. |extension_key| replace:: my_ext\n' > "$d/Documentation/Snippets/Defs.rst"
+printf '.. include:: /Snippets/Defs.rst\n\nPage\n====\n\nInstall |extension_key| now.\n' > "$d/Documentation/Page.rst"
+check "a substitution defined only in an included .rst (absolute path) fires" 1 "$(run check-rst-substitutions-resolve.sh "$d")"
+rm "$d/Documentation/Page.rst"
+printf '.. include:: ../Snippets/Defs.rst\n\nPage\n====\n\nInstall |extension_key| now.\n' > "$d/Documentation/Guide/Page.rst"
+check "a substitution defined only in an included .rst (relative path) fires" 1 "$(run check-rst-substitutions-resolve.sh "$d")"
+
+d=$(fixture subs-own-rst)
+printf '.. |extension_key| replace:: my_ext\n\nPage\n====\n\nInstall |extension_key| now.\n' > "$d/Documentation/Page.rst"
+printf 'Other\n=====\n\nNo include, no substitution.\n' > "$d/Documentation/Other.rst"
+check "a .rst defining its own substitution, included by nobody, stays silent" 0 "$(run check-rst-substitutions-resolve.sh "$d")"
+
+d=$(subs_fixture subs-table)
+printf '.. include:: /Includes.rst.txt\n\nPage\n====\n\n+-----+-----+\n| a   | b   |\n+-----+-----+\n\n| line block\n' > "$d/Documentation/Page.rst"
+check "grid tables and line blocks are not substitution references" 0 "$(run check-rst-substitutions-resolve.sh "$d")"
+
+# render-guides drops the indented body of a comment, with or without a blank
+# line after the `..` line and with or without comment text on it.
+d=$(subs_fixture subs-comment)
+cat > "$d/Documentation/Page.rst" <<'EOF'
+.. include:: /Includes.rst.txt
+
+Page
+====
+
+..
+   |extension_key| in a comment body
+
+.. a comment with text
+
+   |extension_key| after a blank line
+
+..
+
+   |extension_key| after an empty comment
+EOF
+check "a substitution in a comment body stays silent" 0 "$(run check-rst-substitutions-resolve.sh "$d")"
+printf '\nAfter the comment: |extension_key|.\n' >> "$d/Documentation/Page.rst"
+check "prose after a comment is scanned again" 1 "$(run check-rst-substitutions-resolve.sh "$d")"
+
+d=$(subs_fixture subs-directive-body)
+printf '.. include:: /Includes.rst.txt\n\nPage\n====\n\n..  note::\n\n    Install |extension_key| now.\n' > "$d/Documentation/Page.rst"
+check "a substitution in a directive body still fires" 1 "$(run check-rst-substitutions-resolve.sh "$d")"
+
+# An include target with any suffix is read for its definitions: render-guides
+# 0.40.2 does not carry a definition from an included Shared.txt either.
+d=$(fixture subs-shared-txt)
+printf '.. |shared_key| replace:: my_ext\n' > "$d/Documentation/Shared.txt"
+printf '.. include:: Shared.txt\n\nPage\n====\n\nInstall my_ext now.\n' > "$d/Documentation/Page.rst"
+check "an included Shared.txt whose name is not used stays silent" 0 "$(run check-rst-substitutions-resolve.sh "$d")"
+printf '\nInstall |shared_key| now.\n' >> "$d/Documentation/Page.rst"
+check "a substitution defined only in an included Shared.txt fires" 1 "$(run check-rst-substitutions-resolve.sh "$d")"
+
+# A page that another page includes is still reported once, not twice.
+d=$(subs_fixture subs-included-page)
+printf '.. include:: /Includes.rst.txt\n\nPage\n====\n\nInstall |extension_key| now.\n' > "$d/Documentation/Page.rst"
+printf 'Index\n=====\n\n.. include:: Page.rst\n' > "$d/Documentation/Index.rst"
+check "a page included by another page is reported once" 1 \
+    "$( (cd "$d" && bash "$SCRIPTS/check-rst-substitutions-resolve.sh" 2>/dev/null) | grep -c 'Page.rst: |extension_key|')"
+
+# Backslash escapes, measured with render-guides 0.40.2: an odd run before the
+# opening | escapes it (no warning, the text renders), an even run is literal
+# backslashes followed by an active reference (warning, not replaced).
+d=$(subs_fixture subs-escaped)
+cat > "$d/Documentation/Page.rst" <<'EOF'
+.. include:: /Includes.rst.txt
+
+Page
+====
+
+Escaped \|extension_key| and \\\|extension_key| stay text.
+EOF
+check "an escaped opening | (one or three backslashes) stays silent" 0 "$(run check-rst-substitutions-resolve.sh "$d")"
+printf '\nTwo backslashes \\\\|extension_key| do not escape it.\n' >> "$d/Documentation/Page.rst"
+check "two backslashes before | still fire" 1 "$(run check-rst-substitutions-resolve.sh "$d")"
+
 echo
 if [ "$fail" -eq 0 ]; then
     echo "All checkpoint-script tests passed"

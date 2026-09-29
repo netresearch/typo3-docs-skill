@@ -260,17 +260,9 @@ mechanical:
     desc: "Documentation/Introduction/ directory should exist"
 
   # === DOCUMENTATION ACCURACY ===
-  # Mirrors scripts/check-guides-xml-version-sync.sh — with its attribute
-  # extraction corrected. That script reads
-  #   grep -oP 'version="[^"]*"' Documentation/guides.xml | head -1
-  # and a guides.xml opens with `<?xml version="1.0" encoding="UTF-8"?>`, so the
-  # first match is the XML DECLARATION's version, never <project>'s. Measured on
-  # a tree whose guides.xml is entirely correct (version=release=1.0.0,
-  # ext_emconf 1.0.0), the script reports two mismatches and exits 1. Inlining
-  # that verbatim would have turned a dead checkpoint into one that fails every
-  # conforming extension, so the attributes are read off the <project> element.
-  # The shipped script still carries the bug; see the report accompanying this
-  # change.
+  # Mirrors scripts/check-guides-xml-version-sync.sh. Both read the attributes
+  # off the <project> element: a plain `grep -oP 'version="[^"]*"' | head -1`
+  # first hits the XML declaration's version="1.0", never <project>'s.
   - id: TD-30
     type: script
     command: |
@@ -287,22 +279,23 @@ mechanical:
       guides_version=$(printf '%s\n' "$attrs" | sed -n 1p)
       guides_release=$(printf '%s\n' "$attrs" | sed -n 2p)
       emconf_ver=$(grep -oP "'version'\s*=>\s*'[^']*'" ext_emconf.php 2>/dev/null | grep -oP "'[^']*'\$" | tr -d "'")
+      [ -n "$emconf_ver" ] || exit 0
+      # SKILL.md and references/guides-xml.md write version="MAJOR.MINOR" and
+      # release="MAJOR.MINOR.PATCH": release carries the full version, version
+      # its major.minor. A version equal to the full version is accepted too.
+      emconf_short=$(printf '%s\n' "$emconf_ver" | cut -d. -f1-2)
       errors=0
-      if [ -n "$guides_version" ] && [ -n "$emconf_ver" ] && [ "$guides_version" != "$emconf_ver" ]; then
-        echo "Version mismatch: guides.xml version=\"$guides_version\" != ext_emconf.php version='$emconf_ver'"
+      if [ -n "$guides_version" ] && [ "$guides_version" != "$emconf_short" ] && [ "$guides_version" != "$emconf_ver" ]; then
+        echo "Version mismatch: guides.xml version=\"$guides_version\" != ext_emconf.php major.minor '$emconf_short' (or full '$emconf_ver')"
         errors=1
       fi
-      if [ -n "$guides_release" ] && [ -n "$emconf_ver" ] && [ "$guides_release" != "$emconf_ver" ]; then
+      if [ -n "$guides_release" ] && [ "$guides_release" != "$emconf_ver" ]; then
         echo "Release mismatch: guides.xml release=\"$guides_release\" != ext_emconf.php version='$emconf_ver'"
-        errors=1
-      fi
-      if [ -n "$guides_version" ] && [ -n "$guides_release" ] && [ "$guides_version" != "$guides_release" ]; then
-        echo "Internal mismatch: guides.xml version=\"$guides_version\" != release=\"$guides_release\""
         errors=1
       fi
       exit "$errors"
     severity: error
-    desc: "guides.xml version and release attributes must both match ext_emconf.php version"
+    desc: "guides.xml release must equal the ext_emconf.php version and guides.xml version its major.minor (or the full version)"
 
   - id: TD-31
     type: command
@@ -382,32 +375,121 @@ mechanical:
     severity: warning
     desc: "Fluid templates should use f:translate for user-facing text; flag hardcoded English strings (>3 words in title/aria-label/alt)"
 
-  # === RST SUBSTITUTIONS USAGE ===
-  # Mirrors scripts/check-rst-substitutions-used.sh.
+  # === RST SUBSTITUTIONS: DEFINITIONS MUST REACH THE PAGE ===
+  # Mirrors scripts/check-rst-substitutions-resolve.sh (the comment there has
+  # the render evidence).
+  #
+  # Inverted 2026-09-28. The earlier TD-46 told Introduction/ and Installation/
+  # to replace hardcoded values with substitutions from Includes.rst.txt. With
+  # render-guides 0.40.2 (the digest typo3-ci-workflows' docs.yml pins) a
+  # substitution defined in an included file does not reach the including page:
+  # the page shows the literal `|extension_key|` and the render logs
+  # `app.WARNING: No replacement was found for variable |extension_key|`, for
+  # `/Includes.rst.txt`, `../Includes.rst.txt` and an included `.rst` alike.
+  # Following the old advice therefore broke the rendered page. It was also a
+  # substring match (`nr_repurpose` inside `nr_repurpose_tts`, inside ``literals``)
+  # that a single use of the substitution silenced for the whole file.
+  # "Included" means any *.rst.txt and any file an `.. include::` names, whatever
+  # its suffix, so an included .rst or Shared.txt (both measured failing the same
+  # way) is covered too. An opening | after an odd number of backslashes is
+  # escaped and not a reference; after an even number it is (measured as well).
   - id: TD-46
     type: script
     command: |
-      includes="Documentation/Includes.rst.txt"
-      [ -f "$includes" ] || exit 0
-      subs=$(grep -oP '^\.\.\s*\|[^|]+\|' "$includes" 2>/dev/null | grep -oP '\|[^|]+\|')
-      [ -n "$subs" ] || exit 0
-      found=0
-      for target in Documentation/Introduction/Index.rst Documentation/Installation/Index.rst; do
-        [ -f "$target" ] || continue
-        while IFS= read -r sub; do
-          [ -n "$sub" ] || continue
-          sub_escaped=$(printf '%s\n' "$sub" | sed 's/|/\\|/g')
-          sub_value=$(grep -P "^\.\.\s*${sub_escaped}\s+replace::" "$includes" 2>/dev/null | grep -oP '::\s*.*$' | sed 's/^::\s*//')
-          [ -n "$sub_value" ] || continue
-          if grep -qF -- "$sub_value" "$target" 2>/dev/null && ! grep -qF -- "$sub" "$target" 2>/dev/null; then
-            echo "$target: hardcoded '$sub_value' found — use substitution $sub instead"
-            found=1
-          fi
-        done < <(printf '%s\n' "$subs")
-      done
-      exit "$found"
-    severity: info
-    desc: "If Includes.rst.txt defines substitutions, they should be used in Introduction/Index.rst and Installation/Index.rst instead of hardcoded values"
+      [ -d Documentation ] || exit 0
+
+      # One perl process over the whole tree (xargs could split the list, and an
+      # include in one batch would then not be seen in another). Definitions count
+      # as "included" when they sit in a *.rst.txt file or in any file that an
+      # `.. include::` names, resolved like render-guides does: `/x` from
+      # Documentation/, anything else relative to the including file.
+      rc=0
+      find Documentation \( -name '*.rst' -o -name '*.rst.txt' \) -not -path '*GENERATED*' -print0 \
+        | perl -0 -MCwd=abs_path -MFile::Basename=dirname -e '
+          my @files = <STDIN>;
+          chomp @files;
+          my $root = abs_path("Documentation");
+          my (%src, %text);
+          for my $file (@files) {
+              open my $fh, "<", $file or next;
+              local $/ = "\n";
+              my @lines = <$fh>;
+              close $fh;
+              $text{$file} = \@lines;
+              $src{abs_path($file)} = 1 if $file =~ /\.rst\.txt$/;
+              for (@lines) {
+                  next unless /^\s*\.\.\s+include::\s+(\S+)/;
+                  my $t = $1;
+                  my $a = abs_path($t =~ m{^/} ? "$root$t" : dirname($file) . "/$t");
+                  $src{$a} = 1 if defined $a && -f $a;
+              }
+          }
+          # Include targets find did not list (Shared.txt, any other suffix) are read
+          # for their definitions too.
+          my %have = map { (abs_path($_), 1) } keys %text;
+          for my $a (grep { !$have{$_} } keys %src) {
+              open my $fh, "<", $a or next;
+              local $/ = "\n";
+              $text{$a} = [<$fh>];
+              close $fh;
+          }
+          my %inc;
+          for my $file (keys %text) {
+              next unless $src{abs_path($file)};
+              for (@{ $text{$file} }) { $inc{$1} = 1 if /^\.\.\s+\|([^|]+)\|\s+\S+::/; }
+          }
+          exit 0 unless %inc;
+          my $found = 0;
+          for my $file (sort grep { /\.rst$/ } keys %text) {
+              my (%local, @keep);
+              my $block = -1;    # indent of the line opening a literal block, -1 = none
+              for my $l (@{ $text{$file} }) {
+                  if ($l =~ /^\.\.\s+\|([^|]+)\|\s+\S+::/) { $local{$1} = 1; next; }
+                  (my $ind = $l) =~ s/^(\s*).*/length($1)/se;
+                  if ($block >= 0) {
+                      if ($l =~ /^\s*$/ || $ind > $block) { next; }
+                      $block = -1;
+                  }
+                  if ($l =~ /^(\s*)\.\.\s+(code-block|code|sourcecode|literalinclude|uml|raw)::/
+                      || ($l =~ /::\s*$/ && $l !~ /^\s*\.\.\s/)) {
+                      $block = length(($l =~ /^(\s*)/)[0]);
+                      $l =~ s/::\s*$/\n/;
+                      push @keep, $l if $l !~ /^\s*\.\./;
+                      next;
+                  }
+                  if ($l =~ /^(\s*)\.\.(\s|$)/) {
+                      # A comment, i.e. not a directive, target, substitution definition,
+                      # footnote or citation: render-guides drops its indented body.
+                      $block = length($1)
+                          if $l !~ /^\s*\.\.\s+(?:\S+::(?:\s|$)|_|\||\[)/;
+                      next;
+                  }
+                  push @keep, $l;
+              }
+              my $text = join "", @keep;
+              $text =~ s/``.*?``//gs;
+              $text =~ s/`[^`]*`_{0,2}//gs;
+              my %seen;
+              while ($text =~ /(?:(?<![\w|\\])|(?<!\\)(?:\\\\)+\K)\|([^|\s](?:[^|]*[^|\s])?)\|(?=_{0,2}(?![\w|]))/g) {
+                  my $n = $1;
+                  next unless $inc{$n} && !$local{$n} && !$seen{$n}++;
+                  print "$file: |$n| is defined only in an included file and renders as literal text; define it on this page or write the value\n";
+                  $found = 1;
+              }
+          }
+          exit $found;
+        ' || rc=$?
+      # 1 is a finding. Anything else non-zero is the checker failing; it exits 2
+      # with the reason on stderr. automated-assessment's run-checkpoints.sh reports
+      # every non-zero exit of a script as `fail` and discards its output, so there
+      # a failed scan looks like a finding; only a direct run tells them apart.
+      case "$rc" in
+        0) exit 0 ;;
+        1) exit 1 ;;
+        *) echo "check-rst-substitutions-resolve: scan failed (perl exit $rc)" >&2; exit 2 ;;
+      esac
+    severity: warning
+    desc: "A page must not use a substitution (|name|) that only an included file such as Includes.rst.txt defines: render-guides does not carry it into the page, which then shows the literal |name|"
 
   # === PLANTUML RENDERING ===
   # Inverted 2026-08-14: the earlier version flagged the `uml::` directive on
@@ -679,7 +761,7 @@ mechanical:
       [ -d Classes ] || exit 0
       class_count=$(find Classes/ -type f -name '*.php' -not -path '*/.Build/*' -not -path '*/vendor/*' -not -path '*/node_modules/*' 2>/dev/null | wc -l)
       [ "$class_count" -gt 10 ] || exit 0
-      if [ -d Documentation/Developer/Adr ] || [ -d Documentation/Developer/ADR ] || [ -d docs/adr ]; then
+      if [ -d Documentation/Developer/Adr ] || [ -d Documentation/Developer/ADR ] || [ -d Documentation/Adr ] || [ -d Documentation/ADR ] || [ -d docs/adr ]; then
         exit 0
       fi
       echo "Extension has $class_count classes but no ADR directory (Documentation/Developer/Adr/)"

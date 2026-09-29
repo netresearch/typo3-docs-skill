@@ -20,8 +20,9 @@ Architecture Decision Records capture important architectural decisions along wi
 ## Directory Structure
 
 ADRs live where checkpoint TD-49 (`scripts/check-adr-coverage.sh`) looks for
-them: `Documentation/Developer/Adr/` (preferred; `Documentation/Developer/ADR/`
-and `docs/adr/` are also accepted). Do not place them in
+them: `Documentation/Developer/Adr/` (preferred; `Documentation/Developer/ADR/`,
+`Documentation/Adr/`, `Documentation/ADR/` and `docs/adr/` are also accepted).
+Do not place them in
 `Documentation/DeveloperGuide/ArchitectureDecisions/` or `claudedocs/` — those
 paths fail the skill's own coverage check.
 

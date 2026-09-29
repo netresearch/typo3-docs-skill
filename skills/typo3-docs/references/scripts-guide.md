@@ -69,9 +69,9 @@ from the extension root:
 ```bash
 scripts/check-adr-coverage.sh                 # TD-49: ADR dir for >10-class extensions
 scripts/check-changelog-version-coverage.sh   # TD-48: CHANGELOG covers all git tags
-scripts/check-guides-xml-version-sync.sh      # TD-30: guides.xml version/release == ext_emconf.php
+scripts/check-guides-xml-version-sync.sh      # TD-30: guides.xml release == ext_emconf.php, version == its major.minor
 scripts/check-required-doc-sections.sh        # TD-44: standard sections present
-scripts/check-rst-substitutions-used.sh       # TD-46: Includes.rst.txt substitutions used
+scripts/check-rst-substitutions-resolve.sh    # TD-46: no |name| that only an include defines
 scripts/check-untranslated-fluid-strings.sh   # TD-45: hardcoded strings in Fluid templates
 scripts/check-version-match.sh                # version consistency across manifests
 ```
