@@ -15,7 +15,7 @@ NC='\033[0m'
 
 # Configuration
 PROJECT_DIR="$(pwd)"
-DATA_DIR="${PROJECT_DIR}/.claude/docs-extraction/data"
+DATA_DIR="$(bash "$(dirname "${BASH_SOURCE[0]}")/extraction-dir.sh")/data"
 COMPOSER_FILE="${PROJECT_DIR}/composer.json"
 OUTPUT_FILE="${DATA_DIR}/dependencies.json"
 

@@ -20,7 +20,7 @@ NC='\033[0m'
 
 # Configuration
 PROJECT_DIR="$(pwd)"
-DATA_DIR="${PROJECT_DIR}/.claude/docs-extraction/data"
+DATA_DIR="$(bash "$(dirname "${BASH_SOURCE[0]}")/extraction-dir.sh")/data"
 OUTPUT_FILE="${DATA_DIR}/php_apis.json"
 
 CLASSES_DIR="${PROJECT_DIR}/Classes"

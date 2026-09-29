@@ -299,7 +299,7 @@ scripts/extract-all.sh              # Core extraction (PHP, configs, composer)
 scripts/extract-all.sh --all        # Include build configs and repo metadata
 ```
 
-Extraction data saved to `.claude/docs-extraction/data/`:
+Extraction data saved to `$DOCS_EXTRACTION_DIR/data/`, outside the project. Resolve the directory from the project root with `DOCS_EXTRACTION_DIR="$(scripts/extraction-dir.sh)"` (one directory per project under `/tmp/typo3-docs-extraction/` unless you set it):
 - `php_apis.json` - Classes, methods, docblocks
 - `extension_meta.json` - ext_emconf.php data
 - `config_options.json` - ext_conf_template.txt options
@@ -312,7 +312,7 @@ Extraction data saved to `.claude/docs-extraction/data/`:
 scripts/analyze-docs.sh
 ```
 
-Generates `Documentation/ANALYSIS.md` with:
+Generates `$DOCS_EXTRACTION_DIR/ANALYSIS.md` with:
 - Missing documentation items
 - Outdated configuration defaults
 - Inconsistencies between code and docs
@@ -320,7 +320,7 @@ Generates `Documentation/ANALYSIS.md` with:
 
 **Step 3: Review Analysis**
 
-Open `Documentation/ANALYSIS.md` and identify:
+Open `$DOCS_EXTRACTION_DIR/ANALYSIS.md` and identify:
 - **Priority 1**: Missing core documentation (undocumented classes, essential configs)
 - **Priority 2**: Outdated content (wrong defaults, old signatures)
 - **Priority 3**: Enhancement opportunities (missing examples, incomplete descriptions)
@@ -329,7 +329,7 @@ Open `Documentation/ANALYSIS.md` and identify:
 
 When documenting items from ANALYSIS.md:
 
-1. **Open corresponding JSON file** in `.claude/docs-extraction/data/`
+1. **Open corresponding JSON file** in `$DOCS_EXTRACTION_DIR/data/`
 2. **Copy relevant information** (descriptions, defaults, types)
 3. **Create RST documentation** using proper directives
 4. **Add examples and context** beyond extracted data
@@ -346,7 +346,8 @@ When documenting items from ANALYSIS.md:
 
 **Check extracted data:**
 ```bash
-cat .claude/docs-extraction/data/config_options.json | jq '.config_options[] | select(.key=="fetchExternalImages")'
+DOCS_EXTRACTION_DIR="$(scripts/extraction-dir.sh)"
+jq '.config_options[] | select(.key=="fetchExternalImages")' "$DOCS_EXTRACTION_DIR/data/config_options.json"
 ```
 
 **Create documentation:**
@@ -373,11 +374,11 @@ cat .claude/docs-extraction/data/config_options.json | jq '.config_options[] | s
 - Use extracted data as starting templates, not final documentation
 - Add usage examples and context beyond extracted descriptions
 - Re-run analysis after updates to track progress
-- Keep extraction data gitignored (already in `.claude/`)
+- Keep extraction data out of the project (the default location is outside it)
 
 **DON'T:**
 - Skip extraction for existing extensions (saves time finding gaps)
-- Commit `.claude/docs-extraction/` to version control
+- Write extraction data or the analysis into the project or `Documentation/`
 - Blindly copy extracted data without adding examples
 - Ignore security warnings in config option extractions
 - Forget to validate after using extracted data
