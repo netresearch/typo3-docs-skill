@@ -27,7 +27,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SKILL_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 PROJECT_DIR="$(pwd)"
 
-EXTRACTION_DIR="${DOCS_EXTRACTION_DIR:-${TMPDIR:-/tmp}/typo3-docs-extraction}"
+EXTRACTION_DIR="${DOCS_EXTRACTION_DIR:-${TMPDIR:-/tmp}/typo3-docs-extraction/$(pwd -P | cksum | cut -d" " -f1)}"
 DATA_DIR="${EXTRACTION_DIR}/data"
 CACHE_DIR="${EXTRACTION_DIR}/cache"
 

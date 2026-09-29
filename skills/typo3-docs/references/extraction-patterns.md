@@ -512,7 +512,7 @@ Throughout documentation:
 
 ### 1. Extract All Data
 
-Run extraction scripts to populate `$DOCS_EXTRACTION_DIR/data/*.json` (default `/tmp/typo3-docs-extraction`, outside the project)
+Run extraction scripts to populate `$DOCS_EXTRACTION_DIR/data/*.json` (default: a directory per project under `/tmp/typo3-docs-extraction/`, outside the project)
 
 ### 2. Parse Existing Documentation
 

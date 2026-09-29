@@ -15,7 +15,7 @@ NC='\033[0m'
 
 # Configuration
 PROJECT_DIR="$(pwd)"
-DATA_DIR="${DOCS_EXTRACTION_DIR:-${TMPDIR:-/tmp}/typo3-docs-extraction}/data"
+DATA_DIR="${DOCS_EXTRACTION_DIR:-${TMPDIR:-/tmp}/typo3-docs-extraction/$(pwd -P | cksum | cut -d" " -f1)}/data"
 COMPOSER_FILE="${PROJECT_DIR}/composer.json"
 OUTPUT_FILE="${DATA_DIR}/dependencies.json"
 

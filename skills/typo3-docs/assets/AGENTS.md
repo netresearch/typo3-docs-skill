@@ -299,7 +299,7 @@ scripts/extract-all.sh              # Core extraction (PHP, configs, composer)
 scripts/extract-all.sh --all        # Include build configs and repo metadata
 ```
 
-Extraction data saved to `$DOCS_EXTRACTION_DIR/data/` (default `/tmp/typo3-docs-extraction/data/`, outside the project):
+Extraction data saved to `$DOCS_EXTRACTION_DIR/data/` (default: a directory per project under `/tmp/typo3-docs-extraction/`, outside the project):
 - `php_apis.json` - Classes, methods, docblocks
 - `extension_meta.json` - ext_emconf.php data
 - `config_options.json` - ext_conf_template.txt options
@@ -346,7 +346,7 @@ When documenting items from ANALYSIS.md:
 
 **Check extracted data:**
 ```bash
-cat "${DOCS_EXTRACTION_DIR:-/tmp/typo3-docs-extraction}/data/config_options.json" | jq '.config_options[] | select(.key=="fetchExternalImages")'
+cat "$DOCS_EXTRACTION_DIR/data/config_options.json" | jq '.config_options[] | select(.key=="fetchExternalImages")'
 ```
 
 **Create documentation:**
