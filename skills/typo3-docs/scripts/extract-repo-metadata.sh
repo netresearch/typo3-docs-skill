@@ -19,8 +19,8 @@ RED='\033[0;31m'
 NC='\033[0m'
 
 # Configuration
-DATA_DIR="${DOCS_EXTRACTION_DIR:-${TMPDIR:-/tmp}/typo3-docs-extraction/$(pwd -P | cksum | cut -d" " -f1)}/data"
-CACHE_DIR="${DOCS_EXTRACTION_DIR:-${TMPDIR:-/tmp}/typo3-docs-extraction/$(pwd -P | cksum | cut -d" " -f1)}/cache"
+DATA_DIR="$(bash "$(dirname "${BASH_SOURCE[0]}")/extraction-dir.sh")/data"
+CACHE_DIR="$(bash "$(dirname "${BASH_SOURCE[0]}")/extraction-dir.sh")/cache"
 OUTPUT_FILE="${DATA_DIR}/repo_metadata.json"
 CACHE_FILE="${CACHE_DIR}/repo_metadata.json"
 

@@ -22,9 +22,9 @@ NC='\033[0m'
 
 # Configuration
 PROJECT_DIR="$(pwd)"
-DATA_DIR="${DOCS_EXTRACTION_DIR:-${TMPDIR:-/tmp}/typo3-docs-extraction/$(pwd -P | cksum | cut -d" " -f1)}/data"
+DATA_DIR="$(bash "$(dirname "${BASH_SOURCE[0]}")/extraction-dir.sh")/data"
 DOC_DIR="${PROJECT_DIR}/Documentation"
-ANALYSIS_FILE="${DOCS_EXTRACTION_DIR:-${TMPDIR:-/tmp}/typo3-docs-extraction/$(pwd -P | cksum | cut -d" " -f1)}/ANALYSIS.md"
+ANALYSIS_FILE="$(bash "$(dirname "${BASH_SOURCE[0]}")/extraction-dir.sh")/ANALYSIS.md"
 
 # TYPO3 Official Architecture Weights (from typo3-extension-architecture.md)
 # BaseWeight for gap priority calculation: Priority = BaseWeight * Severity * UserImpact
