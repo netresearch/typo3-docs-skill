@@ -8,7 +8,7 @@
 # - Outdated documentation
 # - Inconsistencies
 #
-# Generates: Documentation/ANALYSIS.md
+# Generates: ANALYSIS.md in the extraction directory, outside the project
 #
 
 set -e
@@ -22,9 +22,9 @@ NC='\033[0m'
 
 # Configuration
 PROJECT_DIR="$(pwd)"
-DATA_DIR="${PROJECT_DIR}/.claude/docs-extraction/data"
+DATA_DIR="$(bash "$(dirname "${BASH_SOURCE[0]}")/extraction-dir.sh")/data"
 DOC_DIR="${PROJECT_DIR}/Documentation"
-ANALYSIS_FILE="${DOC_DIR}/ANALYSIS.md"
+ANALYSIS_FILE="$(bash "$(dirname "${BASH_SOURCE[0]}")/extraction-dir.sh")/ANALYSIS.md"
 
 # TYPO3 Official Architecture Weights (from typo3-extension-architecture.md)
 # BaseWeight for gap priority calculation: Priority = BaseWeight * Severity * UserImpact
@@ -340,7 +340,7 @@ Items above are **already sorted by priority score**. Focus on highest scores fi
 ---
 
 **Analysis Date:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")
-**Extraction Data:** See `.claude/docs-extraction/data/`
+**Extraction Data:** the `data/` directory beside this report
 **Weighting Source:** TYPO3 Official Extension Architecture
 
 EOF

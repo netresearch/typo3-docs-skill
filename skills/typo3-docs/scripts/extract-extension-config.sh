@@ -18,7 +18,7 @@ NC='\033[0m'
 
 # Configuration
 PROJECT_DIR="$(pwd)"
-DATA_DIR="${PROJECT_DIR}/.claude/docs-extraction/data"
+DATA_DIR="$(bash "$(dirname "${BASH_SOURCE[0]}")/extraction-dir.sh")/data"
 
 EXT_EMCONF="${PROJECT_DIR}/ext_emconf.php"
 EXT_CONF_TEMPLATE="${PROJECT_DIR}/ext_conf_template.txt"

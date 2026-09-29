@@ -29,7 +29,7 @@ Source Files → Extraction Scripts → Structured JSON → RST Templates → Hu
 
 2. Analysis Phase
    ├─ Parse existing Documentation/**/*.rst → data/existing_docs.json
-   └─ Compare extracted vs existing → Documentation/ANALYSIS.md
+   └─ Compare extracted vs existing → $DOCS_EXTRACTION_DIR/ANALYSIS.md
 
 3. Generation Phase (Optional)
    └─ Create RST templates → Documentation/GENERATED/
@@ -512,7 +512,7 @@ Throughout documentation:
 
 ### 1. Extract All Data
 
-Run extraction scripts to populate `.claude/docs-extraction/data/*.json`
+Run extraction scripts to populate `$DOCS_EXTRACTION_DIR/data/*.json` (outside the project; resolve it with `DOCS_EXTRACTION_DIR="$(scripts/extraction-dir.sh)"` from the project root)
 
 ### 2. Parse Existing Documentation
 
@@ -764,8 +764,8 @@ When AI assistants work with Documentation/:
 
 ```
 User: "Document the ImageProcessor class"
-→ AI reads: .claude/docs-extraction/data/php_apis.json
-→ AI checks: Documentation/ANALYSIS.md (confirms missing)
+→ AI reads: $DOCS_EXTRACTION_DIR/data/php_apis.json
+→ AI checks: $DOCS_EXTRACTION_DIR/ANALYSIS.md (confirms missing)
 → AI generates: Documentation/API/ImageProcessor.rst
 → AI completes [TODO] sections with usage examples
 → AI runs: scripts/validate_docs.sh
