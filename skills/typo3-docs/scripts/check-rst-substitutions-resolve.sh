@@ -57,7 +57,7 @@ find Documentation -name '*.rst' -not -path '*GENERATED*' -print0 \
         $text =~ s/``.*?``//gs;
         $text =~ s/`[^`]*`_{0,2}//gs;
         my %seen;
-        while ($text =~ /(?<![\w|])\|([^|\s](?:[^|]*[^|\s])?)\|(?![\w|])/g) {
+        while ($text =~ /(?<![\w|])\|([^|\s](?:[^|]*[^|\s])?)\|(?=_{0,2}(?![\w|]))/g) {
             my $n = $1;
             next unless $inc{$n} && !$local{$n} && !$seen{$n}++;
             print "$file: |$n| is defined only in an included file and renders as literal text; define it on this page or write the value\n";

@@ -274,6 +274,10 @@ check "literals, code blocks and interpreted text stay silent" 0 "$(run check-rs
 printf '\nAfter the block: |extension_key|.\n' >> "$d/Documentation/Page.rst"
 check "prose after a code block is scanned again" 1 "$(run check-rst-substitutions-resolve.sh "$d")"
 
+d=$(subs_fixture subs-link)
+printf '.. include:: /Includes.rst.txt\n\nPage\n====\n\nSee |extension_key|_ and |extension_key|__ for details.\n' > "$d/Documentation/Page.rst"
+check "a substitution used as a link (|name|_, |name|__) fires" 1 "$(run check-rst-substitutions-resolve.sh "$d")"
+
 d=$(subs_fixture subs-table)
 printf '.. include:: /Includes.rst.txt\n\nPage\n====\n\n+-----+-----+\n| a   | b   |\n+-----+-----+\n\n| line block\n' > "$d/Documentation/Page.rst"
 check "grid tables and line blocks are not substitution references" 0 "$(run check-rst-substitutions-resolve.sh "$d")"
