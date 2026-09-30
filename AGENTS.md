@@ -25,11 +25,13 @@
 │   └── assets/                          # Templates (AGENTS.md for Documentation/)
 ├── scripts/
 │   └── validate_rst.py                  # RST validation (Python)
-├── hooks/                               # Git hooks
+├── hooks/                               # Claude Code plugin hook (runs scripts/validate_rst.py)
+├── tests/                               # Behavioural tests for the scripts (tests.yml)
 ├── .github/workflows/                   # CI workflows
 ├── Build/                               # Build tooling
-├── docs/                                # Architecture and plans
+├── docs/                                # Architecture, security assurance case, plans
 │   ├── ARCHITECTURE.md
+│   ├── SECURITY-ASSURANCE.md
 │   └── exec-plans/
 └── composer.json                        # Package definition
 ```
@@ -44,6 +46,8 @@ No Makefile or npm scripts. Key scripts in `skills/typo3-docs/scripts/`:
 - `bash skills/typo3-docs/scripts/extract-all.sh --all` — extract including build configs and repo metadata
 - `bash skills/typo3-docs/scripts/analyze-docs.sh` — analyze documentation coverage gaps
 - `bash skills/typo3-docs/scripts/add-agents-md.sh` — add AGENTS.md template to Documentation/
+- `for t in tests/*.sh; do bash "$t"; done; python3 tests/validate_rst_hook.py` — run the tests (offline; see README "Tests")
+- `pre-commit run --all-files` — the lint hooks CI also runs
 
 ## Rules
 
@@ -66,3 +70,4 @@ No Makefile or npm scripts. Key scripts in `skills/typo3-docs/scripts/`:
 - [Rendering](skills/typo3-docs/references/rendering.md)
 - [Scripts Guide](skills/typo3-docs/references/scripts-guide.md)
 - [Architecture](docs/ARCHITECTURE.md)
+- [Security assurance case](docs/SECURITY-ASSURANCE.md)

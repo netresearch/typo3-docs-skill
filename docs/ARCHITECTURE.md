@@ -34,7 +34,7 @@ Deep-dive documents organized by topic:
 
 ### Scripts (scripts/)
 
-Two categories of scripts:
+Three categories of scripts, plus two helpers:
 
 **Documentation authoring:**
 - `validate_docs.sh` — check that guides.xml renders, Index.rst exists, RST syntax, encoding, heading hierarchy
@@ -43,13 +43,35 @@ Two categories of scripts:
 
 **Documentation extraction pipeline:**
 - `extract-all.sh` — orchestrator that runs all extractors
-- `extract-php.sh` — parse PHP classes, methods, docblocks
+- `extract-php.sh` — parse PHP class declarations and their docblocks
 - `extract-extension-config.sh` — parse ext_emconf.php, ext_conf_template.txt
 - `extract-composer.sh` — extract dependency information
 - `extract-project-files.sh` — extract from README, CHANGELOG
 - `extract-build-configs.sh` — CI/CD configuration (optional)
 - `extract-repo-metadata.sh` — GitHub/GitLab API metadata (optional)
 - `analyze-docs.sh` — compare extracted data with existing docs, find gaps
+
+**Checkpoint helpers:** `check-*.sh`, the stand-alone versions of the TD-* checks in `checkpoints.yaml` (listed in `references/scripts-guide.md`). They read the extension in the current directory and exit 1 on a finding.
+
+**Helpers:** `extraction-dir.sh` prints the extraction directory every extraction script and `analyze-docs.sh` use; `json-string.sh` is sourced by the extractors to write project values as escaped JSON strings.
+
+### Plugin hook (hooks/)
+
+`hooks/hooks.json` registers `scripts/validate_rst.py` as a Claude Code `PreToolUse` hook for `Write` and `Edit`. It reads the tool call from standard input and, for `.rst` files under `Documentation/`, prints a reminder when the new content matches one of its patterns: Markdown headings, code fences and links, a line that is only bold text, or a list item. It always exits 0.
+
+### Tests (tests/)
+
+Behavioural tests for every script, run offline by `.github/workflows/tests.yml`; see README "Tests".
+
+## Actors
+
+- **User and agent**: run the scripts in the extension being documented; the agent follows `SKILL.md`.
+- **Extension under documentation**: input to every script. The extraction and UI-surface checks run its `ext_emconf.php` and `Configuration/Backend/Modules.php` through PHP.
+- **render-guides container**: renders `Documentation/` into `Documentation-GENERATED-temp/`.
+- **GitHub/GitLab API**: source of `extract-repo-metadata.sh`, through the user's `gh`/`glab` login.
+- **TYPO3 Intercept**: builds docs.typo3.org from the webhook the user configures (`references/intercept-deployment.md`).
+
+Security properties and limits: [SECURITY-ASSURANCE.md](SECURITY-ASSURANCE.md).
 
 ## Data Flow
 
