@@ -145,7 +145,7 @@ Main skill file with comprehensive instructions for:
 
 **validate_docs.sh** - Validation script:
 - Checks RST syntax
-- Validates Settings.cfg and Index.rst
+- Checks that guides.xml will render (a legacy Settings.cfg is only reported) and that Index.rst exists
 - Detects encoding issues
 - Identifies trailing whitespace
 
@@ -158,18 +158,18 @@ Main skill file with comprehensive instructions for:
 - Extracts data from PHP code, extension configs, composer.json
 - Optional: build configs (.github/workflows, phpunit.xml)
 - Optional: repository metadata (GitHub/GitLab API)
-- Outputs to .claude/docs-extraction/data/*.json
+- Writes JSON files to `data/` in the extraction directory, outside the project: `$DOCS_EXTRACTION_DIR` if set, else `${TMPDIR:-/tmp}/typo3-docs-extraction/<sha256 of the project path>`; `extraction-dir.sh` prints it
 
 **analyze-docs.sh** - Documentation coverage analysis:
 - Compares extracted data with existing Documentation/
 - Identifies missing and outdated documentation
-- Generates Documentation/ANALYSIS.md with recommendations
+- Generates ANALYSIS.md with recommendations in the extraction directory
 - Prioritizes action items for systematic documentation
 
 **extract-php.sh** - PHP code extraction:
-- Parses Classes/**/*.php for docblocks and signatures
-- Extracts class descriptions, methods, constants
-- Outputs to .claude/docs-extraction/data/php_apis.json
+- Reads the class declarations in Classes/**/*.php
+- Extracts class name, namespace, docblock summary, @author and @license
+- Outputs to data/php_apis.json in the extraction directory
 
 **extract-extension-config.sh** - Extension configuration extraction:
 - Parses ext_emconf.php for extension metadata
@@ -179,20 +179,20 @@ Main skill file with comprehensive instructions for:
 
 **extract-composer.sh** - Composer dependency extraction:
 - Extracts requirements and dev-requirements
-- Outputs to .claude/docs-extraction/data/dependencies.json
+- Outputs to data/dependencies.json in the extraction directory
 
 **extract-project-files.sh** - Project file extraction:
 - Extracts content from README.md, CHANGELOG.md
-- Outputs to .claude/docs-extraction/data/project_files.json
+- Outputs to data/project_files.json in the extraction directory
 
 **extract-build-configs.sh** - Build configuration extraction (optional):
 - Extracts CI/CD configurations, PHPUnit settings
-- Outputs to .claude/docs-extraction/data/build_configs.json
+- Outputs to data/build_configs.json in the extraction directory
 
 **extract-repo-metadata.sh** - Repository metadata extraction (optional):
 - Fetches GitHub/GitLab repository information
 - Requires gh or glab CLI tools
-- Outputs to .claude/docs-extraction/data/repo_metadata.json
+- Outputs to data/repo_metadata.json in the extraction directory
 - Cached for 24 hours
 
 ## Usage
@@ -205,10 +205,12 @@ The skill automatically activates for TYPO3 documentation tasks. You can also ma
 
 ### Quick Examples
 
+`$SKILL_SCRIPTS` stands for the skill's `scripts/` directory. For the skills-directory install above it is `~/.claude/skills/typo3-docs/skills/typo3-docs/scripts`.
+
 **Add AI Assistant Context:**
 ```bash
 cd /path/to/your-extension
-~/.claude/skills/typo3-docs/scripts/add-agents-md.sh
+$SKILL_SCRIPTS/add-agents-md.sh
 # Creates Documentation/AGENTS.md with TYPO3 documentation patterns
 ```
 
@@ -217,16 +219,16 @@ cd /path/to/your-extension
 cd /path/to/your-extension
 
 # Extract data from code and configs
-~/.claude/skills/typo3-docs/scripts/extract-all.sh
+$SKILL_SCRIPTS/extract-all.sh
 
 # Analyze documentation coverage
-~/.claude/skills/typo3-docs/scripts/analyze-docs.sh
+$SKILL_SCRIPTS/analyze-docs.sh
 
 # Review the analysis report
-cat Documentation/ANALYSIS.md
+cat "$("$SKILL_SCRIPTS/extraction-dir.sh")/ANALYSIS.md"
 
 # Extract with optional sources
-~/.claude/skills/typo3-docs/scripts/extract-all.sh --all  # Include build configs & repo metadata
+$SKILL_SCRIPTS/extract-all.sh --all  # Include build configs & repo metadata
 ```
 
 **Document Configuration:**
@@ -263,12 +265,12 @@ cat Documentation/ANALYSIS.md
 
 **Validate Documentation:**
 ```bash
-~/.claude/skills/typo3-docs/scripts/validate_docs.sh /path/to/project
+$SKILL_SCRIPTS/validate_docs.sh /path/to/project
 ```
 
 **Render Documentation:**
 ```bash
-~/.claude/skills/typo3-docs/scripts/render_docs.sh /path/to/project
+$SKILL_SCRIPTS/render_docs.sh /path/to/project
 ```
 
 ## Deployment Setup
@@ -278,7 +280,7 @@ cat Documentation/ANALYSIS.md
 ### Prerequisites
 1. Extension published in [TYPO3 Extension Repository (TER)](https://extensions.typo3.org/)
 2. Git repository URL referenced on TER detail page
-3. Valid Documentation/ structure with Index.rst and Settings.cfg
+3. Valid Documentation/ structure with Index.rst and guides.xml
 
 ### Quick Webhook Setup
 
@@ -309,7 +311,7 @@ After first push, check:
 
 **First build requires approval** by TYPO3 Documentation Team (1-3 business days). Future builds are automatic.
 
-**Full webhook setup guide:** [references/intercept-deployment.md](references/intercept-deployment.md)
+**Full webhook setup guide:** [references/intercept-deployment.md](skills/typo3-docs/references/intercept-deployment.md)
 
 ## Quality Standards
 
@@ -376,9 +378,7 @@ Based on:
 
 ---
 
-**Version:** 1.0.0
 **Maintained By:** Netresearch DTT GmbH
-**Last Updated:** 2025-10-18
 
 ---
 

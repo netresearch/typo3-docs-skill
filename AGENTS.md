@@ -8,14 +8,14 @@
 ```
 ├── skills/typo3-docs/
 │   ├── SKILL.md                         # Main skill definition
-│   ├── references/                      # Reference documentation (17 files)
+│   ├── references/                      # Reference documentation
 │   │   ├── rst-syntax.md                # RST formatting guide
 │   │   ├── typo3-directives.md          # TYPO3-specific directives
 │   │   ├── extraction-patterns.md       # Doc extraction patterns
 │   │   ├── intercept-deployment.md      # TYPO3 Intercept webhook setup
 │   │   ├── rendering.md                 # Local rendering guide
 │   │   └── ...                          # More references
-│   ├── scripts/                         # Automation scripts (12 files)
+│   ├── scripts/                         # Automation and checkpoint scripts
 │   │   ├── validate_docs.sh             # RST validation
 │   │   ├── render_docs.sh               # Docker-based rendering
 │   │   ├── extract-all.sh               # Full extraction orchestrator

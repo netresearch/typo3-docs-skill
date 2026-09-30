@@ -12,8 +12,8 @@ This skill guides AI agents through creating and maintaining TYPO3 extension doc
 ```
 skills/typo3-docs/
 ├── SKILL.md              # Entry point — workflow, directives, quality standards
-├── references/           # 17 reference documents loaded on demand
-├── scripts/              # 12 automation scripts
+├── references/           # Reference documents loaded on demand
+├── scripts/              # Automation and checkpoint scripts
 └── assets/               # Templates (AGENTS.md for target Documentation/ dirs)
 ```
 
@@ -37,7 +37,7 @@ Deep-dive documents organized by topic:
 Two categories of scripts:
 
 **Documentation authoring:**
-- `validate_docs.sh` — check RST syntax, Settings.cfg, encoding
+- `validate_docs.sh` — check that guides.xml renders, Index.rst exists, RST syntax, encoding, heading hierarchy
 - `render_docs.sh` — render locally with the official TYPO3 Docker image
 - `add-agents-md.sh` — inject AGENTS.md template into Documentation/
 
@@ -53,8 +53,8 @@ Two categories of scripts:
 
 ## Data Flow
 
-1. **Extraction**: Scripts parse source code and configs into JSON files in `.claude/docs-extraction/data/`
-2. **Analysis**: `analyze-docs.sh` compares extracted data with existing `Documentation/` content
+1. **Extraction**: Scripts parse source code and configs into JSON files in `data/` of the extraction directory, which lies outside the project (`extraction-dir.sh`: `$DOCS_EXTRACTION_DIR`, else `${TMPDIR:-/tmp}/typo3-docs-extraction/<sha256 of the project path>`)
+2. **Analysis**: `analyze-docs.sh` compares extracted data with existing `Documentation/` content and writes `ANALYSIS.md` into the extraction directory
 3. **Generation**: Agent uses analysis report to create/update RST files
 4. **Validation**: `validate_docs.sh` checks RST syntax and structure
 5. **Rendering**: `render_docs.sh` produces HTML output for visual review
@@ -64,6 +64,6 @@ Two categories of scripts:
 
 - **Extraction-first workflow**: Extract data from code before writing docs to ensure accuracy
 - **JSON intermediate format**: Extraction outputs JSON, making it easy for agents to consume
-- **Lazy reference loading**: 17 reference files stay out of context until needed
+- **Lazy reference loading**: reference files stay out of context until needed
 - **Official Docker image**: Uses `ghcr.io/typo3-documentation/render-guides` for rendering parity with docs.typo3.org
 - **Template-based AGENTS.md**: Provides documentation context for AI assistants working in target project Documentation/ folders
