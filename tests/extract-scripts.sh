@@ -139,6 +139,11 @@ check "and records that there is none" "False" "$(json "$WORK/meta/data/repo_met
 echo "extract-all.sh"
 check "the core extractions run and exit 0" 0 "$(extract extract-all.sh "$proj" "$WORK/all")"
 check "the core files are written" "5" "$(find "$WORK/all/data" -name '*.json' | wc -l | tr -d ' ')"
+missing_scripts=""
+while IFS= read -r named; do
+    [ -f "$named" ] || missing_scripts="$missing_scripts $named"
+done < <(grep -oE '/[^ ]*/scripts/[A-Za-z0-9_.-]+\.sh' "$WORK/out" || true)
+check "every script the next steps name exists" "" "$missing_scripts"
 check "an unknown option exits 1" 1 \
     "$( (cd "$proj" && DOCS_EXTRACTION_DIR="$WORK/all" bash "$SCRIPTS/extract-all.sh" --bogus >/dev/null 2>&1); echo $?)"
 

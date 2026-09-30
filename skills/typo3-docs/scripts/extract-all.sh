@@ -152,6 +152,5 @@ echo
 echo "Next steps:"
 echo "1. Review extracted data: ls -lh ${DATA_DIR}"
 echo "2. Run gap analysis: ${SCRIPT_DIR}/analyze-docs.sh"
-echo "3. Generate RST templates: ${SCRIPT_DIR}/generate-templates.sh"
-echo "4. Review templates: Documentation/GENERATED/"
+echo "3. Read the report it writes: ${EXTRACTION_DIR}/ANALYSIS.md"
 echo
