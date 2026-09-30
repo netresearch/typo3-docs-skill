@@ -168,6 +168,9 @@ EOF
             name=$(echo "$class_json" | jq -r '.name')
             file=$(echo "$class_json" | jq -r '.file')
             desc=$(echo "$class_json" | jq -r '.description')
+            # The first loop runs in a pipeline subshell, so its class_type is
+            # gone here; derive it again from the file path.
+            class_type=$(get_class_type "$file")
 
             cat >> "${ANALYSIS_FILE}" <<CLASSEOF
 
@@ -258,10 +261,10 @@ if [ -f "${DATA_DIR}/extension_meta.json" ]; then
 
 - **Title:** ${ext_title}
 - **Version:** ${ext_version}
-- **Location:** Check `Documentation/Index.rst` and `Documentation/Settings.cfg`
+- **Location:** Check \`Documentation/Index.rst\` and \`Documentation/guides.xml\`
 
 **Recommended Actions:**
-- Verify version number in Settings.cfg matches ext_emconf.php
+- Verify the release in guides.xml matches ext_emconf.php
 - Ensure extension title is documented in Index.rst
 - Check TYPO3/PHP version constraints are in Installation requirements
 
