@@ -1,13 +1,11 @@
 #!/usr/bin/env bash
-# Check that guides.xml version matches ext_emconf.php version
+# Check that guides.xml version matches ext_emconf.php version.
+#
+# Kept under this name for callers that know it; the check itself is
+# check-guides-xml-version-sync.sh (checkpoint TD-30). This script used to grep
+# the first version="…" in guides.xml, which is the XML declaration's "1.0",
+# so every guides.xml with a declaration was reported as a mismatch, and a
+# missing guides.xml ended the script with a silent exit 1.
 set -euo pipefail
 
-guides_ver=$(grep -oP 'version="[^"]*"' Documentation/guides.xml 2>/dev/null | head -1 | grep -oP '"[^"]*"' | tr -d '"')
-emconf_ver=$(grep -oP "'version'\s*=>\s*'[^']*'" ext_emconf.php 2>/dev/null | grep -oP "'[^']*'$" | tr -d "'")
-
-if [ -n "$guides_ver" ] && [ -n "$emconf_ver" ] && [ "$guides_ver" != "$emconf_ver" ]; then
-    echo "Version mismatch: guides.xml=$guides_ver ext_emconf.php=$emconf_ver"
-    exit 1
-fi
-
-exit 0
+exec bash "$(dirname "${BASH_SOURCE[0]}")/check-guides-xml-version-sync.sh"
