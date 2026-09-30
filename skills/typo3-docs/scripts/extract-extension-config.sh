@@ -19,6 +19,8 @@ NC='\033[0m'
 # Configuration
 PROJECT_DIR="$(pwd)"
 DATA_DIR="$(bash "$(dirname "${BASH_SOURCE[0]}")/extraction-dir.sh")/data"
+# shellcheck source=SCRIPTDIR/json-string.sh
+. "$(dirname "${BASH_SOURCE[0]}")/json-string.sh"
 
 EXT_EMCONF="${PROJECT_DIR}/ext_emconf.php"
 EXT_CONF_TEMPLATE="${PROJECT_DIR}/ext_conf_template.txt"
@@ -56,9 +58,11 @@ if [ -f "${EXT_CONF_TEMPLATE}" ]; then
     # # cat=category/subcategory; type=type; label=Label: Description
     # settingName = defaultValue
 
-    echo '{' > "${OUTPUT_FILE}"
-    echo '  "extraction_date": "'$(date -u +"%Y-%m-%dT%H:%M:%SZ")'",' >> "${OUTPUT_FILE}"
-    echo '  "config_options": [' >> "${OUTPUT_FILE}"
+    {
+        echo '{'
+        printf '  "extraction_date": "%s",\n' "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+        echo '  "config_options": ['
+    } > "${OUTPUT_FILE}"
 
     first=true
 
@@ -80,42 +84,46 @@ if [ -f "${EXT_CONF_TEMPLATE}" ]; then
                 description=$(echo "$description" | sed 's/WARNING:.*//' | sed 's/ *$//')
             fi
 
-            # Read next line for setting name and default
-            read -r next_line
+            # Read next line for setting name and default. A comment on the
+            # last line has none; read then returns 1, which set -e would
+            # turn into an exit in the middle of the JSON.
+            read -r next_line || next_line=""
             if [[ $next_line =~ ^([^=]+)\ =\ (.+)$ ]]; then
                 setting_name="${BASH_REMATCH[1]}"
                 setting_name=$(echo "$setting_name" | sed 's/ *$//')
                 default_value="${BASH_REMATCH[2]}"
                 default_value=$(echo "$default_value" | sed 's/^ *//;s/ *$//')
 
-                # Add comma for non-first entries
-                if [ "$first" = false ]; then
-                    echo '    ,' >> "${OUTPUT_FILE}"
-                fi
+                # Write JSON entry, with a comma before every entry but the first
+                {
+                    if [ "$first" = false ]; then
+                        echo '    ,'
+                    fi
+                    echo '    {'
+                    printf '      "key": %s,\n' "$(json_string "$setting_name")"
+                    printf '      "category": %s,\n' "$(json_string "$category")"
+                    printf '      "subcategory": %s,\n' "$(json_string "$subcategory")"
+                    printf '      "type": %s,\n' "$(json_string "$type")"
+                    printf '      "label": %s,\n' "$(json_string "$label")"
+                    printf '      "description": %s,\n' "$(json_string "$description")"
+                    printf '      "default": %s\n' "$(json_string "$default_value")"
+                    if [ -n "$security_warning" ]; then
+                        echo '      ,'
+                        printf '      "security_warning": %s\n' "$(json_string "$security_warning")"
+                    fi
+                    echo -n '    }'
+                } >> "${OUTPUT_FILE}"
                 first=false
-
-                # Write JSON entry
-                echo '    {' >> "${OUTPUT_FILE}"
-                echo '      "key": "'${setting_name}'",' >> "${OUTPUT_FILE}"
-                echo '      "category": "'${category}'",' >> "${OUTPUT_FILE}"
-                echo '      "subcategory": "'${subcategory}'",' >> "${OUTPUT_FILE}"
-                echo '      "type": "'${type}'",' >> "${OUTPUT_FILE}"
-                echo '      "label": "'"${label}"'",' >> "${OUTPUT_FILE}"
-                echo '      "description": "'"${description}"'",' >> "${OUTPUT_FILE}"
-                echo '      "default": "'"${default_value}"'"' >> "${OUTPUT_FILE}"
-                if [ -n "$security_warning" ]; then
-                    echo '      ,' >> "${OUTPUT_FILE}"
-                    echo '      "security_warning": "'"${security_warning}"'"' >> "${OUTPUT_FILE}"
-                fi
-                echo -n '    }' >> "${OUTPUT_FILE}"
             fi
         fi
     done < "${EXT_CONF_TEMPLATE}"
 
     # Close JSON
-    echo >> "${OUTPUT_FILE}"
-    echo '  ]' >> "${OUTPUT_FILE}"
-    echo '}' >> "${OUTPUT_FILE}"
+    {
+        echo
+        echo '  ]'
+        echo '}'
+    } >> "${OUTPUT_FILE}"
 
     echo -e "${GREEN}✓ ext_conf_template.txt extracted: ${OUTPUT_FILE}${NC}"
 else
