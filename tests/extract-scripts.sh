@@ -104,6 +104,19 @@ echo "extract-composer.sh"
 check "exits 0" 0 "$(extract extract-composer.sh "$proj" "$x")"
 check "the requirements are copied" "^13.4" "$(json "$x/data/dependencies.json" 'require.typo3/cms-core')"
 
+echo "PHP-based extraction in a directory whose name contains a single quote"
+quoted="$WORK/it's-ext"; mkdir -p "$quoted"
+cp "$proj/ext_emconf.php" "$proj/composer.json" "$quoted/"
+check "extract-extension-config.sh exits 0" 0 "$(extract extract-extension-config.sh "$quoted" "$WORK/quoted")"
+check "and reads ext_emconf.php" "1.2.3" "$(json "$WORK/quoted/data/extension_meta.json" 'metadata.version')"
+# extract-composer.sh uses php only when jq is missing: a PATH with just the
+# tools it calls.
+nojq="$WORK/bin-without-jq"; mkdir -p "$nojq"
+for tool in bash dirname mkdir php; do ln -s "$(command -v "$tool")" "$nojq/$tool"; done
+check "extract-composer.sh without jq exits 0" 0 \
+    "$( (cd "$quoted" && DOCS_EXTRACTION_DIR="$WORK/quoted" PATH="$nojq" bash "$SCRIPTS/extract-composer.sh" >/dev/null 2>&1); echo $?)"
+check "and reads composer.json with php" "vendor/ext" "$(json "$WORK/quoted/data/dependencies.json" 'name')"
+
 echo "extract-project-files.sh"
 check "exits 0" 0 "$(extract extract-project-files.sh "$proj" "$x")"
 f="$x/data/project_files.json"

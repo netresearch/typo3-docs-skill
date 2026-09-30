@@ -42,20 +42,22 @@ if command -v jq &> /dev/null; then
         scripts: (.scripts // {})
     }' "${COMPOSER_FILE}" > "${OUTPUT_FILE}"
 else
-    # Fallback to PHP
-    php -r "
-    \$data = json_decode(file_get_contents('${COMPOSER_FILE}'), true);
+    # Fallback to PHP. The path is passed as an argument: interpolated into
+    # the PHP source, a directory name with a single quote was a syntax error.
+    # shellcheck disable=SC2016  # the $ signs belong to PHP, not to the shell
+    php -r '
+    $data = json_decode(file_get_contents($argv[1]), true);
     echo json_encode([
-        'extraction_date' => date('c'),
-        'name' => \$data['name'] ?? '',
-        'description' => \$data['description'] ?? '',
-        'type' => \$data['type'] ?? '',
-        'require' => \$data['require'] ?? [],
-        'require-dev' => \$data['require-dev'] ?? [],
-        'autoload' => \$data['autoload'] ?? [],
-        'scripts' => \$data['scripts'] ?? []
+        "extraction_date" => date("c"),
+        "name" => $data["name"] ?? "",
+        "description" => $data["description"] ?? "",
+        "type" => $data["type"] ?? "",
+        "require" => $data["require"] ?? [],
+        "require-dev" => $data["require-dev"] ?? [],
+        "autoload" => $data["autoload"] ?? [],
+        "scripts" => $data["scripts"] ?? []
     ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-    " > "${OUTPUT_FILE}"
+    ' "${COMPOSER_FILE}" > "${OUTPUT_FILE}"
 fi
 
 echo -e "${GREEN}✓ composer.json extracted: ${OUTPUT_FILE}${NC}"

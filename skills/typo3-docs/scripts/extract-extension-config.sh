@@ -33,15 +33,18 @@ if [ -f "${EXT_EMCONF}" ]; then
 
     OUTPUT_FILE="${DATA_DIR}/extension_meta.json"
 
-    # Use PHP to parse ext_emconf.php properly
-    php -r "
-    \$_EXTKEY = 'temp';
-    include '${EXT_EMCONF}';
+    # Use PHP to parse ext_emconf.php properly. This runs the file's PHP.
+    # The path is passed as an argument: interpolated into the PHP source, a
+    # directory name with a single quote was a PHP syntax error.
+    # shellcheck disable=SC2016  # the $ signs belong to PHP, not to the shell
+    php -r '
+    $_EXTKEY = "temp";
+    include $argv[1];
     echo json_encode([
-        'extraction_date' => date('c'),
-        'metadata' => \$EM_CONF[\$_EXTKEY] ?? []
+        "extraction_date" => date("c"),
+        "metadata" => $EM_CONF[$_EXTKEY] ?? []
     ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-    " > "${OUTPUT_FILE}"
+    ' "${EXT_EMCONF}" > "${OUTPUT_FILE}"
 
     echo -e "${GREEN}✓ ext_emconf.php extracted: ${OUTPUT_FILE}${NC}"
 else
