@@ -150,6 +150,17 @@ check "every script the next steps name exists" "" "$missing_scripts"
 check "an unknown option exits 1" 1 \
     "$( (cd "$proj" && DOCS_EXTRACTION_DIR="$WORK/all" bash "$SCRIPTS/extract-all.sh" --bogus >/dev/null 2>&1); echo $?)"
 
+echo "json-string.sh"
+# shellcheck source=SCRIPTDIR/../skills/typo3-docs/scripts/json-string.sh
+. "$SCRIPTS/json-string.sh"
+value=$'back\\slash "quoted"\ttab\rcr\nnewline\001\037end'
+printf '{"v": %s}\n' "$(json_string "$value")" >"$WORK/json-string.json"
+check "json_string output parses as JSON" "False" "$(json "$WORK/json-string.json" 'v' | grep -q '^INVALID$' && echo True || echo False)"
+check "backslash, quote, tab, CR and newline survive; other control characters are dropped" \
+    "$(printf 'back\\slash "quoted"\ttab\rcr\nnewlineend')" \
+    "$(python3 -c 'import json,sys; sys.stdout.write(json.load(open(sys.argv[1]))["v"])' "$WORK/json-string.json" 2>/dev/null || echo INVALID)"
+check "an empty value is an empty string" '""' "$(json_string '')"
+
 echo "extraction-dir.sh"
 check "DOCS_EXTRACTION_DIR wins" "/some/where" "$(cd "$proj" && DOCS_EXTRACTION_DIR=/some/where bash "$SCRIPTS/extraction-dir.sh")"
 expected="$WORK/tmp/typo3-docs-extraction/$(printf '%s' "$(cd "$proj" && pwd -P)" | sha256sum | cut -d' ' -f1)"
