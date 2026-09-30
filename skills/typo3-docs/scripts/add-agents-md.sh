@@ -38,7 +38,9 @@ fi
 if [ -f "${AGENTS_FILE}" ]; then
     echo -e "${YELLOW}⚠ AGENTS.md already exists in Documentation/${NC}"
     echo
-    read -p "Do you want to overwrite it? (y/N) " -n 1 -r
+    # Without a terminal (an agent, CI) read hits end of input and returns 1,
+    # which set -e turned into a silent exit 1. No answer means no.
+    read -p "Do you want to overwrite it? (y/N) " -n 1 -r || REPLY=""
     echo
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then
         echo "Aborted."
