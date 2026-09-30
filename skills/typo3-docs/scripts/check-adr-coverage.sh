@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Netresearch DTT GmbH
+#
 # Check that extensions with >10 classes have ADR documentation
 set -euo pipefail
 

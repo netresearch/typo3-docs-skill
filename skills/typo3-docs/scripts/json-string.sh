@@ -1,4 +1,7 @@
 # shellcheck shell=bash
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Netresearch DTT GmbH
+#
 # Sourced by the extract-*.sh scripts; defines json_string. Not run directly.
 #
 #   json_string <text>   prints <text> as a JSON string literal, quotes included

@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Netresearch DTT GmbH
+#
 # tests/add-agents-md.sh — behaviour of skills/typo3-docs/scripts/add-agents-md.sh.
 #
 # The script copies assets/AGENTS.md into Documentation/ of the current

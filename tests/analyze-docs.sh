@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Netresearch DTT GmbH
+#
 # tests/analyze-docs.sh — behaviour of skills/typo3-docs/scripts/analyze-docs.sh.
 #
 # The script reads extraction data from DOCS_EXTRACTION_DIR and writes

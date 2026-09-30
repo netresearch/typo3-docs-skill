@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Netresearch DTT GmbH
+#
 # TD-55: the screenshots are not older than the interface they show.
 #
 # Severity `info` on purpose. Measured over the netresearch t3x fleet, five of

@@ -1,3 +1,6 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+<!-- SPDX-FileCopyrightText: Netresearch DTT GmbH -->
+
 # TYPO3 Documentation Skill
 
 A comprehensive Claude Code skill for creating and maintaining TYPO3 extension documentation following official TYPO3 documentation standards.

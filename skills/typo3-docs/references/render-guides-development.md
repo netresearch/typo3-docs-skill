@@ -1,3 +1,6 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+<!-- SPDX-FileCopyrightText: Netresearch DTT GmbH -->
+
 # Developing render-guides itself
 
 For changing the renderer — `TYPO3-Documentation/render-guides`, the

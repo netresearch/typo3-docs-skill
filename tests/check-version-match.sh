@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Netresearch DTT GmbH
+#
 # tests/check-version-match.sh — behaviour of
 # skills/typo3-docs/scripts/check-version-match.sh against guides.xml files of
 # the shape the skill prescribes (an XML declaration, then <project version=…

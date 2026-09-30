@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Netresearch DTT GmbH
+#
 # tests/checkpoint-scripts.sh — exercises the documentation-quality checkpoint
 # scripts against fixtures.
 #

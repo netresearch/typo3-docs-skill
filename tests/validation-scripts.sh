@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Netresearch DTT GmbH
+#
 # tests/validation-scripts.sh — behaviour of the validation and rendering
 # scripts in skills/typo3-docs/scripts/ that tests/checkpoint-scripts.sh does
 # not cover: check-required-doc-sections.sh, check-untranslated-fluid-strings.sh,

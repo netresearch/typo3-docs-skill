@@ -1,3 +1,6 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+<!-- SPDX-FileCopyrightText: Netresearch DTT GmbH -->
+
 # TYPO3 Intercept Deployment & Webhook Setup
 
 Automatic documentation deployment to docs.typo3.org via TYPO3 Intercept.

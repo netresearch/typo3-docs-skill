@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Netresearch DTT GmbH
+#
 # Check Fluid templates for hardcoded English strings in user-facing attributes
 # Flags title, aria-label, alt attributes with >3 English words not using f:translate
 set -euo pipefail

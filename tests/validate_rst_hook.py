@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Netresearch DTT GmbH
 """Behaviour of scripts/validate_rst.py, the PreToolUse hook in hooks/hooks.json.
 
 The hook is run as a subprocess with the payload Claude Code sends on stdin:

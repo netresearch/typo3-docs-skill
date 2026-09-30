@@ -1,3 +1,6 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+<!-- SPDX-FileCopyrightText: Netresearch DTT GmbH -->
+
 # Code Blocks and Structure Elements
 
 Code-presentation elements for TYPO3 docs — routing, decision guides and the

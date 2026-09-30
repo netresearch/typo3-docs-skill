@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Netresearch DTT GmbH
+#
 # TD-53: every documented option carries its type and its default.
 #
 # Depth per entry rather than number of entries: a page with five complete

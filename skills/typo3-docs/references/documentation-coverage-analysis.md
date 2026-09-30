@@ -1,3 +1,6 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+<!-- SPDX-FileCopyrightText: Netresearch DTT GmbH -->
+
 # Documentation Coverage Analysis
 
 `[skill-procedure]` — this skill's own feature-based coverage model and

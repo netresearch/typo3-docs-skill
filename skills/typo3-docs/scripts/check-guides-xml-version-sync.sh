@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Netresearch DTT GmbH
+#
 # Check that guides.xml <project> release matches the ext_emconf.php version and
 # <project> version matches its major.minor (the full version is accepted too).
 # SKILL.md and references/guides-xml.md write version="MAJOR.MINOR" and

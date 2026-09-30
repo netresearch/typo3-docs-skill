@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Netresearch DTT GmbH
+#
 # TD-54: an extension with a user interface shows it at least once.
 #
 # Binds to what the code registers — backend modules and frontend plugins —

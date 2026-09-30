@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Netresearch DTT GmbH
+#
 # Check that guides.xml version matches ext_emconf.php version.
 #
 # Kept under this name for callers that know it; the check itself is

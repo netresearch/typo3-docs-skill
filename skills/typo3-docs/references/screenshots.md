@@ -1,3 +1,6 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+<!-- SPDX-FileCopyrightText: Netresearch DTT GmbH -->
+
 # Screenshots Reference
 
 Creating and inserting screenshots in TYPO3 documentation. Canonical source:

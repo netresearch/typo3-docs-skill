@@ -1,3 +1,6 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+<!-- SPDX-FileCopyrightText: Netresearch DTT GmbH -->
+
 # Contributing to TYPO3-Documentation Repositories
 
 `[regression]`/process knowledge — conventions and verification techniques

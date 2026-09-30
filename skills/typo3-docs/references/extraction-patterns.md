@@ -1,3 +1,6 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+<!-- SPDX-FileCopyrightText: Netresearch DTT GmbH -->
+
 # Documentation Extraction Patterns
 
 Comprehensive guide for automated extraction of documentation content from TYPO3 extension source code, configuration files, and repository metadata.

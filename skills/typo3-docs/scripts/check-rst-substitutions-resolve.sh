@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Netresearch DTT GmbH
+#
 # The perl programs are single-quoted on purpose; their $ belong to perl.
 # shellcheck disable=SC2016
 # TD-46: a page must not use a substitution that only an included file defines.

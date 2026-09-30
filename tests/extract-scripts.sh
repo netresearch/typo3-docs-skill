@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Netresearch DTT GmbH
+#
 # tests/extract-scripts.sh — behaviour of the extract-*.sh scripts in
 # skills/typo3-docs/scripts/.
 #
