@@ -24,7 +24,6 @@ NC='\033[0m'
 
 # Script configuration
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SKILL_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 PROJECT_DIR="$(pwd)"
 
 EXTRACTION_DIR="$(bash "$(dirname "${BASH_SOURCE[0]}")/extraction-dir.sh")"

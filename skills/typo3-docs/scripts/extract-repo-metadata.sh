@@ -15,7 +15,6 @@ set -e
 # Colors
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-RED='\033[0;31m'
 NC='\033[0m'
 
 # Configuration
@@ -116,7 +115,7 @@ elif [ "$REPO_TYPE" = "gitlab" ]; then
     echo "Extracting GitLab metadata..."
 
     # Get repository info
-    glab api "projects/$(echo ${REPO_URL} | sed 's/\//%2F/g')" --jq '{
+    glab api "projects/${REPO_URL//\//%2F}" --jq '{
         extraction_date: now | todate,
         repository: {
             type: "gitlab",

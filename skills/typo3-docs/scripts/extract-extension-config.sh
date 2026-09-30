@@ -11,7 +11,6 @@
 set -e
 
 # Colors
-RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
@@ -93,7 +92,7 @@ if [ -f "${EXT_CONF_TEMPLATE}" ]; then
             read -r next_line || next_line=""
             if [[ $next_line =~ ^([^=]+)\ =\ (.+)$ ]]; then
                 setting_name="${BASH_REMATCH[1]}"
-                setting_name=$(echo "$setting_name" | sed 's/ *$//')
+                setting_name="${setting_name%"${setting_name##*[! ]}"}"
                 default_value="${BASH_REMATCH[2]}"
                 default_value=$(echo "$default_value" | sed 's/^ *//;s/ *$//')
 
