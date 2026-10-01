@@ -116,8 +116,10 @@ elif [ "$REPO_TYPE" = "gitlab" ]; then
 
     echo "Extracting GitLab metadata..."
 
-    # Get repository info
-    glab api "projects/${REPO_URL//\//%2F}" --jq '{
+    # Get repository info. glab api has no --jq option, so jq shapes the
+    # response; under set -e a failed request stops the script here.
+    project_json=$(glab api "projects/${REPO_URL//\//%2F}")
+    jq '{
         extraction_date: now | todate,
         repository: {
             type: "gitlab",
@@ -131,7 +133,7 @@ elif [ "$REPO_TYPE" = "gitlab" ]; then
             created_at: .created_at,
             updated_at: .last_activity_at
         }
-    }' > "${OUTPUT_FILE}"
+    }' <<<"$project_json" > "${OUTPUT_FILE}"
 
     echo -e "${GREEN}✓ GitLab metadata extracted: ${OUTPUT_FILE}${NC}"
 fi

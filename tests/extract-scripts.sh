@@ -7,8 +7,8 @@
 #
 # Each run sets DOCS_EXTRACTION_DIR to a temporary directory, so nothing is
 # written under the shared ${TMPDIR:-/tmp}. Nothing here needs the network:
-# extract-repo-metadata.sh is only run in a repository without a remote, where
-# it stops before calling gh or glab.
+# extract-repo-metadata.sh is run in a repository without a remote, where it
+# stops before calling gh or glab, and against a GitLab remote with a stub glab.
 
 set -uo pipefail
 
@@ -143,6 +143,20 @@ echo "extract-repo-metadata.sh"
 norepo="$WORK/no-remote"; mkdir -p "$norepo"; git -C "$norepo" init -q .
 check "a repository without a GitHub/GitLab remote exits 0" 0 "$(extract extract-repo-metadata.sh "$norepo" "$WORK/meta")"
 check "and records that there is none" "False" "$(json "$WORK/meta/data/repo_metadata.json" 'repository.exists')"
+# A stub glab that, like the real one, rejects --jq and answers the project
+# endpoint with a GitLab-shaped document.
+glrepo="$WORK/gitlab-remote"; mkdir -p "$glrepo" "$WORK/stub-glab"
+git -C "$glrepo" init -q .
+git -C "$glrepo" remote add origin https://gitlab.com/acme/demo.git
+cat >"$WORK/stub-glab/glab" <<'STUB'
+#!/usr/bin/env bash
+for a in "$@"; do [ "$a" = "--jq" ] && { echo "ERROR Unknown flag: --jq." >&2; exit 1; }; done
+[ "$1 $2" = "api projects/acme%2Fdemo" ] || exit 1
+echo '{"name": "demo", "path_with_namespace": "acme/demo", "description": "D", "topics": [], "star_count": 1, "forks_count": 0, "open_issues_count": 0, "created_at": "2026-01-01", "last_activity_at": "2026-02-01"}'
+STUB
+chmod +x "$WORK/stub-glab/glab"
+check "a GitLab remote exits 0" 0 "$(PATH="$WORK/stub-glab:$PATH" extract extract-repo-metadata.sh "$glrepo" "$WORK/gl-meta")"
+check "and writes the project metadata" "acme/demo" "$(json "$WORK/gl-meta/data/repo_metadata.json" 'repository.full_name')"
 
 echo "extract-all.sh"
 check "the core extractions run and exit 0" 0 "$(extract extract-all.sh "$proj" "$WORK/all")"
