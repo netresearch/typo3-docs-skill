@@ -43,7 +43,7 @@ The repository ships no server component, no container image and no code that ru
 | Threat | Countermeasure | Evidence |
 | --- | --- | --- |
 | A path or file name from the project is interpreted by the shell (CWE-78) | Paths are quoted; file lists are read line by line (`while IFS= read -r`) or NUL-separated (`find -print0`); PHP receives file paths as arguments (`$argv`), not inside its source | `extract-*.sh`, `validate_docs.sh`, `check-guides-xml-schema.sh`; `tests/extract-scripts.sh` (directory name with a single quote) |
-| A value from the project breaks out of the JSON the extractors write (CWE-116) | Every project-derived value goes through `json_string`, which escapes backslashes, quotes and control characters | `scripts/json-string.sh`; `tests/extract-scripts.sh` |
+| A value from the project breaks out of the JSON the extractors write (CWE-116) | The bash extractors pass every project-derived value through `json_string`, which escapes backslashes, quotes and control characters; `ext_emconf.php` metadata and the php fallback of `extract-composer.sh` are serialised by PHP's `json_encode`, and `extract-composer.sh` and `extract-repo-metadata.sh` otherwise build their JSON with jq | `scripts/json-string.sh`, `extract-extension-config.sh`, `extract-composer.sh`, `extract-repo-metadata.sh`; `tests/extract-scripts.sh` |
 | Report text from the project is run as a command | The heredocs in `analyze-docs.sh` expand only variables; the Markdown backticks in its text are escaped | `analyze-docs.sh`; `tests/analyze-docs.sh` ("prints nothing on stderr") |
 | A script silently overwrites the user's work | `add-agents-md.sh` asks before replacing `Documentation/AGENTS.md`; without an answer it aborts | `add-agents-md.sh`; `tests/add-agents-md.sh` |
 | A malformed or foreign hook payload breaks the agent's write | `validate_rst.py` exits 0 on unreadable, invalid or unexpected input and never blocks | `scripts/validate_rst.py`; `tests/validate_rst_hook.py` |
@@ -61,8 +61,8 @@ Which of these checks must pass before a pull request can merge is set in the br
 
 - **Least privilege:** the check scripts and checkpoints do not change the extension; the scripts that do name their target. Workflows start from `permissions: {}`.
 - **Fail safe:** the hook fails open so it can never stop an edit; `add-agents-md.sh` treats a missing answer as "no".
-- **Economy of mechanism:** the scripts are short bash and Python programs with no dependencies beyond standard tools, PHP and, for rendering, Docker.
-- **Separation of data and code:** project values are passed to PHP as arguments and written into JSON through one escaping function.
+- **Economy of mechanism:** the scripts are short bash and Python programs; the tools they call are listed in README "Dependencies".
+- **Separation of data and code:** project values are passed to PHP as arguments and written into JSON by an escaping serialiser (`json_string`, `json_encode` or jq), never by plain string concatenation.
 
 ## What a user cannot expect
 

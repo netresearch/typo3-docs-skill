@@ -205,7 +205,7 @@ The skill automatically activates for TYPO3 documentation tasks. You can also ma
 
 ### Quick Examples
 
-`$SKILL_SCRIPTS` stands for the skill's `scripts/` directory. For the skills-directory install above it is `~/.claude/skills/typo3-docs/skills/typo3-docs/scripts`.
+`$SKILL_SCRIPTS` stands for the skill's `scripts/` directory. For the skills-directory install above, set it first: `SKILL_SCRIPTS=~/.claude/skills/typo3-docs/skills/typo3-docs/scripts`.
 
 **Add AI Assistant Context:**
 ```bash
