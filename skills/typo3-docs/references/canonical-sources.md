@@ -1,3 +1,6 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+<!-- SPDX-FileCopyrightText: Netresearch DTT GmbH -->
+
 # Canonical Sources — who owns which truth
 
 The official TYPO3 How-to-Document manual is the canonical source for TYPO3

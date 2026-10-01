@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Netresearch DTT GmbH
 """
 PreToolUse hook to validate RST content before writing to Documentation/ files.
 Checks for common TYPO3 RST patterns and provides helpful reminders.
@@ -87,11 +89,17 @@ def main():
     if not input_data:
         return
 
+    # Claude Code passes the tool's arguments nested under "tool_input"
+    # (Write: file_path, content; Edit: file_path, new_string).
     try:
         data = json.loads(input_data)
-        file_path = data.get("file_path", "") or data.get("path", "")
-        content = data.get("content", "") or data.get("new_string", "")
-    except (json.JSONDecodeError, TypeError):
+        tool_input = data.get("tool_input") or {}
+        file_path = tool_input.get("file_path", "") or tool_input.get("path", "")
+        content = tool_input.get("content", "") or tool_input.get("new_string", "")
+    except (json.JSONDecodeError, TypeError, AttributeError):
+        return
+
+    if not isinstance(file_path, str) or not isinstance(content, str):
         return
 
     if not file_path or "Documentation" not in file_path:

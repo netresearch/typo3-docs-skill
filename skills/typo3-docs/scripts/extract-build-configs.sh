@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Netresearch DTT GmbH
 
 #
 # Extract Build Configuration
@@ -14,38 +16,43 @@ set -e
 
 # Colors
 GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
 NC='\033[0m'
 
 # Configuration
 PROJECT_DIR="$(pwd)"
 DATA_DIR="$(bash "$(dirname "${BASH_SOURCE[0]}")/extraction-dir.sh")/data"
 OUTPUT_FILE="${DATA_DIR}/build_configs.json"
+# shellcheck source=SCRIPTDIR/json-string.sh
+. "$(dirname "${BASH_SOURCE[0]}")/json-string.sh"
 
 mkdir -p "${DATA_DIR}"
 
 echo "Extracting build configurations..."
 
 # Start JSON
-echo '{' > "${OUTPUT_FILE}"
-echo '  "extraction_date": "'$(date -u +"%Y-%m-%dT%H:%M:%SZ")'",' >> "${OUTPUT_FILE}"
+{
+    echo '{'
+    printf '  "extraction_date": "%s",\n' "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+} > "${OUTPUT_FILE}"
 
 # GitHub Actions
 if [ -d "${PROJECT_DIR}/.github/workflows" ]; then
     workflow_files=$(find "${PROJECT_DIR}/.github/workflows" -name "*.yml" -o -name "*.yaml" 2>/dev/null || true)
     if [ -n "$workflow_files" ]; then
-        echo '  "github_actions": {' >> "${OUTPUT_FILE}"
-        echo '    "exists": true,' >> "${OUTPUT_FILE}"
-        echo '    "files": [' >> "${OUTPUT_FILE}"
-        first=true
-        for wf in $workflow_files; do
-            if [ "$first" = false ]; then echo '      ,' >> "${OUTPUT_FILE}"; fi
-            first=false
-            rel_path="${wf#$PROJECT_DIR/}"
-            echo '      "'${rel_path}'"' >> "${OUTPUT_FILE}"
-        done
-        echo '    ]' >> "${OUTPUT_FILE}"
-        echo '  },' >> "${OUTPUT_FILE}"
+        {
+            echo '  "github_actions": {'
+            echo '    "exists": true,'
+            echo '    "files": ['
+            first=true
+            while IFS= read -r wf; do
+                if [ "$first" = false ]; then echo '      ,'; fi
+                first=false
+                rel_path="${wf#"$PROJECT_DIR"/}"
+                printf '      %s\n' "$(json_string "$rel_path")"
+            done <<< "$workflow_files"
+            echo '    ]'
+            echo '  },'
+        } >> "${OUTPUT_FILE}"
     else
         echo '  "github_actions": { "exists": false },' >> "${OUTPUT_FILE}"
     fi
@@ -63,15 +70,17 @@ fi
 # PHPUnit
 phpunit_files=$(find "${PROJECT_DIR}" -maxdepth 2 -name "phpunit.xml*" 2>/dev/null || true)
 if [ -n "$phpunit_files" ]; then
-    echo '  "phpunit": { "exists": true, "files": [' >> "${OUTPUT_FILE}"
-    first=true
-    for pf in $phpunit_files; do
-        if [ "$first" = false ]; then echo '      ,' >> "${OUTPUT_FILE}"; fi
-        first=false
-        rel_path="${pf#$PROJECT_DIR/}"
-        echo '      "'${rel_path}'"' >> "${OUTPUT_FILE}"
-    done
-    echo '    ] },' >> "${OUTPUT_FILE}"
+    {
+        echo '  "phpunit": { "exists": true, "files": ['
+        first=true
+        while IFS= read -r pf; do
+            if [ "$first" = false ]; then echo '      ,'; fi
+            first=false
+            rel_path="${pf#"$PROJECT_DIR"/}"
+            printf '      %s\n' "$(json_string "$rel_path")"
+        done <<< "$phpunit_files"
+        echo '    ] },'
+    } >> "${OUTPUT_FILE}"
 else
     echo '  "phpunit": { "exists": false },' >> "${OUTPUT_FILE}"
 fi

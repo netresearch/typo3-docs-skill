@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Netresearch DTT GmbH
 """
 Validate TYPO3 RST heading hierarchy.
 
@@ -116,7 +118,9 @@ def main():
         sys.exit(2)
 
     filepath = sys.argv[1]
-    with open(filepath) as f:
+    # validate_docs.sh reports a non-UTF-8 file as a warning; reading it must
+    # not fail, or the caller's `set -e` ends the run at this file.
+    with open(filepath, encoding="utf-8", errors="replace") as f:
         lines = f.readlines()
 
     headings = parse_headings(lines)

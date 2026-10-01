@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Netresearch DTT GmbH
+#
 # TD-52: every setting the extension declares is mentioned in the documentation.
 #
 # The denominator comes from the code, not from a page count: ext_conf_template.txt

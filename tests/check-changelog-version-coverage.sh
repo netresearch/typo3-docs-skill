@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Netresearch DTT GmbH
+#
 # Cases for skills/typo3-docs/scripts/check-changelog-version-coverage.sh.
 #
 # The script reported every released version of this repository as missing from

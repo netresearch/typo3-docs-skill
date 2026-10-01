@@ -1,3 +1,6 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+<!-- SPDX-FileCopyrightText: Netresearch DTT GmbH -->
+
 # RST Coding Guidelines
 
 Working summary of the TYPO3 documentation coding standards, plus the

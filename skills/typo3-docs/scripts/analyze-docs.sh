@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Netresearch DTT GmbH
 
 #
 # Analyze Documentation Coverage
@@ -14,7 +16,6 @@
 set -e
 
 # Colors
-RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
@@ -43,14 +44,12 @@ declare -A BASE_WEIGHTS=(
     ["other"]=3                  # Miscellaneous
 )
 
-# Severity Multipliers
+# Severity and user impact multipliers. The report's "Priority Score System"
+# section lists the full table (outdated = 2, incomplete = 1, integrators = 2);
+# only the values below are applied, because the analysis detects missing
+# documentation only.
 SEVERITY_MISSING=3               # Completely undocumented
-SEVERITY_OUTDATED=2              # Exists but wrong/incomplete
-SEVERITY_INCOMPLETE=1            # Partial documentation
-
-# User Impact Multipliers
 IMPACT_USER=3                    # End users, editors
-IMPACT_INTEGRATOR=2              # TypoScript, TSconfig
 IMPACT_DEVELOPER=1               # API, internal code
 
 # Function to calculate gap priority
@@ -144,10 +143,12 @@ if [ -f "${DATA_DIR}/php_apis.json" ]; then
 EOF
 
     if [ $missing_classes -gt 0 ]; then
-        echo "## Missing Class Documentation" >> "${ANALYSIS_FILE}"
-        echo >> "${ANALYSIS_FILE}"
-        echo "Classes listed by **priority score** (Priority = BaseWeight × Severity × Impact)" >> "${ANALYSIS_FILE}"
-        echo >> "${ANALYSIS_FILE}"
+        {
+            echo "## Missing Class Documentation"
+            echo
+            echo "Classes listed by **priority score** (Priority = BaseWeight × Severity × Impact)"
+            echo
+        } >> "${ANALYSIS_FILE}"
 
         # Create temporary file with priority calculations
         temp_classes=$(mktemp)
@@ -157,7 +158,7 @@ EOF
             file_path=$(echo "$class_json" | jq -r '.file')
             class_type=$(get_class_type "$file_path")
             base_weight=${BASE_WEIGHTS[$class_type]}
-            priority=$(calculate_priority $base_weight $SEVERITY_MISSING $IMPACT_DEVELOPER)
+            priority=$(calculate_priority "$base_weight" "$SEVERITY_MISSING" "$IMPACT_DEVELOPER")
 
             echo "$priority|$class_json" >> "$temp_classes"
         done
@@ -168,6 +169,9 @@ EOF
             name=$(echo "$class_json" | jq -r '.name')
             file=$(echo "$class_json" | jq -r '.file')
             desc=$(echo "$class_json" | jq -r '.description')
+            # The first loop runs in a pipeline subshell, so its class_type is
+            # gone here; derive it again from the file path.
+            class_type=$(get_class_type "$file")
 
             cat >> "${ANALYSIS_FILE}" <<CLASSEOF
 
@@ -213,14 +217,16 @@ if [ -f "${DATA_DIR}/config_options.json" ]; then
 EOF
 
     if [ $missing_options -gt 0 ]; then
-        echo "## Missing Configuration Documentation" >> "${ANALYSIS_FILE}"
-        echo >> "${ANALYSIS_FILE}"
-        echo "Configuration options listed by **priority score** (Priority = BaseWeight × Severity × Impact)" >> "${ANALYSIS_FILE}"
-        echo >> "${ANALYSIS_FILE}"
+        {
+            echo "## Missing Configuration Documentation"
+            echo
+            echo "Configuration options listed by **priority score** (Priority = BaseWeight × Severity × Impact)"
+            echo
+        } >> "${ANALYSIS_FILE}"
 
         # Configuration options are user-facing (HIGH priority)
         base_weight=${BASE_WEIGHTS["ext_conf_template"]}
-        priority=$(calculate_priority $base_weight $SEVERITY_MISSING $IMPACT_USER)
+        priority=$(calculate_priority "$base_weight" "$SEVERITY_MISSING" "$IMPACT_USER")
 
         # List undocumented options with priority
         jq -r --arg priority "$priority" '.config_options[] |
@@ -258,10 +264,10 @@ if [ -f "${DATA_DIR}/extension_meta.json" ]; then
 
 - **Title:** ${ext_title}
 - **Version:** ${ext_version}
-- **Location:** Check `Documentation/Index.rst` and `Documentation/Settings.cfg`
+- **Location:** Check \`Documentation/Index.rst\` and \`Documentation/guides.xml\`
 
 **Recommended Actions:**
-- Verify version number in Settings.cfg matches ext_emconf.php
+- Verify the release in guides.xml matches ext_emconf.php
 - Ensure extension title is documented in Index.rst
 - Check TYPO3/PHP version constraints are in Installation requirements
 

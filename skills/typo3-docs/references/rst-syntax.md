@@ -1,3 +1,6 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+<!-- SPDX-FileCopyrightText: Netresearch DTT GmbH -->
+
 # RST Syntax Reference
 
 TYPO3-specific reStructuredText conventions. Generic RST/Sphinx syntax

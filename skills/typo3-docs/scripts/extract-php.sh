@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Netresearch DTT GmbH
 
 #
 # Extract PHP Code Documentation
@@ -13,7 +15,6 @@
 set -e
 
 # Colors
-RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
@@ -21,6 +22,8 @@ NC='\033[0m'
 # Configuration
 PROJECT_DIR="$(pwd)"
 DATA_DIR="$(bash "$(dirname "${BASH_SOURCE[0]}")/extraction-dir.sh")/data"
+# shellcheck source=SCRIPTDIR/json-string.sh
+. "$(dirname "${BASH_SOURCE[0]}")/json-string.sh"
 OUTPUT_FILE="${DATA_DIR}/php_apis.json"
 
 CLASSES_DIR="${PROJECT_DIR}/Classes"
@@ -65,6 +68,9 @@ get_class_category() {
     fi
 }
 
+# Create output directory
+mkdir -p "${DATA_DIR}"
+
 # Check if Classes/ exists
 if [ ! -d "${CLASSES_DIR}" ]; then
     echo -e "${YELLOW}No Classes/ directory found, skipping PHP extraction${NC}"
@@ -72,24 +78,25 @@ if [ ! -d "${CLASSES_DIR}" ]; then
     exit 0
 fi
 
-# Create output directory
-mkdir -p "${DATA_DIR}"
-
 echo "Scanning PHP files in: ${CLASSES_DIR}"
 
 # Initialize JSON output
-echo '{' > "${OUTPUT_FILE}"
-echo '  "extraction_date": "'$(date -u +"%Y-%m-%dT%H:%M:%SZ")'",' >> "${OUTPUT_FILE}"
-echo '  "classes": [' >> "${OUTPUT_FILE}"
+{
+    echo '{'
+    printf '  "extraction_date": "%s",\n' "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+    echo '  "classes": ['
+} > "${OUTPUT_FILE}"
 
 # Find all PHP files
 php_files=$(find "${CLASSES_DIR}" -type f -name "*.php" | sort)
 file_count=$(echo "$php_files" | wc -l)
 current=0
+written=0
 
-for php_file in $php_files; do
+while IFS= read -r php_file; do
+    [ -n "$php_file" ] || continue
     current=$((current + 1))
-    rel_path="${php_file#$PROJECT_DIR/}"
+    rel_path="${php_file#"$PROJECT_DIR"/}"
 
     echo "  Processing: ${rel_path} (${current}/${file_count})"
 
@@ -120,27 +127,33 @@ for php_file in $php_files; do
     doc_priority=$(get_doc_priority "$rel_path")
     class_category=$(get_class_category "$rel_path")
 
-    # Build JSON entry (simplified structure)
-    if [ $current -gt 1 ]; then
-        echo '    ,' >> "${OUTPUT_FILE}"
-    fi
-
-    echo '    {' >> "${OUTPUT_FILE}"
-    echo '      "name": "'${class_name}'",' >> "${OUTPUT_FILE}"
-    echo '      "namespace": "'${namespace}'",' >> "${OUTPUT_FILE}"
-    echo '      "file": "'${rel_path}'",' >> "${OUTPUT_FILE}"
-    echo '      "description": "'${class_desc}'",' >> "${OUTPUT_FILE}"
-    echo '      "author": "'${author}'",' >> "${OUTPUT_FILE}"
-    echo '      "license": "'${license}'",' >> "${OUTPUT_FILE}"
-    echo '      "documentation_priority": "'${doc_priority}'",' >> "${OUTPUT_FILE}"
-    echo '      "category": "'${class_category}'"' >> "${OUTPUT_FILE}"
-    echo -n '    }' >> "${OUTPUT_FILE}"
-done
+    # Build JSON entry (simplified structure). The separator depends on the
+    # entries written, not on the files read: a file without a class (an
+    # interface, a trait) is skipped and must not leave a leading comma.
+    {
+        if [ "$written" -gt 0 ]; then
+            echo '    ,'
+        fi
+        echo '    {'
+        printf '      "name": %s,\n' "$(json_string "$class_name")"
+        printf '      "namespace": %s,\n' "$(json_string "$namespace")"
+        printf '      "file": %s,\n' "$(json_string "$rel_path")"
+        printf '      "description": %s,\n' "$(json_string "$class_desc")"
+        printf '      "author": %s,\n' "$(json_string "$author")"
+        printf '      "license": %s,\n' "$(json_string "$license")"
+        printf '      "documentation_priority": %s,\n' "$(json_string "$doc_priority")"
+        printf '      "category": %s\n' "$(json_string "$class_category")"
+        echo -n '    }'
+    } >> "${OUTPUT_FILE}"
+    written=$((written + 1))
+done <<< "$php_files"
 
 # Close JSON
-echo >> "${OUTPUT_FILE}"
-echo '  ]' >> "${OUTPUT_FILE}"
-echo '}' >> "${OUTPUT_FILE}"
+{
+    echo
+    echo '  ]'
+    echo '}'
+} >> "${OUTPUT_FILE}"
 
 echo -e "${GREEN}✓ PHP extraction complete: ${OUTPUT_FILE}${NC}"
 echo "  Found ${file_count} PHP files"

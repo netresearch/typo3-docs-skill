@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Netresearch DTT GmbH
 
 #
 # Extract Project Files
@@ -13,54 +15,63 @@ set -e
 
 # Colors
 GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
 NC='\033[0m'
 
 # Configuration
 PROJECT_DIR="$(pwd)"
 DATA_DIR="$(bash "$(dirname "${BASH_SOURCE[0]}")/extraction-dir.sh")/data"
 OUTPUT_FILE="${DATA_DIR}/project_files.json"
+# shellcheck source=SCRIPTDIR/json-string.sh
+. "$(dirname "${BASH_SOURCE[0]}")/json-string.sh"
 
 mkdir -p "${DATA_DIR}"
 
 echo "Extracting project files..."
 
 # Start JSON
-echo '{' > "${OUTPUT_FILE}"
-echo '  "extraction_date": "'$(date -u +"%Y-%m-%dT%H:%M:%SZ")'",' >> "${OUTPUT_FILE}"
+{
+    echo '{'
+    printf '  "extraction_date": "%s",\n' "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+} > "${OUTPUT_FILE}"
 
 # Extract README.md
 if [ -f "${PROJECT_DIR}/README.md" ]; then
-    echo '  "readme": {' >> "${OUTPUT_FILE}"
-    echo '    "exists": true,' >> "${OUTPUT_FILE}"
-    echo '    "path": "README.md",' >> "${OUTPUT_FILE}"
     # Get first 100 lines as preview
-    readme_content=$(head -100 "${PROJECT_DIR}/README.md" | sed 's/"/\\"/g' | sed ':a;N;$!ba;s/\n/\\n/g')
-    echo '    "content_preview": "'${readme_content}'"' >> "${OUTPUT_FILE}"
-    echo '  },' >> "${OUTPUT_FILE}"
+    readme_content=$(head -100 "${PROJECT_DIR}/README.md")
+    {
+        echo '  "readme": {'
+        echo '    "exists": true,'
+        echo '    "path": "README.md",'
+        printf '    "content_preview": %s\n' "$(json_string "$readme_content")"
+        echo '  },'
+    } >> "${OUTPUT_FILE}"
 else
     echo '  "readme": { "exists": false },' >> "${OUTPUT_FILE}"
 fi
 
 # Extract CHANGELOG.md
 if [ -f "${PROJECT_DIR}/CHANGELOG.md" ]; then
-    echo '  "changelog": {' >> "${OUTPUT_FILE}"
-    echo '    "exists": true,' >> "${OUTPUT_FILE}"
-    echo '    "path": "CHANGELOG.md",' >> "${OUTPUT_FILE}"
     # Get first 50 lines as preview
-    changelog_content=$(head -50 "${PROJECT_DIR}/CHANGELOG.md" | sed 's/"/\\"/g' | sed ':a;N;$!ba;s/\n/\\n/g')
-    echo '    "content_preview": "'${changelog_content}'"' >> "${OUTPUT_FILE}"
-    echo '  },' >> "${OUTPUT_FILE}"
+    changelog_content=$(head -50 "${PROJECT_DIR}/CHANGELOG.md")
+    {
+        echo '  "changelog": {'
+        echo '    "exists": true,'
+        echo '    "path": "CHANGELOG.md",'
+        printf '    "content_preview": %s\n' "$(json_string "$changelog_content")"
+        echo '  },'
+    } >> "${OUTPUT_FILE}"
 else
     echo '  "changelog": { "exists": false },' >> "${OUTPUT_FILE}"
 fi
 
 # Extract CONTRIBUTING.md
 if [ -f "${PROJECT_DIR}/CONTRIBUTING.md" ]; then
-    echo '  "contributing": {' >> "${OUTPUT_FILE}"
-    echo '    "exists": true,' >> "${OUTPUT_FILE}"
-    echo '    "path": "CONTRIBUTING.md"' >> "${OUTPUT_FILE}"
-    echo '  }' >> "${OUTPUT_FILE}"
+    {
+        echo '  "contributing": {'
+        echo '    "exists": true,'
+        echo '    "path": "CONTRIBUTING.md"'
+        echo '  }'
+    } >> "${OUTPUT_FILE}"
 else
     echo '  "contributing": { "exists": false }' >> "${OUTPUT_FILE}"
 fi

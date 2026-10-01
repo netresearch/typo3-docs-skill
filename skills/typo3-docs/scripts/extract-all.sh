@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Netresearch DTT GmbH
 
 #
 # Extract All Documentation Data
@@ -24,7 +26,6 @@ NC='\033[0m'
 
 # Script configuration
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SKILL_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 PROJECT_DIR="$(pwd)"
 
 EXTRACTION_DIR="$(bash "$(dirname "${BASH_SOURCE[0]}")/extraction-dir.sh")"
@@ -153,6 +154,5 @@ echo
 echo "Next steps:"
 echo "1. Review extracted data: ls -lh ${DATA_DIR}"
 echo "2. Run gap analysis: ${SCRIPT_DIR}/analyze-docs.sh"
-echo "3. Generate RST templates: ${SCRIPT_DIR}/generate-templates.sh"
-echo "4. Review templates: Documentation/GENERATED/"
+echo "3. Read the report it writes: ${EXTRACTION_DIR}/ANALYSIS.md"
 echo

@@ -1,3 +1,6 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+<!-- SPDX-FileCopyrightText: Netresearch DTT GmbH -->
+
 # guides.xml Configuration Reference
 
 Working reference for `Documentation/guides.xml`, with labelled Netresearch

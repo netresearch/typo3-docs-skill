@@ -1,3 +1,6 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+<!-- SPDX-FileCopyrightText: Netresearch DTT GmbH -->
+
 # Documentation Quality Checks (TD-52 … TD-55)
 
 How these four were chosen, and — more useful — what was tried and thrown away.

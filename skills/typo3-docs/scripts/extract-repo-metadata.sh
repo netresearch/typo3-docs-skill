@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Netresearch DTT GmbH
 
 #
 # Extract Repository Metadata
@@ -15,7 +17,6 @@ set -e
 # Colors
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-RED='\033[0;31m'
 NC='\033[0m'
 
 # Configuration
@@ -115,8 +116,10 @@ elif [ "$REPO_TYPE" = "gitlab" ]; then
 
     echo "Extracting GitLab metadata..."
 
-    # Get repository info
-    glab api "projects/$(echo ${REPO_URL} | sed 's/\//%2F/g')" --jq '{
+    # Get repository info. glab api has no --jq option, so jq shapes the
+    # response; under set -e a failed request stops the script here.
+    project_json=$(glab api "projects/${REPO_URL//\//%2F}")
+    jq '{
         extraction_date: now | todate,
         repository: {
             type: "gitlab",
@@ -130,7 +133,7 @@ elif [ "$REPO_TYPE" = "gitlab" ]; then
             created_at: .created_at,
             updated_at: .last_activity_at
         }
-    }' > "${OUTPUT_FILE}"
+    }' <<<"$project_json" > "${OUTPUT_FILE}"
 
     echo -e "${GREEN}✓ GitLab metadata extracted: ${OUTPUT_FILE}${NC}"
 fi

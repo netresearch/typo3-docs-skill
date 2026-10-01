@@ -1,3 +1,6 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+<!-- SPDX-FileCopyrightText: Netresearch DTT GmbH -->
+
 # TYPO3 Documentation Skill
 
 A comprehensive Claude Code skill for creating and maintaining TYPO3 extension documentation following official TYPO3 documentation standards.
@@ -142,7 +145,7 @@ Main skill file with comprehensive instructions for:
 
 **validate_docs.sh** - Validation script:
 - Checks RST syntax
-- Validates Settings.cfg and Index.rst
+- Checks that guides.xml will render (a legacy Settings.cfg is only reported) and that Index.rst exists
 - Detects encoding issues
 - Identifies trailing whitespace
 
@@ -155,18 +158,18 @@ Main skill file with comprehensive instructions for:
 - Extracts data from PHP code, extension configs, composer.json
 - Optional: build configs (.github/workflows, phpunit.xml)
 - Optional: repository metadata (GitHub/GitLab API)
-- Outputs to .claude/docs-extraction/data/*.json
+- Writes JSON files to `data/` in the extraction directory, outside the project: `$DOCS_EXTRACTION_DIR` if set, else `${TMPDIR:-/tmp}/typo3-docs-extraction/<sha256 of the project path>`; `extraction-dir.sh` prints it
 
 **analyze-docs.sh** - Documentation coverage analysis:
 - Compares extracted data with existing Documentation/
 - Identifies missing and outdated documentation
-- Generates Documentation/ANALYSIS.md with recommendations
+- Generates ANALYSIS.md with recommendations in the extraction directory
 - Prioritizes action items for systematic documentation
 
 **extract-php.sh** - PHP code extraction:
-- Parses Classes/**/*.php for docblocks and signatures
-- Extracts class descriptions, methods, constants
-- Outputs to .claude/docs-extraction/data/php_apis.json
+- Reads the class declarations in Classes/**/*.php
+- Extracts class name, namespace, docblock summary, @author and @license
+- Outputs to data/php_apis.json in the extraction directory
 
 **extract-extension-config.sh** - Extension configuration extraction:
 - Parses ext_emconf.php for extension metadata
@@ -176,20 +179,20 @@ Main skill file with comprehensive instructions for:
 
 **extract-composer.sh** - Composer dependency extraction:
 - Extracts requirements and dev-requirements
-- Outputs to .claude/docs-extraction/data/dependencies.json
+- Outputs to data/dependencies.json in the extraction directory
 
 **extract-project-files.sh** - Project file extraction:
 - Extracts content from README.md, CHANGELOG.md
-- Outputs to .claude/docs-extraction/data/project_files.json
+- Outputs to data/project_files.json in the extraction directory
 
 **extract-build-configs.sh** - Build configuration extraction (optional):
 - Extracts CI/CD configurations, PHPUnit settings
-- Outputs to .claude/docs-extraction/data/build_configs.json
+- Outputs to data/build_configs.json in the extraction directory
 
 **extract-repo-metadata.sh** - Repository metadata extraction (optional):
 - Fetches GitHub/GitLab repository information
 - Requires gh or glab CLI tools
-- Outputs to .claude/docs-extraction/data/repo_metadata.json
+- Outputs to data/repo_metadata.json in the extraction directory
 - Cached for 24 hours
 
 ## Usage
@@ -202,10 +205,12 @@ The skill automatically activates for TYPO3 documentation tasks. You can also ma
 
 ### Quick Examples
 
+`$SKILL_SCRIPTS` stands for the skill's `scripts/` directory. For the skills-directory install above, set it first: `SKILL_SCRIPTS=~/.claude/skills/typo3-docs/skills/typo3-docs/scripts`.
+
 **Add AI Assistant Context:**
 ```bash
 cd /path/to/your-extension
-~/.claude/skills/typo3-docs/scripts/add-agents-md.sh
+$SKILL_SCRIPTS/add-agents-md.sh
 # Creates Documentation/AGENTS.md with TYPO3 documentation patterns
 ```
 
@@ -214,16 +219,16 @@ cd /path/to/your-extension
 cd /path/to/your-extension
 
 # Extract data from code and configs
-~/.claude/skills/typo3-docs/scripts/extract-all.sh
+$SKILL_SCRIPTS/extract-all.sh
 
 # Analyze documentation coverage
-~/.claude/skills/typo3-docs/scripts/analyze-docs.sh
+$SKILL_SCRIPTS/analyze-docs.sh
 
 # Review the analysis report
-cat Documentation/ANALYSIS.md
+cat "$("$SKILL_SCRIPTS/extraction-dir.sh")/ANALYSIS.md"
 
 # Extract with optional sources
-~/.claude/skills/typo3-docs/scripts/extract-all.sh --all  # Include build configs & repo metadata
+$SKILL_SCRIPTS/extract-all.sh --all  # Include build configs & repo metadata
 ```
 
 **Document Configuration:**
@@ -260,12 +265,12 @@ cat Documentation/ANALYSIS.md
 
 **Validate Documentation:**
 ```bash
-~/.claude/skills/typo3-docs/scripts/validate_docs.sh /path/to/project
+$SKILL_SCRIPTS/validate_docs.sh /path/to/project
 ```
 
 **Render Documentation:**
 ```bash
-~/.claude/skills/typo3-docs/scripts/render_docs.sh /path/to/project
+$SKILL_SCRIPTS/render_docs.sh /path/to/project
 ```
 
 ## Deployment Setup
@@ -275,7 +280,7 @@ cat Documentation/ANALYSIS.md
 ### Prerequisites
 1. Extension published in [TYPO3 Extension Repository (TER)](https://extensions.typo3.org/)
 2. Git repository URL referenced on TER detail page
-3. Valid Documentation/ structure with Index.rst and Settings.cfg
+3. Valid Documentation/ structure with Index.rst and guides.xml
 
 ### Quick Webhook Setup
 
@@ -306,7 +311,7 @@ After first push, check:
 
 **First build requires approval** by TYPO3 Documentation Team (1-3 business days). Future builds are automatic.
 
-**Full webhook setup guide:** [references/intercept-deployment.md](references/intercept-deployment.md)
+**Full webhook setup guide:** [references/intercept-deployment.md](skills/typo3-docs/references/intercept-deployment.md)
 
 ## Quality Standards
 
@@ -338,15 +343,56 @@ Before committing documentation changes, ensure:
 
 ## Contributing
 
-Contributions are welcome! Please follow these guidelines:
+Open issues and pull requests on [GitHub](https://github.com/netresearch/typo3-docs-skill). Fork the repository, create a branch, and open a pull request against `main`. The commands for working on this repository are listed in [AGENTS.md](AGENTS.md#commands). A pull request that adds or changes behaviour in a script adds or updates a check in `tests/` that fails without the change.
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/improvement`)
-3. Make your changes
-4. Test the skill thoroughly
-5. Commit your changes (`git commit -m 'Add improvement'`)
-6. Push to the branch (`git push origin feature/improvement`)
-7. Create a Pull Request
+### Tests
+
+The behavioural tests live in `tests/` and run offline. They need bash, git, php, python3, perl and jq; no Docker daemon, network or model API is used.
+
+```bash
+bash tests/checkpoint-scripts.sh                  # the TD-* check scripts (settings, confval, screenshots, ADRs, substitutions, guides.xml sync)
+bash tests/check-changelog-version-coverage.sh    # check-changelog-version-coverage.sh
+bash tests/check-version-match.sh                 # check-version-match.sh
+bash tests/validation-scripts.sh                  # validate_docs.sh, validate_headings.py, check-guides-xml-schema.sh, check-required-doc-sections.sh, check-untranslated-fluid-strings.sh, render_docs.sh
+bash tests/extract-scripts.sh                     # extract-*.sh, extraction-dir.sh, json-string.sh
+bash tests/analyze-docs.sh                        # analyze-docs.sh
+bash tests/add-agents-md.sh                       # add-agents-md.sh
+bash tests/check-plugin-version.sh                # Build/Scripts/check-plugin-version.sh and Build/hooks/pre-push
+python3 tests/validate_rst_hook.py                # scripts/validate_rst.py, the plugin hook
+```
+
+- The tests build fixture directories (extensions, git repositories, extraction data, hook payloads) in a temporary directory, run the script against them and compare exit codes, output and written files. Extraction output goes to a temporary `DOCS_EXTRACTION_DIR`.
+- `render_docs.sh` is run against a stand-in `docker` placed first on `PATH`, which records the arguments; the real renderer is not started.
+- Each check prints `ok` or `FAIL`; a `FAIL` line names the expectation that was not met and, where there is one, the value found instead. A test file exits 1 when any check failed.
+
+In CI, the Tests workflow (`.github/workflows/tests.yml`) runs every `tests/**/*.sh` and `tests/**/*.py` on each pull request and on pushes to `main`, and fails when the repository ships scripts under `skills/*/scripts/` but no test ran. The skill's Markdown is not executed: Skill Validation checks its structure, and Eval Validation checks the definitions in `skills/typo3-docs/evals/evals.json`. `pre-commit run --all-files` runs the hooks of [`.pre-commit-config.yaml`](.pre-commit-config.yaml) locally. `shellcheck -x -S style` reports nothing for the repository's shell scripts; CI enforces severity `error`.
+
+### Dependencies
+
+- **Composer:** `composer.json` requires `netresearch/composer-agent-skill-plugin` (`*`, the latest release at install time), which installs the skill into a PHP project. No `composer.lock` is committed.
+- **Tools the scripts call:** bash, git, php (guides.xml parsing, `ext_emconf.php`), python3 (`validate_headings.py`, the plugin hook), jq (`analyze-docs.sh`, `extract-repo-metadata.sh`; `extract-composer.sh` falls back to php), perl (`check-rst-substitutions-resolve.sh`), Docker (`render_docs.sh`, image `ghcr.io/typo3-documentation/render-guides:latest`), `gh` or `glab` (`extract-repo-metadata.sh`, optional) and docutils' `rst2html.py` (`validate_docs.sh`, optional). The scripts install none of them; `SKILL.md` names php and Docker under `compatibility`.
+- **Development tools:** the hooks in `.pre-commit-config.yaml` are pinned by `rev:`. Renovate ([`renovate.json`](renovate.json), `config:recommended` with the pre-commit manager enabled) proposes updates for them. The Composer requirement has no version range and no lock file, so there is nothing for it to update.
+- **CI:** the workflows call reusable workflows of `netresearch/.github`, `netresearch/skill-repo-skill` and `netresearch/typo3-ci-workflows`; those reusables pin the third-party actions they use by commit SHA.
+- A new dependency arrives through a pull request, where dependency review and Composer Audit run (see below); which licences and findings are acceptable is set by the organisation policy linked below.
+
+## Governance and policies
+
+This repository follows the Netresearch organisation policies:
+
+- [Governance](https://github.com/netresearch/.github/blob/main/GOVERNANCE.md): ownership, roles, how decisions are made and disputes resolved, and continuity.
+- [Roadmap](https://github.com/netresearch/.github/blob/main/ROADMAP.md): planned and explicitly excluded work for the coming year.
+- [Handling of dependency and code analysis findings](https://github.com/netresearch/.github/blob/main/SECURITY.md#handling-of-dependency-and-code-analysis-findings): thresholds, deadlines and the exception process for dependency (SCA) and static analysis (SAST) findings.
+- [Secret management](https://github.com/netresearch/.github/blob/main/SECURITY.md#secret-management): how CI and release credentials are stored, accessed and rotated.
+- [Access roster](https://github.com/netresearch/.github/blob/main/docs/access-roster.md): who holds administrative access to this repository and the organisation.
+
+The security assurance case for this skill (threat model, trust boundaries, countermeasures and limits) is in [docs/SECURITY-ASSURANCE.md](docs/SECURITY-ASSURANCE.md).
+
+Checks that run on pull requests in this repository:
+
+- Every pull request: Skill Validation (`lint.yml`: skill structure, markdownlint, yamllint, actionlint, JSON syntax, ShellCheck, ruff, checkpoint schema), Eval Validation (`eval-validate.yml`), Tests (`tests.yml`), PR Quality Gates (`pr-quality.yml`), the Labeler (`labeler.yml`) and Auto-merge dependency PRs (`auto-merge-deps.yml`, which acts only on Renovate and Dependabot pull requests); configured outside the workflows: CodeQL through GitHub's default setup (Actions and Python), SonarCloud and the DCO sign-off check; on pull requests to `main` that are not drafts, also the CodeRabbit review and the Copilot code review that the repository ruleset requests.
+- Pull requests to `main`: `security.yml` with Betterleaks (secret scanning; fails when it finds a secret), zizmor (workflow static analysis, reported to code scanning), dependency review (fails on vulnerabilities of severity high or above), Composer Audit and Opengrep SAST (which findings fail the check is set by the [organisation rule](https://github.com/netresearch/.github/blob/main/SECURITY.md#static-analysis-sast)); Harness Verification (`harness-verify.yml`) and Template Drift (`check-template-drift.yml`).
+
+Secrets are detected by Betterleaks, which also scans every push to `main`, and by GitHub secret scanning with push protection, which is enabled for the repository.
 
 ## License
 
@@ -373,9 +419,7 @@ Based on:
 
 ---
 
-**Version:** 1.0.0
 **Maintained By:** Netresearch DTT GmbH
-**Last Updated:** 2025-10-18
 
 ---
 

@@ -1,4 +1,6 @@
 ---
+# SPDX-License-Identifier: CC-BY-SA-4.0
+# SPDX-FileCopyrightText: Netresearch DTT GmbH
 name: typo3-docs
 description: "Use when TYPO3 extension documentation has to render on docs.typo3.org, which builds a manual from Documentation/guides.xml and reads no Settings.cfg (a single README.rst serves an extension too small for one): when an extension has no documentation yet, or when creating, editing or reviewing Documentation/*.rst, guides.xml, README.md or XLF translations, rendering docs with Docker, TYPO3 RST directives, screenshots, or XLIFF 2-space indentation (TYPO3 v14+)."
 license: "(MIT AND CC-BY-SA-4.0). See LICENSE-MIT and LICENSE-CC-BY-SA-4.0"

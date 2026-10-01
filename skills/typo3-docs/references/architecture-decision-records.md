@@ -1,3 +1,6 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+<!-- SPDX-FileCopyrightText: Netresearch DTT GmbH -->
+
 # Architecture Decision Records (ADRs)
 
 `[skill-procedure]` — ADR practice for TYPO3 extension documentation (not an
