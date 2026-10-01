@@ -347,7 +347,7 @@ Open issues and pull requests on [GitHub](https://github.com/netresearch/typo3-d
 
 ### Tests
 
-The behavioural tests live in `tests/` and run offline. They need bash, git, php, python3 and jq; no Docker daemon, network or model API is used.
+The behavioural tests live in `tests/` and run offline. They need bash, git, php, python3, perl and jq; no Docker daemon, network or model API is used.
 
 ```bash
 bash tests/checkpoint-scripts.sh                  # the TD-* check scripts (settings, confval, screenshots, ADRs, substitutions, guides.xml sync)
@@ -370,7 +370,7 @@ In CI, the Tests workflow (`.github/workflows/tests.yml`) runs every `tests/**/*
 ### Dependencies
 
 - **Composer:** `composer.json` requires `netresearch/composer-agent-skill-plugin` (`*`, the latest release at install time), which installs the skill into a PHP project. No `composer.lock` is committed.
-- **Tools the scripts call:** bash, git, php (guides.xml parsing, `ext_emconf.php`), python3 (`validate_headings.py`, the plugin hook), jq (`analyze-docs.sh`, `extract-repo-metadata.sh`; `extract-composer.sh` falls back to php), Docker (`render_docs.sh`, image `ghcr.io/typo3-documentation/render-guides:latest`), `gh` or `glab` (`extract-repo-metadata.sh`, optional) and docutils' `rst2html.py` (`validate_docs.sh`, optional). The scripts install none of them; `SKILL.md` names php and Docker under `compatibility`.
+- **Tools the scripts call:** bash, git, php (guides.xml parsing, `ext_emconf.php`), python3 (`validate_headings.py`, the plugin hook), jq (`analyze-docs.sh`, `extract-repo-metadata.sh`; `extract-composer.sh` falls back to php), perl (`check-rst-substitutions-resolve.sh`), Docker (`render_docs.sh`, image `ghcr.io/typo3-documentation/render-guides:latest`), `gh` or `glab` (`extract-repo-metadata.sh`, optional) and docutils' `rst2html.py` (`validate_docs.sh`, optional). The scripts install none of them; `SKILL.md` names php and Docker under `compatibility`.
 - **Development tools:** the hooks in `.pre-commit-config.yaml` are pinned by `rev:`. Renovate ([`renovate.json`](renovate.json), `config:recommended` with the pre-commit manager enabled) proposes updates for them. The Composer requirement has no version range and no lock file, so there is nothing for it to update.
 - **CI:** the workflows call reusable workflows of `netresearch/.github`, `netresearch/skill-repo-skill` and `netresearch/typo3-ci-workflows`; those reusables pin the third-party actions they use by commit SHA.
 - A new dependency arrives through a pull request, where dependency review and Composer Audit run (see below); which licences and findings are acceptable is set by the organisation policy linked below.
@@ -389,10 +389,10 @@ The security assurance case for this skill (threat model, trust boundaries, coun
 
 Checks that run on pull requests in this repository:
 
-- Every pull request: Skill Validation (`lint.yml`: skill structure, markdownlint, yamllint, actionlint, JSON syntax, ShellCheck, ruff, checkpoint schema), Eval Validation (`eval-validate.yml`) and Tests (`tests.yml`).
-- Pull requests to `main`: `security.yml` with Betterleaks (secret scanning; fails when it finds a secret), zizmor (workflow static analysis, reported to code scanning), dependency review (fails on vulnerabilities of severity high or above), Composer Audit and Opengrep SAST (fails on findings of severity WARNING or above); Harness Verification (`harness-verify.yml`) and Template Drift (`check-template-drift.yml`).
+- Every pull request: Skill Validation (`lint.yml`: skill structure, markdownlint, yamllint, actionlint, JSON syntax, ShellCheck, ruff, checkpoint schema), Eval Validation (`eval-validate.yml`), Tests (`tests.yml`), PR Quality Gates (`pr-quality.yml`), the Labeler (`labeler.yml`) and Auto-merge dependency PRs (`auto-merge-deps.yml`, which acts only on Renovate and Dependabot pull requests); configured outside the workflows: CodeQL through GitHub's default setup (Actions and Python), SonarCloud, the DCO sign-off check, the CodeRabbit review and the Copilot code review that the repository ruleset requests.
+- Pull requests to `main`: `security.yml` with Betterleaks (secret scanning; fails when it finds a secret), zizmor (workflow static analysis, reported to code scanning), dependency review (fails on vulnerabilities of severity high or above), Composer Audit and Opengrep SAST (which findings fail the check is set by the [organisation rule](https://github.com/netresearch/.github/blob/main/SECURITY.md#static-analysis-sast)); Harness Verification (`harness-verify.yml`) and Template Drift (`check-template-drift.yml`).
 
-Betterleaks is this repository's secret detection; it also scans every push to `main`.
+Secrets are detected by Betterleaks, which also scans every push to `main`, and by GitHub secret scanning with push protection, which is enabled for the repository.
 
 ## License
 

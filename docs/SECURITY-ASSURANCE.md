@@ -51,9 +51,9 @@ The repository ships no server component, no container image and no code that ru
 | A checkpoint modifies the assessed project | The checkpoint commands read files and exit with a status; none writes a file or calls the network | `checkpoints.yaml` |
 | A release is tagged with a version that disagrees with `plugin.json` | The pre-push hook runs `check-plugin-version.sh`, which fails when a semver tag at `HEAD` differs from `.claude-plugin/plugin.json` | `Build/hooks/pre-push`, `Build/Scripts/check-plugin-version.sh`; `tests/check-plugin-version.sh` |
 | A released archive is tampered with, or released from an unsigned tag | The release workflow verifies that the tag is signed and publishes a Cosign-signed `SHA256SUMS.txt` and build-provenance attestations for the archives | `.github/workflows/release.yml` (calls the skill-repo-skill release reusable) |
-| A secret is committed | Betterleaks scans every push to `main` and every pull request to `main` and fails when it finds one | `.github/workflows/security.yml` |
+| A secret is committed | Betterleaks scans every push to `main` and every pull request to `main` and fails when it finds one; GitHub secret scanning with push protection is enabled for the repository (repository settings) | `.github/workflows/security.yml` |
 | A vulnerable or malicious dependency is added | Dependency review fails a pull request to `main` on vulnerabilities of severity high or above; Composer Audit checks the Composer dependencies against known advisories; Renovate proposes updates | `.github/workflows/security.yml`, `renovate.json` |
-| Insecure code or workflow patterns | Opengrep fails on findings of severity WARNING or above; zizmor reports workflow findings to code scanning; ShellCheck and ruff run in Skill Validation | `.github/workflows/security.yml`, `.github/workflows/lint.yml` |
+| Insecure code or workflow patterns | Opengrep fails on the findings the [organisation rule](https://github.com/netresearch/.github/blob/main/SECURITY.md#static-analysis-sast) names; zizmor reports workflow findings to code scanning; ShellCheck and ruff run in Skill Validation | `.github/workflows/security.yml`, `.github/workflows/lint.yml` |
 
 Which of these checks must pass before a pull request can merge is set in the branch protection of `main`, not in this repository.
 
