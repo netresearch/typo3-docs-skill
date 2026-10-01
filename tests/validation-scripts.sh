@@ -102,6 +102,13 @@ printf 'Page\n====\n' >"$d2/Documentation/Page.rst"
 check "a guides.xml that will not render exits 1" 1 "$(run validate_docs.sh "$d2" "$d2")"
 guides "$d2/Documentation/guides.xml"
 check "no Index.rst exits 1" 1 "$(run validate_docs.sh "$d2" "$d2")"
+d3="$WORK/latin1"; mkdir -p "$d3/Documentation"
+printf '=====\nDemo\n=====\n\nText.\n' >"$d3/Documentation/Index.rst"
+printf '=====\nCaf\xe9\n=====\n\nText \xe9\n' >"$d3/Documentation/Other.rst"
+guides "$d3/Documentation/guides.xml"
+check "a Latin-1 .rst file under a UTF-8 locale is a warning, exit 0" 0 "$(LC_ALL=C.UTF-8 run validate_docs.sh "$d3" "$d3")"
+check "and the encoding warning names the file" "yes" \
+    "$(grep -q 'Non-UTF-8 encoding in: .*Other.rst' "$WORK/out" && echo yes || echo no)"
 
 echo "validate_headings.py"
 printf 'Page\n====\n\nSection\n-------\n\nSub\n~~~\n' >"$WORK/good.rst"
