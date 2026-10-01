@@ -111,6 +111,20 @@ check(
     r,
 )
 
+for name, tool_input in (
+    ("a file_path that is not a string", '{"file_path": 1, "content": "# Title"}'),
+    (
+        "content that is not a string",
+        '{"file_path": "/ext/Documentation/Index.rst", "content": ["# Title"]}',
+    ),
+):
+    r = run('{"tool_input": ' + tool_input + "}")
+    check(
+        f"{name} exits 0 silently",
+        r.returncode == 0 and r.stdout == "" and r.stderr == "",
+        r,
+    )
+
 print()
 if failures:
     print(f"{failures} validate_rst.py test(s) FAILED")

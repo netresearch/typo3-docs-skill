@@ -99,6 +99,9 @@ def main():
     except (json.JSONDecodeError, TypeError, AttributeError):
         return
 
+    if not isinstance(file_path, str) or not isinstance(content, str):
+        return
+
     if not file_path or "Documentation" not in file_path:
         return
 
