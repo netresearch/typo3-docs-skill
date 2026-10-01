@@ -88,10 +88,12 @@ if [ -f "${EXT_CONF_TEMPLATE}" ]; then
                 description=$(echo "$description" | sed 's/WARNING:.*//' | sed 's/ *$//')
             fi
 
-            # Read next line for setting name and default. A comment on the
-            # last line has none; read then returns 1, which set -e would
-            # turn into an exit in the middle of the JSON.
-            read -r next_line || next_line=""
+            # Read next line for setting name and default. At the end of the
+            # file read returns 1, which set -e would turn into an exit in the
+            # middle of the JSON. It still assigns a last line that has no
+            # newline, so keep that value; after a comment on the last line it
+            # is empty.
+            read -r next_line || true
             if [[ $next_line =~ ^([^=]+)\ =\ (.+)$ ]]; then
                 setting_name="${BASH_REMATCH[1]}"
                 setting_name="${setting_name%"${setting_name##*[! ]}"}"

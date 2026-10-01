@@ -102,6 +102,11 @@ check "a label keeps its double quotes" 'Enable "beta"' "$(json "$f" 'config_opt
 check "a security warning is split off the description" "keep it private" \
     "$(json "$f" 'config_options.1.security_warning')"
 check "ext_emconf.php metadata is read" "1.2.3" "$(json "$x/data/extension_meta.json" 'metadata.version')"
+nonl="$WORK/no-newline"; mkdir -p "$nonl"
+cp "$proj/ext_emconf.php" "$proj/composer.json" "$nonl/"
+printf '# cat=basic; type=boolean; label=Enable\nenable = 1' >"$nonl/ext_conf_template.txt"
+check "a last setting without a newline exits 0" 0 "$(extract extract-extension-config.sh "$nonl" "$WORK/no-newline-x")"
+check "and is kept" "enable" "$(json "$WORK/no-newline-x/data/config_options.json" 'config_options.0.key')"
 
 echo "extract-composer.sh"
 check "exits 0" 0 "$(extract extract-composer.sh "$proj" "$x")"
