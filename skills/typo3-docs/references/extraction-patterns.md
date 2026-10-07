@@ -833,14 +833,11 @@ Version numbers appearing in documentation must match the canonical source:
 Before publishing any documentation containing PHP code examples, run these checks:
 
 ```bash
-# 1. Extract all method names referenced in documentation
-grep -rhoP '\b[a-z][a-zA-Z]+\(\)' Documentation/ | sort -u > /tmp/doc_methods.txt
-
-# 2. Extract all actual method names from source
-grep -rhoP 'function\s+\K[a-zA-Z]+(?=\s*\()' Classes/ | sort -u > /tmp/src_methods.txt
-
-# 3. Find methods in docs that do not exist in source
-comm -23 /tmp/doc_methods.txt /tmp/src_methods.txt
+# Methods named in the documentation (without the parentheses) that do
+# not exist in the source; no temporary files are written.
+comm -23 \
+    <(grep -rhoP '\b[a-z][a-zA-Z]+(?=\(\))' Documentation/ | sort -u) \
+    <(grep -rhoP 'function\s+\K[a-zA-Z]+(?=\s*\()' Classes/ | sort -u)
 ```
 
 For CLI commands:

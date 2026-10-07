@@ -195,6 +195,12 @@ mkdir -p "$WORK/tmp2" "$WORK/elsewhere"
 ln -s "$WORK/elsewhere" "$WORK/tmp2/typo3-docs-extraction-$(id -u)"
 check "a symlink in place of the per-user directory is refused" "1:" \
     "$(cd "$proj" && out="$(env -u DOCS_EXTRACTION_DIR TMPDIR="$WORK/tmp2" bash "$SCRIPTS/extraction-dir.sh" 2>/dev/null)"; echo "$?:$out")"
+mkdir -p "$WORK/tmp3"
+: >"$WORK/tmp3/typo3-docs-extraction-$(id -u)"
+check "a file in place of the per-user directory is refused" "1:" \
+    "$(cd "$proj" && out="$(env -u DOCS_EXTRACTION_DIR TMPDIR="$WORK/tmp3" bash "$SCRIPTS/extraction-dir.sh" 2>/dev/null)"; echo "$?:$out")"
+check "a TMPDIR that does not exist yet is created" "0" \
+    "$(cd "$proj" && env -u DOCS_EXTRACTION_DIR TMPDIR="$WORK/notyet/sub" bash "$SCRIPTS/extraction-dir.sh" >/dev/null 2>&1; echo "$?")"
 
 echo
 if [ "$fail" -eq 0 ]; then

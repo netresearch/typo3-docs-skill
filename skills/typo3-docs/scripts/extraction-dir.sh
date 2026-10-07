@@ -30,7 +30,11 @@ else
     key="$(printf '%s' "${project}" | shasum -a 256 | cut -d' ' -f1)"
 fi
 
-base="${TMPDIR:-/tmp}/typo3-docs-extraction-$(id -u)"
+parent="${TMPDIR:-/tmp}"
+base="${parent}/typo3-docs-extraction-$(id -u)"
+# A TMPDIR that does not exist yet is created, as before; only the per-user
+# directory inside it has to be private.
+mkdir -p "${parent}"
 if [ ! -e "${base}" ] && [ ! -L "${base}" ]; then
     mkdir -m 0700 "${base}" 2>/dev/null || true
 fi
