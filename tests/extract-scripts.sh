@@ -182,9 +182,19 @@ check "an empty value is an empty string" '""' "$(json_string '')"
 
 echo "extraction-dir.sh"
 check "DOCS_EXTRACTION_DIR wins" "/some/where" "$(cd "$proj" && DOCS_EXTRACTION_DIR=/some/where bash "$SCRIPTS/extraction-dir.sh")"
-expected="$WORK/tmp/typo3-docs-extraction/$(printf '%s' "$(cd "$proj" && pwd -P)" | sha256sum | cut -d' ' -f1)"
-check "otherwise it is TMPDIR/typo3-docs-extraction/<sha256 of the project path>" "$expected" \
+mkdir -p "$WORK/tmp"
+base="$WORK/tmp/typo3-docs-extraction-$(id -u)"
+expected="$base/$(printf '%s' "$(cd "$proj" && pwd -P)" | sha256sum | cut -d' ' -f1)"
+check "otherwise it is TMPDIR/typo3-docs-extraction-<uid>/<sha256 of the project path>" "$expected" \
     "$(cd "$proj" && env -u DOCS_EXTRACTION_DIR TMPDIR="$WORK/tmp" bash "$SCRIPTS/extraction-dir.sh")"
+check "the per-user directory is private (0700)" "700" "$(stat -c %a "$base")"
+chmod 0777 "$base"
+(cd "$proj" && env -u DOCS_EXTRACTION_DIR TMPDIR="$WORK/tmp" bash "$SCRIPTS/extraction-dir.sh" >/dev/null)
+check "an existing per-user directory is made private again" "700" "$(stat -c %a "$base")"
+mkdir -p "$WORK/tmp2" "$WORK/elsewhere"
+ln -s "$WORK/elsewhere" "$WORK/tmp2/typo3-docs-extraction-$(id -u)"
+check "a symlink in place of the per-user directory is refused" "1:" \
+    "$(cd "$proj" && out="$(env -u DOCS_EXTRACTION_DIR TMPDIR="$WORK/tmp2" bash "$SCRIPTS/extraction-dir.sh" 2>/dev/null)"; echo "$?:$out")"
 
 echo
 if [ "$fail" -eq 0 ]; then

@@ -6,10 +6,13 @@
 # current directory.
 #
 # DOCS_EXTRACTION_DIR wins when set. Otherwise the directory lies outside the
-# project, one per project: ${TMPDIR:-/tmp}/typo3-docs-extraction/<key>, where
-# <key> is the SHA-256 of the project's physical path. Every extraction script
-# and analyze-docs.sh resolve their directory through this file, so they agree,
-# and a reader can resolve the same directory with:
+# project, one per project and user:
+# ${TMPDIR:-/tmp}/typo3-docs-extraction-<uid>/<key>, where <key> is the
+# SHA-256 of the project's physical path. The per-user directory is created
+# with mode 0700 and must be a real directory owned by the current user, so
+# nobody else can create, read or replace what lies inside it. Every
+# extraction script and analyze-docs.sh resolve their directory through this
+# file, so they agree, and a reader can resolve the same directory with:
 #
 #   DOCS_EXTRACTION_DIR="$(path/to/scripts/extraction-dir.sh)"
 
@@ -27,4 +30,14 @@ else
     key="$(printf '%s' "${project}" | shasum -a 256 | cut -d' ' -f1)"
 fi
 
-printf '%s\n' "${TMPDIR:-/tmp}/typo3-docs-extraction/${key}"
+base="${TMPDIR:-/tmp}/typo3-docs-extraction-$(id -u)"
+if [ ! -e "${base}" ] && [ ! -L "${base}" ]; then
+    mkdir -m 0700 "${base}" 2>/dev/null || true
+fi
+if [ -L "${base}" ] || [ ! -d "${base}" ] || [ ! -O "${base}" ]; then
+    echo "extraction-dir.sh: ${base} is not a directory owned by $(id -un); set DOCS_EXTRACTION_DIR or TMPDIR" >&2
+    exit 1
+fi
+chmod 0700 "${base}"
+
+printf '%s\n' "${base}/${key}"
