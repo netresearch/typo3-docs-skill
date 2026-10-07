@@ -28,6 +28,11 @@ CACHE_FILE="${CACHE_DIR}/repo_metadata.json"
 mkdir -p "${DATA_DIR}"
 mkdir -p "${CACHE_DIR}"
 
+# Intermediate files go to a private directory (mktemp -d, mode 0700), never
+# to fixed names in a shared /tmp.
+WORK_DIR="$(mktemp -d)"
+trap 'rm -rf "${WORK_DIR}"' EXIT
+
 # Check cache (24 hour TTL)
 if [ -f "${CACHE_FILE}" ]; then
     cache_age=$(($(date +%s) - $(stat -c %Y "${CACHE_FILE}" 2>/dev/null || stat -f %m "${CACHE_FILE}" 2>/dev/null || echo 0)))
@@ -88,21 +93,18 @@ if [ "$REPO_TYPE" = "github" ]; then
         name: .name,
         published_at: .published_at,
         prerelease: .prerelease
-    })' > /tmp/releases.json
+    })' > "${WORK_DIR}/releases.json"
 
     # Get contributors
     gh api "repos/${REPO_URL}/contributors?per_page=10" --jq 'map({
         login: .login,
         contributions: .contributions
-    })' > /tmp/contributors.json
+    })' > "${WORK_DIR}/contributors.json"
 
     # Merge into output file
-    jq --slurpfile releases /tmp/releases.json --slurpfile contributors /tmp/contributors.json \
-        '. + {releases: $releases[0], contributors: $contributors[0]}' "${OUTPUT_FILE}" > /tmp/merged.json
-    mv /tmp/merged.json "${OUTPUT_FILE}"
-
-    # Clean up temp files
-    rm -f /tmp/releases.json /tmp/contributors.json
+    jq --slurpfile releases "${WORK_DIR}/releases.json" --slurpfile contributors "${WORK_DIR}/contributors.json" \
+        '. + {releases: $releases[0], contributors: $contributors[0]}' "${OUTPUT_FILE}" > "${WORK_DIR}/merged.json"
+    mv "${WORK_DIR}/merged.json" "${OUTPUT_FILE}"
 
     echo -e "${GREEN}✓ GitHub metadata extracted: ${OUTPUT_FILE}${NC}"
 

@@ -39,6 +39,18 @@ def payload(tool: str, **tool_input: str) -> str:
     )
 
 
+def context(result: subprocess.CompletedProcess) -> str:
+    """The additionalContext the hook hands the agent, or "" when it printed none."""
+    try:
+        output = json.loads(result.stdout)
+    except json.JSONDecodeError:
+        return ""
+    specific = output.get("hookSpecificOutput", {}) if isinstance(output, dict) else {}
+    if specific.get("hookEventName") != "PreToolUse":
+        return ""
+    return specific.get("additionalContext", "")
+
+
 def check(name: str, condition: bool, result: subprocess.CompletedProcess) -> None:
     global failures
     if condition:
@@ -55,7 +67,7 @@ print("validate_rst.py")
 r = run(payload("Write", file_path="/ext/Documentation/Index.rst", content="# Title\n"))
 check(
     "Write of a Markdown heading into Documentation/*.rst is reported",
-    r.returncode == 0 and "Markdown heading detected" in r.stdout,
+    r.returncode == 0 and "Markdown heading detected" in context(r),
     r,
 )
 
@@ -69,7 +81,7 @@ r = run(
 )
 check(
     "Edit with a Markdown link into Documentation/*.rst is reported",
-    r.returncode == 0 and "Markdown link detected" in r.stdout,
+    r.returncode == 0 and "Markdown link detected" in context(r),
     r,
 )
 

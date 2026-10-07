@@ -62,8 +62,9 @@ repos:
     rev: v0.11.0.1
     hooks:
       - id: shellcheck
-        # The same level CI enforces: lint.yml calls the shared validate.yml
-        # without shellcheck-severity, which defaults to error. At the hook's
-        # own default (style) any change to a script that predates the hook
-        # fails on findings CI accepts.
-        args: [--severity=error]
+        # Stricter than CI: lint.yml (template-managed) calls the shared
+        # validate.yml without shellcheck-severity, which defaults to error.
+        # Every tracked script passes at style, so the hook keeps it that way.
+        # --external-sources follows the `# shellcheck source=` directives, so
+        # a file checked on its own still resolves the files it sources.
+        args: [--external-sources, --severity=style]

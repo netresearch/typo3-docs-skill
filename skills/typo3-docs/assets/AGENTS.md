@@ -299,7 +299,7 @@ scripts/extract-all.sh              # Core extraction (PHP, configs, composer)
 scripts/extract-all.sh --all        # Include build configs and repo metadata
 ```
 
-Extraction data saved to `$DOCS_EXTRACTION_DIR/data/`, outside the project. Resolve the directory from the project root with `DOCS_EXTRACTION_DIR="$(scripts/extraction-dir.sh)"` (one directory per project under `/tmp/typo3-docs-extraction/` unless you set it):
+Extraction data saved to `$DOCS_EXTRACTION_DIR/data/`, outside the project. Resolve the directory from the project root with `DOCS_EXTRACTION_DIR="$(scripts/extraction-dir.sh)"` (one directory per project under `${TMPDIR:-/tmp}/typo3-docs-extraction-<uid>/`, private to the user, unless you set it):
 - `php_apis.json` - Classes, methods, docblocks
 - `extension_meta.json` - ext_emconf.php data
 - `config_options.json` - ext_conf_template.txt options

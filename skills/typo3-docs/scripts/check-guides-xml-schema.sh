@@ -53,6 +53,10 @@ if ! command -v php >/dev/null 2>&1; then
     exit 2
 fi
 
+# PHP's error message goes to a private temporary file, not a fixed name in /tmp.
+ERRORS_FILE="$(mktemp)"
+trap 'rm -f "$ERRORS_FILE"' EXIT
+
 # The PHP body is single-quoted on purpose: $argv, $doc and $root belong to
 # PHP, and letting the shell expand them would substitute empty strings.
 # shellcheck disable=SC2016
@@ -97,13 +101,11 @@ if ($missing !== []) {
     exit(1);
 }
 exit(0);
-' "$GUIDES" "$NS" 2>/tmp/guides-xml-check.$$ || {
-    echo "❌ $GUIDES will not render: $(cat /tmp/guides-xml-check.$$)"
-    rm -f /tmp/guides-xml-check.$$
+' "$GUIDES" "$NS" 2>"$ERRORS_FILE" || {
+    echo "❌ $GUIDES will not render: $(cat "$ERRORS_FILE")"
     echo "   Expected: <guides xmlns=\"$NS\"> with"
     echo "   <project title=\"…\" release=\"…\" version=\"…\" copyright=\"…\"/>"
     echo "   assets/guides.xml.dist is that file; copy it rather than writing one."
     exit 1
 }
-rm -f /tmp/guides-xml-check.$$
 echo "✅ guides.xml is in $NS with a <project> carrying title and release"
