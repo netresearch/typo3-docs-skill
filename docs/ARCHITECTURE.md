@@ -57,7 +57,7 @@ Three categories of scripts, plus two helpers:
 
 ### Plugin hook (hooks/)
 
-`hooks/hooks.json` registers `scripts/validate_rst.py` as a Claude Code `PreToolUse` hook for `Write` and `Edit`. It reads the tool call from standard input and, for `.rst` files under `Documentation/`, prints a reminder when the new content matches one of its patterns: Markdown headings, code fences and links, a line that is only bold text, or a list item. It always exits 0.
+`hooks/hooks.json` registers `scripts/validate_rst.py` as a Claude Code `PreToolUse` hook for `Write` and `Edit`. It reads the tool call from standard input and, for `.rst` files under `Documentation/`, hands the agent a reminder as the documented `hookSpecificOutput.additionalContext` JSON field when the new content matches one of its patterns: Markdown headings, code fences and links, a line that is only bold text, or a list item. It always exits 0.
 
 ### Tests (tests/)
 
@@ -75,7 +75,7 @@ Security properties and limits: [SECURITY-ASSURANCE.md](SECURITY-ASSURANCE.md).
 
 ## Data Flow
 
-1. **Extraction**: Scripts parse source code and configs into JSON files in `data/` of the extraction directory, which lies outside the project (`extraction-dir.sh`: `$DOCS_EXTRACTION_DIR`, else `${TMPDIR:-/tmp}/typo3-docs-extraction/<sha256 of the project path>`)
+1. **Extraction**: Scripts parse source code and configs into JSON files in `data/` of the extraction directory, which lies outside the project (`extraction-dir.sh`: `$DOCS_EXTRACTION_DIR`, else `${TMPDIR:-/tmp}/typo3-docs-extraction-<uid>/<sha256 of the project path>`, in a per-user directory with mode 0700)
 2. **Analysis**: `analyze-docs.sh` compares extracted data with existing `Documentation/` content and writes `ANALYSIS.md` into the extraction directory
 3. **Generation**: Agent uses analysis report to create/update RST files
 4. **Validation**: `validate_docs.sh` checks RST syntax and structure
