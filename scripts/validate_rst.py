@@ -117,8 +117,7 @@ def main():
             icon = severity_icons.get(issue["severity"], "•")
             output_lines.append(f"{icon} {issue['message']}")
 
-        print(f"""<system-reminder>
-RST validation for {file_path}:
+        message = f"""RST validation for {file_path}:
 
 {chr(10).join(output_lines)}
 
@@ -129,8 +128,19 @@ TYPO3 RST Quick Reference:
 - Notes: .. note::, .. tip::, .. warning::
 - TYPO3 directives: .. confval::, .. versionadded::
 
-See typo3-docs skill for full RST reference.
-</system-reminder>""")
+See typo3-docs skill for full RST reference."""
+        # Plain stdout of a PreToolUse hook is not shown to the agent; the
+        # documented JSON field additionalContext is. The hook never blocks.
+        print(
+            json.dumps(
+                {
+                    "hookSpecificOutput": {
+                        "hookEventName": "PreToolUse",
+                        "additionalContext": message,
+                    }
+                }
+            )
+        )
 
 
 if __name__ == "__main__":

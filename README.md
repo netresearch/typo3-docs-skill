@@ -158,7 +158,7 @@ Main skill file with comprehensive instructions for:
 - Extracts data from PHP code, extension configs, composer.json
 - Optional: build configs (.github/workflows, phpunit.xml)
 - Optional: repository metadata (GitHub/GitLab API)
-- Writes JSON files to `data/` in the extraction directory, outside the project: `$DOCS_EXTRACTION_DIR` if set, else `${TMPDIR:-/tmp}/typo3-docs-extraction/<sha256 of the project path>`; `extraction-dir.sh` prints it
+- Writes JSON files to `data/` in the extraction directory, outside the project: `$DOCS_EXTRACTION_DIR` if set, else `${TMPDIR:-/tmp}/typo3-docs-extraction-<uid>/<sha256 of the project path>` in a per-user directory with mode 0700; `extraction-dir.sh` prints it
 
 **analyze-docs.sh** - Documentation coverage analysis:
 - Compares extracted data with existing Documentation/
