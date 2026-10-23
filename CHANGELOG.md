@@ -9,6 +9,27 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- Checkpoint TD-30 and `scripts/check-guides-xml-version-sync.sh` accept the `version="MAJOR.MINOR" release="MAJOR.MINOR.PATCH"` pair that `SKILL.md` and `references/guides-xml.md` prescribe: `release` must equal the `ext_emconf.php` version and `version` its major.minor, and the full version is still accepted. The script reads the attributes off `<project>`; it used to match the XML declaration's `version="1.0"` first (#160)
+- Checkpoint TD-49 and `scripts/check-adr-coverage.sh` also find ADRs in `Documentation/Adr/` and `Documentation/ADR/`; `references/architecture-decision-records.md` keeps `Documentation/Developer/Adr/` as the preferred location (#160)
+- Checkpoint TD-46 no longer tells Introduction/ and Installation/ pages to replace hardcoded values with substitutions from `Includes.rst.txt`, which render-guides does not carry into the including page. It now reports, at severity `warning` instead of `info`, a page that uses a substitution only an included file defines; the script is renamed `scripts/check-rst-substitutions-resolve.sh`, and `references/file-structure.md` no longer puts substitutions into `Includes.rst.txt` (#160)
+- `extract-all.sh`, the extractors and `analyze-docs.sh` write their data and `ANALYSIS.md` outside the documented project instead of into `.claude/docs-extraction/` and `Documentation/ANALYSIS.md`: to `$DOCS_EXTRACTION_DIR` when set, otherwise to one directory per project under `${TMPDIR:-/tmp}/typo3-docs-extraction-<uid>/`, which `scripts/extraction-dir.sh` prints (#161, #165)
+- `scripts/extraction-dir.sh` creates the per-user directory with mode 0700 and refuses it when it is a symlink, not a directory or owned by another user. `extract-repo-metadata.sh` and `check-guides-xml-schema.sh` keep their intermediate files in `mktemp` locations that are removed on exit, and the method check in `references/extraction-patterns.md` compares two process substitutions instead of writing fixed `/tmp` files (#165)
+- The plugin hook `scripts/validate_rst.py` reads `file_path` and `content` from `tool_input`, where Claude Code passes them; it read them from the top level and so never checked anything. It no longer exits 1 on a non-string value (#162)
+- The plugin hook hands its warnings to the agent as `hookSpecificOutput.additionalContext` JSON, the field Claude Code documents for a `PreToolUse` hook, instead of plain text. It still never blocks (#165)
+- `add-agents-md.sh` no longer exits 1 silently when run without a terminal and `Documentation/AGENTS.md` exists; no answer means "no" (#162)
+- `check-version-match.sh` runs the TD-30 check, `check-guides-xml-version-sync.sh`, instead of comparing the XML declaration's `1.0` with `ext_emconf.php`, which made every `guides.xml` a mismatch (#162)
+- `analyze-docs.sh` fills in the class type of each missing class and no longer runs the Markdown backticks in its report as shell commands (#162)
+- The extractors write valid JSON for namespaced classes, quoted labels, `*` list items and a trailing `# cat=` line; `extract-php.sh` no longer fails without `Classes/`, `extract-extension-config.sh` keeps a last setting that has no trailing newline, and it and the PHP fallback of `extract-composer.sh` work in a directory whose name contains a single quote (#162)
+- `extract-repo-metadata.sh` no longer passes `--jq` to `glab api`, which has no such option, so a GitLab remote gets its metadata instead of an error and an empty file (#162)
+- `extract-all.sh` no longer points at a `generate-templates.sh` that does not exist; its last step names the `ANALYSIS.md` report instead (#162)
+- `validate_headings.py` reads a non-UTF-8 `.rst` file instead of raising `UnicodeDecodeError`, so `validate_docs.sh` reports a warning rather than ending with exit 1 (#162)
+
+### Changed
+
+- Repository only, nothing under `skills/typo3-docs/` changes behaviour: behavioural tests for every shipped script and the plugin hook, SPDX notices on authored files, a security assurance case in `docs/SECURITY-ASSURANCE.md`, README sections on dependencies and governance, and a README that describes CodeQL as the `codeql` job of `security.yml` (#162, #173)
+
 ## [v2.20.6](https://github.com/netresearch/typo3-docs-skill/releases/tag/v2.20.6) — 2026-09-27
 
 ### Added
