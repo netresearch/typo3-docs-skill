@@ -9,6 +9,8 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v2.20.7](https://github.com/netresearch/typo3-docs-skill/releases/tag/v2.20.7) — 2026-10-23
+
 ### Fixed
 
 - Checkpoint TD-30 and `scripts/check-guides-xml-version-sync.sh` accept the `version="MAJOR.MINOR" release="MAJOR.MINOR.PATCH"` pair that `SKILL.md` and `references/guides-xml.md` prescribe: `release` must equal the `ext_emconf.php` version and `version` its major.minor, and the full version is still accepted. The script reads the attributes off `<project>`; it used to match the XML declaration's `version="1.0"` first (#160)
