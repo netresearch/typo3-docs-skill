@@ -109,11 +109,22 @@ guides "$d3/Documentation/guides.xml"
 check "a Latin-1 .rst file under a UTF-8 locale is a warning, exit 0" 0 "$(LC_ALL=C.UTF-8 run validate_docs.sh "$d3" "$d3")"
 check "and the encoding warning names the file" "yes" \
     "$(grep -q 'Non-UTF-8 encoding in: .*Other.rst' "$WORK/out" && echo yes || echo no)"
-# PATH without any directory that holds a uv executable.
+# PATH without uv. A directory that holds uv usually holds other tools too
+# (Homebrew's bin has bash), so it is replaced by a shim directory linking
+# everything in it except uv, at the position of the first such directory.
+shim="$WORK/path-without-uv"; mkdir -p "$shim"
 nouv_path=""
 IFS=: read -ra path_dirs <<<"$PATH"
 for p in "${path_dirs[@]}"; do
-    [ -x "$p/uv" ] || nouv_path="${nouv_path:+$nouv_path:}$p"
+    if [ -x "$p/uv" ]; then
+        case ":$nouv_path:" in *":$shim:"*) ;; *) nouv_path="${nouv_path:+$nouv_path:}$shim" ;; esac
+        for x in "$p"/*; do
+            n="${x##*/}"
+            [ "$n" = uv ] || [ -e "$shim/$n" ] || [ ! -x "$x" ] || ln -s "$x" "$shim/$n"
+        done
+    else
+        nouv_path="${nouv_path:+$nouv_path:}$p"
+    fi
 done
 check "without uv on PATH exits 3" 3 \
     "$( (cd "$d" && PATH="$nouv_path" bash "$SCRIPTS/validate_docs.sh" "$d" >/dev/null 2>"$WORK/err"); echo $?)"
