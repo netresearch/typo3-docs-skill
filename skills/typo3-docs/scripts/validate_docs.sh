@@ -112,6 +112,14 @@ if ! command -v uv >/dev/null 2>&1; then
     echo "   Install uv: https://docs.astral.sh/uv/getting-started/installation/" >&2
     exit 3
 fi
+# uv itself exits 2 when it finds no Python 3.11 or later and cannot download
+# one; inside the loop that would also end the run with no message. One run on
+# an empty input settles it before the first file.
+if ! UV_PROBE_ERR=$(uv run "$SCRIPT_DIR/validate_headings.py" /dev/null 2>&1 >/dev/null); then
+    echo "❌ uv could not run validate_headings.py on Python 3.11 or later:" >&2
+    while IFS= read -r line; do echo "   $line"; done <<<"$UV_PROBE_ERR" >&2
+    exit 3
+fi
 
 while IFS= read -r -d '' file; do
     # Check for :ref: references

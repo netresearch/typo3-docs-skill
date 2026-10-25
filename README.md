@@ -148,7 +148,7 @@ Main skill file with comprehensive instructions for:
 - Checks that guides.xml will render (a legacy Settings.cfg is only reported) and that Index.rst exists
 - Detects encoding issues
 - Identifies trailing whitespace
-- Checks the heading hierarchy with `validate_headings.py` through `uv run`; without uv on `PATH` it says so on stderr and exits 3
+- Checks the heading hierarchy with `validate_headings.py` through `uv run`; without uv on `PATH`, or when uv cannot provide Python 3.11 or later, it says so on stderr and exits 3
 
 **render_docs.sh** - Rendering script:
 - Renders documentation locally with Docker

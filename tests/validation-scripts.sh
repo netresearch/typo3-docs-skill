@@ -119,6 +119,14 @@ check "without uv on PATH exits 3" 3 \
     "$( (cd "$d" && PATH="$nouv_path" bash "$SCRIPTS/validate_docs.sh" "$d" >/dev/null 2>"$WORK/err"); echo $?)"
 check "and says on stderr that uv is missing" "yes" \
     "$(grep -q '^❌ uv not found: the heading check runs validate_headings.py' "$WORK/err" && grep -q 'Install uv: https://docs.astral.sh/uv/' "$WORK/err" && echo yes || echo no)"
+# uv present but without a usable Python: it exits 2 with its own message.
+uvstub="$WORK/uv-no-python"; mkdir -p "$uvstub"
+printf '#!/bin/sh\necho "error: No interpreter found for Python >=3.11 in managed installations or search path" >&2\nexit 2\n' >"$uvstub/uv"
+chmod +x "$uvstub/uv"
+check "a uv that finds no Python 3.11 exits 3" 3 \
+    "$( (cd "$d" && PATH="$uvstub:$nouv_path" bash "$SCRIPTS/validate_docs.sh" "$d" >/dev/null 2>"$WORK/err"); echo $?)"
+check "and passes uv's message on" "yes" \
+    "$(grep -q '^❌ uv could not run validate_headings.py on Python 3.11 or later:' "$WORK/err" && grep -q 'No interpreter found for Python >=3.11' "$WORK/err" && echo yes || echo no)"
 
 echo "validate_headings.py"
 printf 'Page\n====\n\nSection\n-------\n\nSub\n~~~\n' >"$WORK/good.rst"
