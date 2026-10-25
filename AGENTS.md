@@ -46,7 +46,7 @@ No Makefile or npm scripts. Key scripts in `skills/typo3-docs/scripts/`:
 - `bash skills/typo3-docs/scripts/extract-all.sh --all` — extract including build configs and repo metadata
 - `bash skills/typo3-docs/scripts/analyze-docs.sh` — analyze documentation coverage gaps
 - `bash skills/typo3-docs/scripts/add-agents-md.sh` — add AGENTS.md template to Documentation/
-- `for t in tests/*.sh; do bash "$t"; done; python3 tests/validate_rst_hook.py` — run the tests (offline; see README "Tests")
+- `for t in tests/*.sh; do bash "$t"; done; uv run --python 3.11 python tests/validate_rst_hook.py` — run the tests (offline; see README "Tests")
 - `pre-commit run --all-files` — the lint hooks CI also runs
 
 ## Rules

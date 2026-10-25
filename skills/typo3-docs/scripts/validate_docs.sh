@@ -6,6 +6,12 @@
 #
 # Usage: ./validate_docs.sh [project_root]
 #
+# Exit codes:
+#   0  validation ran; findings, if any, are warnings
+#   1  the documentation fails a required check
+#   3  uv is not on PATH, so the heading check (validate_headings.py,
+#      Python 3.11 or later through uv run) cannot run
+#
 
 set -e
 
@@ -99,6 +105,22 @@ WARNINGS=0
 HEADING_ERRORS=0
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# The heading check below runs validate_headings.py through uv. Without uv the
+# command substitution fails and `set -e` would end the run with no message.
+if ! command -v uv >/dev/null 2>&1; then
+    echo "❌ uv not found: the heading check runs validate_headings.py on Python 3.11 or later through uv run" >&2
+    echo "   Install uv: https://docs.astral.sh/uv/getting-started/installation/" >&2
+    exit 3
+fi
+# uv itself exits 2 when it finds no Python 3.11 or later and cannot download
+# one; inside the loop that would also end the run with no message. One run on
+# an empty input settles it before the first file.
+if ! UV_PROBE_ERR=$(uv run "$SCRIPT_DIR/validate_headings.py" /dev/null 2>&1 >/dev/null); then
+    echo "❌ uv could not run validate_headings.py on Python 3.11 or later:" >&2
+    while IFS= read -r line; do echo "   $line"; done <<<"$UV_PROBE_ERR" >&2
+    exit 3
+fi
+
 while IFS= read -r -d '' file; do
     # Check for :ref: references
     # The patterns are single-quoted on purpose: the backticks and brackets
@@ -127,7 +149,7 @@ while IFS= read -r -d '' file; do
     fi
 
     # Check TYPO3 heading hierarchy (= for h1/h2, - for h3, ~ for h4)
-    RESULT=$(python3 "$SCRIPT_DIR/validate_headings.py" "$file" 2>/dev/null)
+    RESULT=$(uv run "$SCRIPT_DIR/validate_headings.py" "$file" 2>/dev/null)
     if [ -n "$RESULT" ]; then
         echo "❌ Heading hierarchy issue in: $(basename "$file")"
         echo "$RESULT"

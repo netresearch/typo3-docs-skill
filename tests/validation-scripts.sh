@@ -109,14 +109,47 @@ guides "$d3/Documentation/guides.xml"
 check "a Latin-1 .rst file under a UTF-8 locale is a warning, exit 0" 0 "$(LC_ALL=C.UTF-8 run validate_docs.sh "$d3" "$d3")"
 check "and the encoding warning names the file" "yes" \
     "$(grep -q 'Non-UTF-8 encoding in: .*Other.rst' "$WORK/out" && echo yes || echo no)"
+# PATH without uv. A directory that holds uv usually holds other tools too
+# (Homebrew's bin has bash), so it is replaced by a shim directory linking
+# everything in it except uv, at the position of the first such directory.
+shim="$WORK/path-without-uv"; mkdir -p "$shim"
+nouv_path=""
+IFS=: read -ra path_dirs <<<"$PATH"
+for p in "${path_dirs[@]}"; do
+    if [ -x "$p/uv" ]; then
+        case ":$nouv_path:" in *":$shim:"*) ;; *) nouv_path="${nouv_path:+$nouv_path:}$shim" ;; esac
+        for x in "$p"/*; do
+            n="${x##*/}"
+            [ "$n" = uv ] || [ -e "$shim/$n" ] || [ ! -x "$x" ] || ln -s "$x" "$shim/$n"
+        done
+    else
+        nouv_path="${nouv_path:+$nouv_path:}$p"
+    fi
+done
+check "without uv on PATH exits 3" 3 \
+    "$( (cd "$d" && PATH="$nouv_path" bash "$SCRIPTS/validate_docs.sh" "$d" >/dev/null 2>"$WORK/err"); echo $?)"
+check "and says on stderr that uv is missing" "yes" \
+    "$(grep -q '^❌ uv not found: the heading check runs validate_headings.py' "$WORK/err" && grep -q 'Install uv: https://docs.astral.sh/uv/' "$WORK/err" && echo yes || echo no)"
+# uv present but without a usable Python: it exits 2 with its own message.
+uvstub="$WORK/uv-no-python"; mkdir -p "$uvstub"
+printf '#!/bin/sh\necho "error: No interpreter found for Python >=3.11 in managed installations or search path" >&2\nexit 2\n' >"$uvstub/uv"
+chmod +x "$uvstub/uv"
+check "a uv that finds no Python 3.11 exits 3" 3 \
+    "$( (cd "$d" && PATH="$uvstub:$nouv_path" bash "$SCRIPTS/validate_docs.sh" "$d" >/dev/null 2>"$WORK/err"); echo $?)"
+check "and passes uv's message on" "yes" \
+    "$(grep -q '^❌ uv could not run validate_headings.py on Python 3.11 or later:' "$WORK/err" && grep -q 'No interpreter found for Python >=3.11' "$WORK/err" && echo yes || echo no)"
 
 echo "validate_headings.py"
 printf 'Page\n====\n\nSection\n-------\n\nSub\n~~~\n' >"$WORK/good.rst"
-check "a correct hierarchy prints nothing" "" "$(python3 "$SCRIPTS/validate_headings.py" "$WORK/good.rst")"
+check "a correct hierarchy prints nothing" "" "$(uv run "$SCRIPTS/validate_headings.py" "$WORK/good.rst")"
 printf 'Page\n====\n\nDeep\n~~~~\n' >"$WORK/skip.rst"
 check "a skipped level is reported" "yes" \
-    "$(python3 "$SCRIPTS/validate_headings.py" "$WORK/skip.rst" | grep -q 'skipping "-"' && echo yes || echo no)"
-check "a wrong argument count exits 2" 2 "$(python3 "$SCRIPTS/validate_headings.py" >/dev/null 2>&1; echo $?)"
+    "$(uv run "$SCRIPTS/validate_headings.py" "$WORK/skip.rst" | grep -q 'skipping "-"' && echo yes || echo no)"
+# Exit 2 alone would also pass when uv finds no matching interpreter (uv exits
+# 2 then too), so the script's own usage line is asserted with it.
+check "a wrong argument count exits 2 with the usage line" "2 usage" \
+    "$(uv run "$SCRIPTS/validate_headings.py" >/dev/null 2>"$WORK/err"; rc=$?
+       grep -q '^Usage: .*validate_headings\.py <file\.rst>$' "$WORK/err" && echo "$rc usage" || echo "$rc no-usage")"
 
 echo "render_docs.sh"
 bin="$WORK/bin"; mkdir -p "$bin"
