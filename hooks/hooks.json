@@ -7,7 +7,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "uv run ${CLAUDE_PLUGIN_ROOT}/scripts/validate_rst.py || true",
+            "command": "uv run \"${CLAUDE_PLUGIN_ROOT}/scripts/validate_rst.py\" || true",
             "timeout": 2
           }
         ]
@@ -17,7 +17,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "uv run ${CLAUDE_PLUGIN_ROOT}/scripts/validate_rst.py || true",
+            "command": "uv run \"${CLAUDE_PLUGIN_ROOT}/scripts/validate_rst.py\" || true",
             "timeout": 2
           }
         ]
