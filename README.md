@@ -148,6 +148,7 @@ Main skill file with comprehensive instructions for:
 - Checks that guides.xml will render (a legacy Settings.cfg is only reported) and that Index.rst exists
 - Detects encoding issues
 - Identifies trailing whitespace
+- Checks the heading hierarchy with `validate_headings.py` through `uv run`; without uv on `PATH` it says so on stderr and exits 3
 
 **render_docs.sh** - Rendering script:
 - Renders documentation locally with Docker
@@ -347,7 +348,7 @@ Open issues and pull requests on [GitHub](https://github.com/netresearch/typo3-d
 
 ### Tests
 
-The behavioural tests live in `tests/` and run offline. They need bash, git, php, python3, perl and jq; no Docker daemon, network or model API is used.
+The behavioural tests live in `tests/` and run offline. They need bash, git, php, uv, perl and jq; no Docker daemon, network or model API is used.
 
 ```bash
 bash tests/checkpoint-scripts.sh                  # the TD-* check scripts (settings, confval, screenshots, ADRs, substitutions, guides.xml sync)
@@ -358,7 +359,7 @@ bash tests/extract-scripts.sh                     # extract-*.sh, extraction-dir
 bash tests/analyze-docs.sh                        # analyze-docs.sh
 bash tests/add-agents-md.sh                       # add-agents-md.sh
 bash tests/check-plugin-version.sh                # Build/Scripts/check-plugin-version.sh and Build/hooks/pre-push
-python3 tests/validate_rst_hook.py                # scripts/validate_rst.py, the plugin hook
+uv run --python 3.11 python tests/validate_rst_hook.py  # scripts/validate_rst.py, the plugin hook
 ```
 
 - The tests build fixture directories (extensions, git repositories, extraction data, hook payloads) in a temporary directory, run the script against them and compare exit codes, output and written files. Extraction output goes to a temporary `DOCS_EXTRACTION_DIR`.
@@ -370,7 +371,7 @@ In CI, the Tests workflow (`.github/workflows/tests.yml`) runs every `tests/**/*
 ### Dependencies
 
 - **Composer:** `composer.json` requires `netresearch/composer-agent-skill-plugin` (`*`, the latest release at install time), which installs the skill into a PHP project. No `composer.lock` is committed.
-- **Tools the scripts call:** bash, git, php (guides.xml parsing, `ext_emconf.php`), python3 (`validate_headings.py`, the plugin hook), jq (`analyze-docs.sh`, `extract-repo-metadata.sh`; `extract-composer.sh` falls back to php), perl (`check-rst-substitutions-resolve.sh`), Docker (`render_docs.sh`, image `ghcr.io/typo3-documentation/render-guides:latest`), `gh` or `glab` (`extract-repo-metadata.sh`, optional) and docutils' `rst2html.py` (`validate_docs.sh`, optional). The scripts install none of them; `SKILL.md` names php and Docker under `compatibility`.
+- **Tools the scripts call:** bash, git, php (guides.xml parsing, `ext_emconf.php`), uv (`validate_headings.py` and the plugin hook run on Python 3.11 or later through `uv run`), jq (`analyze-docs.sh`, `extract-repo-metadata.sh`; `extract-composer.sh` falls back to php), perl (`check-rst-substitutions-resolve.sh`), Docker (`render_docs.sh`, image `ghcr.io/typo3-documentation/render-guides:latest`), `gh` or `glab` (`extract-repo-metadata.sh`, optional) and docutils' `rst2html.py` (`validate_docs.sh`, optional). The scripts install none of them; `SKILL.md` names uv, php and Docker under `compatibility`.
 - **Development tools:** the hooks in `.pre-commit-config.yaml` are pinned by `rev:`. Renovate ([`renovate.json`](renovate.json), `config:recommended` with the pre-commit manager enabled) proposes updates for them. The Composer requirement has no version range and no lock file, so there is nothing for it to update.
 - **CI:** the workflows call reusable workflows of `netresearch/.github`, `netresearch/skill-repo-skill` and `netresearch/typo3-ci-workflows`; those reusables pin the third-party actions they use by commit SHA.
 - A new dependency arrives through a pull request, where dependency review and Composer Audit run (see below); which licences and findings are acceptable is set by the organisation policy linked below.

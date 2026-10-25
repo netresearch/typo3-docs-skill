@@ -1,6 +1,11 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run --script
 # SPDX-License-Identifier: MIT
 # SPDX-FileCopyrightText: Netresearch DTT GmbH
+#
+# /// script
+# requires-python = ">=3.11"
+# dependencies = []
+# ///
 """
 PreToolUse hook to validate RST content before writing to Documentation/ files.
 Checks for common TYPO3 RST patterns and provides helpful reminders.

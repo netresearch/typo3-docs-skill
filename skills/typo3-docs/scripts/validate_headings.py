@@ -1,6 +1,11 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run --script
 # SPDX-License-Identifier: MIT
 # SPDX-FileCopyrightText: Netresearch DTT GmbH
+#
+# /// script
+# requires-python = ">=3.11"
+# dependencies = []
+# ///
 """
 Validate TYPO3 RST heading hierarchy.
 
@@ -12,7 +17,7 @@ TYPO3 heading convention:
   h5: " below only
   h6: ' below only
 
-Usage: python3 validate_headings.py <file.rst>
+Usage: uv run validate_headings.py <file.rst>
 Exit code 0 = no issues, output contains error lines if any.
 """
 

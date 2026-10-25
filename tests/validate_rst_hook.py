@@ -4,7 +4,7 @@
 """Behaviour of scripts/validate_rst.py, the PreToolUse hook in hooks/hooks.json.
 
 The hook is run as a subprocess with the payload Claude Code sends on stdin:
-the tool's arguments are nested under "tool_input". Run: python3 tests/validate_rst_hook.py
+the tool's arguments are nested under "tool_input". Run: uv run --python 3.11 python tests/validate_rst_hook.py
 """
 
 import json
