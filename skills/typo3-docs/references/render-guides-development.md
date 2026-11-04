@@ -117,3 +117,50 @@ commit `assets` and `resources/public` together with the source change. The
 check uses the Node version from that package's `.nvmrc`; a different local
 Node can produce a different byte stream, so confirm first that a no-op
 rebuild on `main` leaves the tree unchanged.
+
+## Updating Composer dependencies
+
+- **Raising the PHP floor** (`require.php` and `config.platform.php` in the
+  root `composer.json`) is a full `composer update`: the whole tree may resolve
+  differently once the platform changes.
+- **Upgrading one library** is a targeted update with its dependencies,
+  `composer update <vendor/pkg> [<vendor/pkg> …] -W`, so unrelated upgrades
+  stay out of the change.
+- **`composer update --lock` alone** only refreshes the lock file's content
+  hash; it updates no package, so it is not enough after changing the platform
+  or a constraint.
+- **A dependency bump can change fixture output.** A newer
+  `phpdocumentor/guides` changes rendered HTML (1.9.2 → 1.9.6 started wrapping
+  admonition bodies in `<p>`, rendered one-line `.. hint::` text and passed the
+  code-block language to the highlighter). Regenerate the expectations and
+  consider a separate pull request for the bump, so the fixture diff is not
+  mixed with your change.
+- **`composer.lock` conflicts on rebase.** During a rebase, `--ours` is the
+  branch you rebase onto and `--theirs` is your replayed commit. Take upstream's
+  lock (`git checkout --ours composer.lock`), re-run the same targeted
+  `composer update` your commit made, `git add composer.lock`, continue, and run
+  `composer install` before the tests — `vendor/` is stale after the rebase.
+- **PHP extensions per package.** Each sub-package declares the `ext-*` its
+  own source uses in its `composer.json` (at `a0e64940`: `typo3-docs-theme`
+  curl and dom; `typo3-guides-cli` dom, libxml and simplexml;
+  `typo3-version-handling` curl). Code that starts calling another extension's
+  functions adds the declaration to that package.
+
+## Contributing to TYPO3-Documentation repositories
+
+- **Commit messages** follow the How to Document rules
+  ([Commit messages](https://docs.typo3.org/permalink/h2document:commit-messages)),
+  which render-guides' `AGENTS.md` repeats: a `[TASK]` / `[BUGFIX]` /
+  `[FEATURE]` summary (render-guides adds `[DOCS]`), a body that explains why,
+  then `Assisted-by: <tool/model name> <contact>` when AI helped beyond a
+  spelling check, before the human's `Signed-off-by:`. `Co-authored-by:` is for
+  people (and dependabot), never for a model.
+- **No other agent trailers.** Session or host metadata trailers and a session
+  footer in the pull request body are not part of those rules; maintainers
+  squash-merge without them. Where a personal convention adds such trailers,
+  the repository rule wins: drop them here.
+- **Architecture decisions** of the organisation live in
+  `TYPO3-Documentation/.github` under `Documentation/Decisions/ADR-NNN-Name.rst`:
+  reStructuredText starting with `.. include:: /Includes.rst.txt`, sections
+  Status, Context, Decision, Alternatives Considered, Consequences. Contributors
+  without push access open the pull request from a fork.
