@@ -10,7 +10,8 @@ rather than taken from its documentation, which does not describe any of the
 parsing or fixture behaviour below. The one overlap is the committed stylesheet:
 `references/screenshots.md` already notes that it is a build artifact that must
 be rebuilt in the same commit — the section here adds what CI checks about it.
-The repository's own `AGENTS.md` covers its `make` targets, fixture recording
+render-guides' own `AGENTS.md` (in the root of
+`TYPO3-Documentation/render-guides`, not this skill's) covers its `make` targets, fixture recording
 and layout; read it first.
 
 ## Directive options do not arrive as you wrote them
@@ -137,8 +138,8 @@ rebuild on `main` leaves the tree unchanged.
   mixed with your change.
 - **`composer.lock` conflicts on rebase.** During a rebase, `--ours` is the
   branch you rebase onto and `--theirs` is your replayed commit. Take upstream's
-  lock (`git checkout --ours composer.lock`), re-run the same targeted
-  `composer update` your commit made, `git add composer.lock`, continue, and run
+  lock (`git checkout --ours composer.lock`), re-run the same
+  `composer update` command your commit made (full or targeted), `git add composer.lock`, continue, and run
   `composer install` before the tests — `vendor/` is stale after the rebase.
 - **PHP extensions per package.** Each sub-package declares the `ext-*` its
   own source uses in its `composer.json` (at `a0e64940`: `typo3-docs-theme`
