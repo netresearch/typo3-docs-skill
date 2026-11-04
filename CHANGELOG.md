@@ -9,6 +9,12 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- The plugin hook starts `scripts/validate_rst.py` as `uv run --offline "${CLAUDE_PLUGIN_ROOT}/scripts/validate_rst.py" || true`, on Python 3.11 or later instead of the first `python3` on `PATH`. `--offline` keeps uv from downloading anything within the hook's timeout, the quoted plugin root survives a path with a space, and `|| true` keeps the hook a non-blocking hint when uv or a matching Python is missing (#178)
+- `validate_rst.py` and `validate_headings.py` carry a PEP 723 block (`requires-python = ">=3.11"`, no dependencies) and the shebang `#!/usr/bin/env -S uv run --script`; `validate_docs.sh` runs the heading check through `uv run`. The `compatibility` field of `SKILL.md` names uv and the Python 3.11 floor (#178)
+- `validate_docs.sh` exits 3 with a message on stderr when uv is not on `PATH` or cannot provide Python 3.11 or later, instead of ending without a message; its header and `docs/SECURITY-ASSURANCE.md` document the exit codes 0, 1 and 3, the README the exit code 3 (#178)
+
 ## [v2.20.7](https://github.com/netresearch/typo3-docs-skill/releases/tag/v2.20.7) — 2026-10-23
 
 ### Fixed
