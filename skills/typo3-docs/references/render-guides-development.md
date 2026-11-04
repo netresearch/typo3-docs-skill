@@ -9,8 +9,9 @@ documentation with it. Everything here was measured against the repository
 rather than taken from its documentation, which does not describe any of the
 parsing or fixture behaviour below. The one overlap is the committed stylesheet:
 `references/screenshots.md` already notes that it is a build artifact that must
-be rebuilt in the same commit — the section here adds why CI will not catch a
-missed rebuild.
+be rebuilt in the same commit — the section here adds what CI checks about it.
+The repository's own `AGENTS.md` covers its `make` targets, fixture recording
+and layout; read it first.
 
 ## Directive options do not arrive as you wrote them
 
@@ -88,25 +89,31 @@ string.
 
 **The strong assertion is an absent `expected/logs/` directory.** Where a
 fixture ships no expected log, the runner asserts that no warning log was
-written — the only place in the suite a new warning cannot hide. Keep such a
-manual free of anything that fetches an interlink inventory over the network, or
-a transient failure fails the suite for an unrelated reason.
+written — the only place in the suite a new warning cannot hide. The suite
+does not use the network: answers from docs.typo3.org, api.typo3.org and
+Packagist come from recordings in `tests/Integration/http-fixtures/`, and an
+address without a recording is answered as not found. A fixture that adds an
+interlink, a PHP class or a Composer package needs its recordings (record with
+`RECORD_HTTP=1`, as render-guides' `AGENTS.md` describes); without them the
+lookup is answered as not found.
 
 **Regenerate expectations, do not hand-edit them.** Each fixture renders into
 its own `temp/`; splice the marker region from there into `expected/`. And when
 counting fixtures, exclude `temp/` — it is generated output that looks exactly
 like an expectation to a recursive grep.
 
-## The committed theme assets are not gated
+## The committed theme assets are gated by a byte comparison
 
-`packages/typo3-docs-theme/resources/public/css/theme.css` is committed, and
-**no CI job rebuilds it**: `.github/workflows/main.yaml` runs `npm ci` and
-`npm test` and nothing else. A SCSS change whose compiled asset is not rebuilt
-passes CI and ships nothing.
+`packages/typo3-docs-theme/resources/public/` (compiled `css/theme.css`,
+`js/theme.min.js`) is committed. `.github/workflows/check-built-assets.yaml`
+runs `npm ci --ignore-scripts && npm run build` in `packages/typo3-docs-theme`
+whenever a pull request, merge-queue entry or push to `main` touches that
+package, and fails when `assets/` or `resources/public/` then differ from the
+commit, or contain untracked files. A SCSS or JS change without its rebuilt
+output is therefore red, not silently shipped.
 
-Rebuild from `packages/typo3-docs-theme`. `npx grunt sass` regenerates the
-stylesheet alone; `npm run build` is `vite build && grunt build`, where the
-grunt default also runs `stylelint`, the JS pipeline and `removesourcemap` — use
-it when anything beyond the CSS is involved. Either way, confirm first that a
-no-op rebuild on `main` leaves the tree byte-identical, so your diff carries the
-one change and not the churn of a different toolchain version.
+Rebuild with `npm ci && npm run build` in `packages/typo3-docs-theme` and
+commit `assets` and `resources/public` together with the source change. The
+check uses the Node version from that package's `.nvmrc`; a different local
+Node can produce a different byte stream, so confirm first that a no-op
+rebuild on `main` leaves the tree unchanged.
