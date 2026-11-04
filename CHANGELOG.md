@@ -9,6 +9,8 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v2.20.8](https://github.com/netresearch/typo3-docs-skill/releases/tag/v2.20.8) — 2026-11-04
+
 ### Changed
 
 - The plugin hook starts `scripts/validate_rst.py` as `uv run --offline "${CLAUDE_PLUGIN_ROOT}/scripts/validate_rst.py" || true`, on Python 3.11 or later instead of the first `python3` on `PATH`. `--offline` keeps uv from downloading anything within the hook's timeout, the quoted plugin root survives a path with a space, and `|| true` keeps the hook a non-blocking hint when uv or a matching Python is missing (#178)
