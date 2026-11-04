@@ -107,8 +107,8 @@ like an expectation to a recursive grep.
 `packages/typo3-docs-theme/resources/public/` (compiled `css/theme.css`,
 `js/theme.min.js`) is committed. `.github/workflows/check-built-assets.yaml`
 runs `npm ci --ignore-scripts && npm run build` in `packages/typo3-docs-theme`
-whenever a pull request, merge-queue entry or push to `main` touches that
-package, and fails when `assets/` or `resources/public/` then differ from the
+whenever a pull request or merge-queue entry touches that package, and on
+every push to `main`, and fails when `assets/` or `resources/public/` then differ from the
 commit, or contain untracked files. A SCSS or JS change without its rebuilt
 output is therefore red, not silently shipped.
 
