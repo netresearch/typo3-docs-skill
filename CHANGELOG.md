@@ -9,6 +9,12 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- `references/render-guides-development.md` no longer says that no CI job rebuilds the committed theme assets: `check-built-assets.yaml` compares them byte for byte after `npm run build` on pull requests and merge-queue entries that touch the theme package and on every push to `main`. The integration suite answers from `tests/Integration/http-fixtures/` instead of the network (#184)
+- `references/screenshots.md` names `npm run build` / `npm run build:css` for the theme package instead of `npx grunt sass`; the package no longer has grunt (#184)
+- `references/render-guides-development.md` gains the sections *Updating Composer dependencies* (full versus targeted update, `--lock`, fixture churn from a `phpdocumentor/guides` bump, the `composer.lock` rebase conflict, per-package `ext-*` declarations) and *Contributing to TYPO3-Documentation repositories* (commit format with `Assisted-by` and `Signed-off-by`, no other agent trailers, ADRs in `TYPO3-Documentation/.github`); the `SKILL.md` description of the reference names them (#184)
+
 ## [v2.20.8](https://github.com/netresearch/typo3-docs-skill/releases/tag/v2.20.8) — 2026-11-04
 
 ### Changed
