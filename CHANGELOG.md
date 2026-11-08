@@ -9,6 +9,8 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v2.20.9](https://github.com/netresearch/typo3-docs-skill/releases/tag/v2.20.9) — 2026-11-08
+
 ### Changed
 
 - `references/render-guides-development.md` no longer says that no CI job rebuilds the committed theme assets: `check-built-assets.yaml` compares them byte for byte after `npm run build` on pull requests and merge-queue entries that touch the theme package and on every push to `main`. The integration suite answers from `tests/Integration/http-fixtures/` instead of the network (#184)
