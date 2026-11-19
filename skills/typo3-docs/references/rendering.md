@@ -316,13 +316,18 @@ main manual passed with the same warning. The sub-process was also stopped
 after 60 seconds. Since that change, the sub-process's exit code decides, the
 main render's fail level (`--fail-on-log`, `--fail-on-error` or `fail-on-log`
 in the main `guides.xml`) is passed to each translation, and there is no time
-limit. Check that the image you render with contains the change before you
+limit. The passed level overrides the translation's own: with `--fail-on-error`
+on the main render, a translation that sets `fail-on-log` fails on errors
+only. Check that the image you render with contains the change before you
 rely on it.
 
-When a docs.typo3.org deploy fails although every file was rendered, read the
-log for `Rendering failed` after a localization, then render that
-`Localization.xx_YY` directory locally and fix its warning or the setting in
-its `guides.xml` that causes it.
+When a docs.typo3.org deploy fails although every file was rendered, find the
+line `Trying to render Localization.xx_YY ...` and the `SUB-PROCESS:` line
+after it. The warnings that follow come from that translation. Do not search
+for `Rendering failed` alone: the sub-process prints it only when a fail option
+is set, so a failure caused by stderr output alone does not show it. Then render
+that `Localization.xx_YY` directory locally and fix its warning or the setting
+in its `guides.xml` that causes it.
 
 ### Claims This File Carried That Are False
 
