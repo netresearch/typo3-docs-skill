@@ -300,6 +300,30 @@ HTML of such a run, search `singlehtml/Index.html`.
 - Any warning about a missing `:alt:`. The only alt-text warning in the stack is Markdown-only, so a reStructuredText image without `:alt:` is silent.
 - Any warning about a code block without a language. Highlighting is simply off.
 
+### Translations (`Localization.*`) Render on Their Own
+
+Each `Documentation/Localization.xx_YY` directory is rendered in a separate
+sub-process, and that sub-process reads only the translation's own
+`guides.xml`. Settings in the main `guides.xml` do not reach it. A setting
+copied into the translation's `guides.xml`, such as `check-link-text="true"`,
+applies there, so a translation can warn where the main manual is silent.
+
+Until [render-guides#1608](https://github.com/TYPO3-Documentation/render-guides/pull/1608)
+(merged 2026-11-19), the result of a translation came from whether its
+sub-process wrote to stderr. Warnings go to stderr, so one warning in a
+translation failed the whole run, without `--fail-on-log` and although the
+main manual passed with the same warning. The sub-process was also stopped
+after 60 seconds. Since that change, the sub-process's exit code decides, the
+main render's fail level (`--fail-on-log`, `--fail-on-error` or `fail-on-log`
+in the main `guides.xml`) is passed to each translation, and there is no time
+limit. Check that the image you render with contains the change before you
+rely on it.
+
+When a docs.typo3.org deploy fails although every file was rendered, read the
+log for `Rendering failed` after a localization, then render that
+`Localization.xx_YY` directory locally and fix its warning or the setting in
+its `guides.xml` that causes it.
+
 ### Claims This File Carried That Are False
 
 Each was tested against the image named above and did not reproduce.
