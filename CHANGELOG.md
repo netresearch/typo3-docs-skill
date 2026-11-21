@@ -9,6 +9,8 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v2.20.10](https://github.com/netresearch/typo3-docs-skill/releases/tag/v2.20.10) — 2026-11-21
+
 ### Changed
 
 - `references/rendering.md` gains the section *Translations (`Localization.*`) Render on Their Own*: each translation renders in its own sub-process that reads only its own `guides.xml`. It records what render-guides#1608 changed (the exit code decides instead of stderr output, the main fail level is passed to each translation, no 60-second limit) and how to find the translation behind a docs.typo3.org deploy that fails although every file was rendered (#193)
