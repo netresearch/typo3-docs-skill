@@ -118,14 +118,15 @@ Use sufficient contrast to ensure annotations are visible:
 - For readers with color vision differences
 - Against varying background colors in the screenshot
 
-### Recommended Annotation Colors `[NR policy]`
+### Recommended Annotation Colors
 
-House palette — not a TYPO3 convention (the manual prescribes no annotation
-colors; `#FF8700` is the TYPO3 brand orange used by choice):
+The TYPO3 manual prescribes no annotation colors. Use the colors of the
+organisation's branding (a branding skill, style guide or design tokens the
+project provides) when one is available; otherwise use this neutral set:
 
 | Element | Color | Hex |
 |---------|-------|-----|
-| Highlight boxes | TYPO3 brand orange | `#FF8700` |
+| Highlight boxes | Red | `#D32F2F` |
 | Arrows/lines | Dark gray | `#333333` |
 | Numbers/labels | White on dark background | `#FFFFFF` on `#333333` |
 
